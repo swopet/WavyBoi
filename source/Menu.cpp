@@ -38,6 +38,9 @@ void Menu::initialize(MENU_TYPE new_type,sf::Font * new_font,sf::Vector2i new_po
 			menu_options.push_back((MenuOption){std::string("Open"),&AnimationManager::clickDisplayOpen,true});
 			menu_options.push_back((MenuOption){std::string("Close"),&AnimationManager::clickDisplayClose,false});
 		break;
+		case MENU_TYPE::NEW:
+			name = "New";
+		break;
 	}
 	font = new_font;
 	height = new_height;

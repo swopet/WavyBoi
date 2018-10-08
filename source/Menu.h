@@ -15,6 +15,7 @@ struct MenuOption {
 enum class MENU_TYPE {
 	FILE,
 	EDIT,
+	NEW,
 	DISPLAY
 };
 

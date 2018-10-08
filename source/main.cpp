@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <sfeMovie/Movie.hpp>
 #include "AnimationManager.h"
 #include "ControlWindow.h"
 #include "DisplayWindow.h"
