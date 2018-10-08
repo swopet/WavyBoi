@@ -13,6 +13,7 @@ rendering. */
 
 struct AnimationManagerState {
 	bool edited;
+	bool display_open = false;
 	std::string project_name;
 	std::string project_path;
 	sf::Vector2u out_res;
@@ -23,9 +24,12 @@ private:
 	AnimationManagerState state;
 public:
 	AnimationManager();
-	std::string get_name();
-	bool is_edited();
-	bool verify_close();
+	std::string getName();
+	bool isEdited();
+	bool isDisplayOpen();
+	bool verifyClose();
+	void clickDisplayOpen();
+	void clickDisplayClose();
 	void clickFileNew();
 	void clickFileOpen();
 	void clickFileSave();

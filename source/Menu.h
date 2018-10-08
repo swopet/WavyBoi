@@ -9,11 +9,13 @@
 struct MenuOption {
 	std::string name;
 	void (AnimationManager::*clickFunc)();
+	bool enabled;
 };
 
 enum class MENU_TYPE {
 	FILE,
-	EDIT
+	EDIT,
+	DISPLAY
 };
 
 class Menu{
@@ -30,6 +32,9 @@ private:
 	std::vector<MenuOption> menu_options;
 public:
 	Menu();
+	MENU_TYPE getType();
+	void toggleOption(int);
+	bool getOptionEnabled(int);
 	void initialize(MENU_TYPE,sf::Font *,sf::Vector2i,unsigned int);
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	void update(sf::Vector2i);

@@ -7,15 +7,19 @@ AnimationManager::AnimationManager(){
 	state.out_res = sf::Vector2u(600,400);
 }
 
-std::string AnimationManager::get_name(){
+std::string AnimationManager::getName(){
 	return state.project_name;
 }
 
-bool AnimationManager::is_edited(){
+bool AnimationManager::isEdited(){
 	return state.edited;
 }
 
-bool AnimationManager::verify_close(){
+bool AnimationManager::isDisplayOpen(){
+	return state.display_open;
+}
+
+bool AnimationManager::verifyClose(){
 	if (state.edited){
 		//TODO: add warning about closing without saving project
 		return true;
@@ -23,6 +27,16 @@ bool AnimationManager::verify_close(){
 	else {
 		return true;
 	}
+}
+
+void AnimationManager::clickDisplayOpen(){
+	std::cout << "Clicked Display -> Open" << std::endl;
+	state.display_open = true;
+}
+
+void AnimationManager::clickDisplayClose(){
+	std::cout << "Clicked Display -> Close" << std::endl;
+	state.display_open = false;
 }
 
 //TODO

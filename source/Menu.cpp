@@ -4,22 +4,39 @@ Menu::Menu(){
 	
 }
 
+MENU_TYPE Menu::getType(){
+	return type;
+}
+
+void Menu::toggleOption(int pos){
+	menu_options.at(pos).enabled = !menu_options.at(pos).enabled;
+}
+
+bool Menu::getOptionEnabled(int pos){
+	return menu_options.at(pos).enabled;
+}
+
 void Menu::initialize(MENU_TYPE new_type,sf::Font * new_font,sf::Vector2i new_pos,unsigned int new_height){
 	type = new_type;
 	switch(type){
 		case MENU_TYPE::FILE:
 			name = "File";
-			menu_options.push_back((MenuOption){std::string("New"),&AnimationManager::clickFileNew});
-			menu_options.push_back((MenuOption){std::string("Open"),&AnimationManager::clickFileOpen});
-			menu_options.push_back((MenuOption){std::string("Save"),&AnimationManager::clickFileSave});
-			menu_options.push_back((MenuOption){std::string("Save As"),&AnimationManager::clickFileSaveAs});
+			menu_options.push_back((MenuOption){std::string("New"),&AnimationManager::clickFileNew,true});
+			menu_options.push_back((MenuOption){std::string("Open"),&AnimationManager::clickFileOpen,true});
+			menu_options.push_back((MenuOption){std::string("Save"),&AnimationManager::clickFileSave,true});
+			menu_options.push_back((MenuOption){std::string("Save As"),&AnimationManager::clickFileSaveAs,true});
 		break;
 		case MENU_TYPE::EDIT:
 			name = "Edit";
-			menu_options.push_back((MenuOption){std::string("Cut"),&AnimationManager::clickEditCut});
-			menu_options.push_back((MenuOption){std::string("Copy"),&AnimationManager::clickEditCopy});
-			menu_options.push_back((MenuOption){std::string("Paste"),&AnimationManager::clickEditPaste});
-			menu_options.push_back((MenuOption){std::string("Delete"),&AnimationManager::clickEditDelete});
+			menu_options.push_back((MenuOption){std::string("Cut"),&AnimationManager::clickEditCut,true});
+			menu_options.push_back((MenuOption){std::string("Copy"),&AnimationManager::clickEditCopy,true});
+			menu_options.push_back((MenuOption){std::string("Paste"),&AnimationManager::clickEditPaste,true});
+			menu_options.push_back((MenuOption){std::string("Delete"),&AnimationManager::clickEditDelete,true});
+		break;
+		case MENU_TYPE::DISPLAY:
+			name = "Display";
+			menu_options.push_back((MenuOption){std::string("Open"),&AnimationManager::clickDisplayOpen,true});
+			menu_options.push_back((MenuOption){std::string("Close"),&AnimationManager::clickDisplayClose,false});
 		break;
 	}
 	font = new_font;
@@ -54,7 +71,7 @@ void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 			temp_text.setColor(sf::Color::White);
 			sf::RectangleShape temp_rect(sf::Vector2f(menu_options_width,height+MENU_BORDER_THICKNESS*4));
 			temp_rect.setPosition(temp_pos.x,temp_pos.y);
-			temp_rect.setFillColor(sf::Color(127,127,127));
+			(*it).enabled ? temp_rect.setFillColor(sf::Color(127,127,127)) : temp_rect.setFillColor(sf::Color(95,95,95));
 			temp_rect.setOutlineThickness(-MENU_BORDER_THICKNESS);
 			temp_rect.setOutlineColor(sf::Color(63,63,63));
 			target.draw(temp_rect);
@@ -93,6 +110,10 @@ bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation
 		if (is_open){
 			int ctr = 1;
 			for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
+				if (!(*it).enabled){
+					ctr++;
+					continue;
+				}
 				if (mouse_pos.x >= pos.x
 				    && mouse_pos.y >= pos.y + ctr * (height+MENU_BORDER_THICKNESS*4)
 					&& mouse_pos.x < pos.x + menu_options_width

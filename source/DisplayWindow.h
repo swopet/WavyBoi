@@ -12,5 +12,6 @@ public:
 	DisplayWindow();
 	DisplayWindow(AnimationManager *);
 	bool update(AnimationManager *);
+	void open(AnimationManager *);
 	void close();
 };

@@ -3,20 +3,23 @@
 
 
 ControlWindow::ControlWindow(AnimationManager * animation_manager){
-	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->get_name());
+	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->getName());
 	state.window_size = sf::Vector2u(1600,900);
 	state.menu_height = 24;
 	font = NULL;
 	loadFont("resources/fonts/Montserrat-Medium.otf");
 	sf::Vector2i pos(0,0);
 	Menu * file_menu = new Menu();
-	file_menu->initialize(MENU_TYPE::FILE,font,pos,state.menu_height-4);
+	file_menu->initialize(MENU_TYPE::FILE,font,pos,state.menu_height);
 	menu_tabs.push_back(file_menu);
 	pos = pos + sf::Vector2i(file_menu->get_width(),0);
-	std::cout << pos.x << std::endl;
 	Menu * edit_menu = new Menu();
-	edit_menu->initialize(MENU_TYPE::EDIT,font,pos,state.menu_height-4);
+	edit_menu->initialize(MENU_TYPE::EDIT,font,pos,state.menu_height);
 	menu_tabs.push_back(edit_menu);
+	pos = pos + sf::Vector2i(edit_menu->get_width(),0);
+	Menu * display_menu = new Menu();
+	display_menu->initialize(MENU_TYPE::DISPLAY,font,pos,state.menu_height);
+	menu_tabs.push_back(display_menu);
 }
 
 ControlWindow::ControlWindow(){
@@ -24,8 +27,6 @@ ControlWindow::ControlWindow(){
 }
 
 bool ControlWindow::update(AnimationManager * animation_manager){
-	sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
 	sf::Event event;
 	processLeftClickHeld(animation_manager);
 	while (window->pollEvent(event))
@@ -56,18 +57,27 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 			}
 		}
 	}
-	sf::Text file_menu("File",*font,state.menu_height-4);
-	file_menu.setColor(sf::Color::White);
-	file_menu.setPosition(10, 0);
-	window->clear();
 	for (std::vector<Menu *>::iterator it = menu_tabs.begin(); it != menu_tabs.end(); ++it){
+		if ((*it)->getType() == MENU_TYPE::DISPLAY){
+			if (animation_manager->isDisplayOpen()){
+				if ((*it)->getOptionEnabled(0)){
+					(*it)->toggleOption(0);
+					(*it)->toggleOption(1);
+				}
+			}
+			else {
+				if ((*it)->getOptionEnabled(1)){
+					(*it)->toggleOption(0);
+					(*it)->toggleOption(1);
+				}
+			}
+		}
 		(*it)->update(sf::Mouse::getPosition(*window));
 	}
+	window->clear();
 	drawTopMenu(animation_manager);
-    //window->draw(shape);
-	//window->draw(file_menu);
     window->display();
-	window->setTitle("WavyBoi - " + animation_manager->get_name() + (animation_manager->is_edited() ? "*" : ""));
+	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;
 }
 
