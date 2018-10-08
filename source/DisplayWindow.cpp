@@ -27,8 +27,16 @@ bool DisplayWindow::update(AnimationManager * animation_manager){
 }
 
 void DisplayWindow::open(AnimationManager * animation_manager){
-	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->getName());
-	window->setPosition(sf::Vector2i(0,0));
+	std::vector<sf::VideoMode> modes = sf::VideoMode::getFullscreenModes();
+	for (std::size_t i = 0; i < modes.size(); ++i)
+	{
+		sf::VideoMode mode = modes[i];
+		std::cout << "Mode #" << i << ": "
+				  << mode.width << "x" << mode.height << " - "
+				  << mode.bitsPerPixel << " bpp" << std::endl;
+	}
+	window = new sf::RenderWindow(sf::VideoMode(1920,1080), "WavyBoi - " + animation_manager->getName(), sf::Style::None);
+	window->setPosition(sf::Vector2i(1680,0));
 }
 
 void DisplayWindow::close(){

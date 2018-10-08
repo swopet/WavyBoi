@@ -4,6 +4,7 @@ the second monitor/projector or whatever. */
 
 #include <SFML/Graphics.hpp>
 #include "AnimationManager.h"
+#include <vector>
 
 class DisplayWindow {
 private:
