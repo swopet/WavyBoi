@@ -76,6 +76,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	}
 	window->clear();
 	drawTopMenu(animation_manager);
+	drawObjects(animation_manager);
     window->display();
 	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;
@@ -83,6 +84,13 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 
 void ControlWindow::drawTopMenu(AnimationManager * animation_manager){
 	for (std::vector<Menu *>::iterator it = menu_tabs.begin(); it != menu_tabs.end(); ++it){
+		(*it)->draw(*window,sf::RenderStates());
+	}
+}
+
+void ControlWindow::drawObjects(AnimationManager * animation_manager){
+	std::vector<Object *> objects = animation_manager->getObjects();
+	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it){
 		(*it)->draw(*window,sf::RenderStates());
 	}
 }
@@ -104,10 +112,31 @@ bool ControlWindow::loadFont(std::string font_name){
 void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * animation_manager){
 	bool processed = false;
 	std::cout << "Mouse left clicked at " << mouse_pos.x << "," << mouse_pos.y << std::endl;
+	//check if clicked on menu tabs first
 	if (!processed){
 		for (std::vector<Menu *>::iterator it = menu_tabs.begin(); it != menu_tabs.end(); ++it){
 			processed = (*it)->processLeftClick(mouse_pos,animation_manager);
 			if (processed) break;
+		}
+	}
+	//check if clicked on an object
+	if (!processed){
+		std::vector<Object *> objects = animation_manager->getObjects();
+		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it){
+			ClickResponse response = (*it)->processLeftClick(mouse_pos);
+			processed = response.clicked;
+			if (processed){
+				switch(response.type){
+					case CLICK_RESPONSE::SELECTED:
+						state.selected.push_back(*it);
+						std::cout << "selected " << (*it)->getName();
+						//add the object to the selected stack in control_window
+						break;
+					default:
+						break;
+				}
+				break;
+			}
 		}
 	}
 	state.left_mouse_held = true;
@@ -116,8 +145,15 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 	if (!state.left_mouse_held) return;
 	sf::Vector2i mouse_pos = sf::Mouse::getPosition(*window);
+	sf::Vector2i diff = mouse_pos - state.last_mouse_pos;
 	state.last_mouse_pos = mouse_pos;
+	for (std::vector<Object *>::iterator it = state.selected.begin(); it != state.selected.end(); ++it){
+		(*it)->move(sf::Vector2f(diff));
+	}
 }
 void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos,AnimationManager * animation_manager){
+	while (state.selected.size() > 0){
+		state.selected.pop_back();
+	}
 	state.left_mouse_held = false;
 }

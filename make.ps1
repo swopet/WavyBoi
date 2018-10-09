@@ -9,7 +9,7 @@ $WB_INCLUDE=".\source"
 mkdir .\tmp
 $output_files = ""
 foreach ($source_file in get-childitem .\source *.cpp -recurse) {
-  & gcc ("-O0 -g3 -Wall -c -fmessage-length=0 -I" + $SFML_INCLUDE + " -I" + $SFE_INCLUDE + " -I" + $WB_INCLUDE + " -o .\tmp\" + $source_file.basename + ".o .\source\" + $source_file.basename + ".cpp -w").Split(" ")
+  & gcc ("-O0 -g3 -Wall -c -fmessage-length=0 -I" + $SFML_INCLUDE + " -I" + $SFE_INCLUDE + " -I" + $WB_INCLUDE + " -o .\tmp\" + $source_file.basename + ".o " + $source_file.fullname + " -w").Split(" ")
   if ($source_file.basename -eq "main"){
 	$output_files = ".\tmp\main.o " + $output_files
   } Else {

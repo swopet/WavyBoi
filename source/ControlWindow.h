@@ -11,6 +11,7 @@ struct ControlWindowState {
 	unsigned int menu_height;
 	bool left_mouse_held = false;
 	sf::Vector2i last_mouse_pos;
+	std::vector<Object *> selected;
 };
 
 class ControlWindow {
@@ -24,6 +25,7 @@ public:
 	ControlWindow(AnimationManager *);
 	bool update(AnimationManager *);
 	void drawTopMenu(AnimationManager *);
+	void drawObjects(AnimationManager *);
 	void close();
 	bool loadFont(std::string);
 	void processLeftClick(sf::Vector2i,AnimationManager *);

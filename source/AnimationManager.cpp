@@ -5,10 +5,17 @@ AnimationManager::AnimationManager(){
 	state.project_name = "untitled";
 	state.project_path = "";
 	state.out_res = sf::Vector2u(600,400);
+	
+	Video * new_video = new Video();
+	objects.push_back(new_video);
 }
 
 std::string AnimationManager::getName(){
 	return state.project_name;
+}
+
+std::vector<Object *> AnimationManager::getObjects(){
+	return objects;
 }
 
 bool AnimationManager::isEdited(){

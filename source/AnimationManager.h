@@ -7,6 +7,9 @@ rendering. */
 #include <string>
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "Object/Object.h"
+#include "Object/Video.h"
+#include "Common.h"
  
 #define WAVYBOITMP "C:\Users\Trevor\Documents\WavyBoi\tmp"
 
@@ -22,9 +25,11 @@ struct AnimationManagerState {
 class AnimationManager {
 private:
 	AnimationManagerState state;
+	std::vector<Object *> objects;
 public:
 	AnimationManager();
 	std::string getName();
+	std::vector<Object *> getObjects();
 	bool isEdited();
 	bool isDisplayOpen();
 	bool verifyClose();
