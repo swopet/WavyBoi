@@ -1,4 +1,2 @@
 *.dll
-*.bat
-*.ps1
-release/*
+release/*.exe
