@@ -10,10 +10,8 @@ rendering. */
 #include <SFML/Graphics.hpp>
 #include <Object/Object.h>
 #include <Object/Video.h>
+#include <Object/Link.h>
 #include <Common.h>
- 
-#define WAVYBOITMP "C:\Users\Trevor\Documents\WavyBoi\tmp"
-
 
 struct AnimationManagerState {
 	bool edited;
@@ -23,10 +21,17 @@ struct AnimationManagerState {
 	sf::Vector2u out_res;
 };
 
+struct ObjectNode {
+	std::vector<Link *> inputs;
+	Object * obj;
+	std::vector<Link *> outputs;
+};
+
 class AnimationManager {
 private:
 	AnimationManagerState state;
 	std::vector<Object *> objects;
+	ObjectNode channels[4];
 public:
 	AnimationManager();
 	std::string getName();
@@ -34,6 +39,7 @@ public:
 	bool isEdited();
 	bool isDisplayOpen();
 	bool verifyClose();
+	ObjectNode * getChannels();
 	void update();
 	void clickDisplayOpen();
 	void clickDisplayClose();

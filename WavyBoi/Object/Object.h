@@ -23,6 +23,11 @@ public:
 	std::string getName();
 	void setVisible(bool);
 	void move(sf::Vector2f);
+	virtual Parameter * getNewParameter() {
+		param new_param;
+		new_param.int_val = 0;
+		return new Parameter(PARAM_TYPE::INT, new_param, name);
+	}
 	virtual param getVal() {
 		param return_param;
 		return_param.int_val = 0;

@@ -19,8 +19,14 @@ typedef union {
 
 class Parameter{
 private:
+	PARAM_TYPE type;
 	param value;
 	std::string name;
 public:
+	PARAM_TYPE getType();
+	param getValue();
+	std::string getName();
+	void setValue(param);
+	Parameter(PARAM_TYPE, param, std::string);
 	Parameter();
 };

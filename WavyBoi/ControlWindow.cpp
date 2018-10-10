@@ -76,6 +76,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 		(*it)->update(sf::Mouse::getPosition(*window));
 	}
 	animation_manager->update();
+	window->setActive(true);
 	window->clear();
 	drawTopMenu(animation_manager);
 	drawObjects(animation_manager);

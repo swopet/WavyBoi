@@ -9,6 +9,7 @@ AnimationManager::AnimationManager(){
 	
 	Video * new_video = new Video();
 	objects.push_back(new_video);
+	channels[0].inputs.push_back(new Link(new_video, NULL, new_video->getNewParameter()));
 }
 
 std::string AnimationManager::getName(){
@@ -37,9 +38,19 @@ bool AnimationManager::verifyClose(){
 	}
 }
 
+ObjectNode * AnimationManager::getChannels()
+{
+	return channels;
+}
+
 void AnimationManager::update() {
 	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
 		(*it)->update();
+	}
+	for (int i = 0; i < 4; i++) {
+		for (std::vector<Link *>::iterator it = channels[i].inputs.begin(); it != channels[i].inputs.end(); ++it) {
+			(*it)->update();
+		}
 	}
 }
 

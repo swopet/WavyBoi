@@ -17,6 +17,7 @@ private:
 public:
 	Video();
 	param getVal();
+	Parameter * getNewParameter();
 	void update();
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	void loadFromFile(std::string);

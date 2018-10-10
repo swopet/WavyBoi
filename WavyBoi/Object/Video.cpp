@@ -70,6 +70,11 @@ param Video::getVal() {
 	return return_param;
 }
 
+Parameter * Video::getNewParameter()
+{
+	return new Parameter(PARAM_TYPE::TEXTURE, getVal(), name);
+}
+
 ClickResponse Video::processLeftClick(sf::Vector2i mouse_pos){
 	ClickResponse response;
 	response.clicked = false;
