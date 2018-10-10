@@ -59,6 +59,17 @@ void Video::loadFromFile(std::string file_name){ //load from full path
 	}
 }
 
+param Video::getVal() {
+	param return_param;
+	if (movie != NULL) {
+		return_param.texture = &movie->getCurrentImage();
+	}
+	else {
+		return_param.texture = NULL;
+	}
+	return return_param;
+}
+
 ClickResponse Video::processLeftClick(sf::Vector2i mouse_pos){
 	ClickResponse response;
 	response.clicked = false;

@@ -2,6 +2,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include <Common.h>
+#include <Object/Parameter.h>
 
 enum class OBJECT_TYPE {
 	VIDEO,
@@ -22,6 +23,11 @@ public:
 	std::string getName();
 	void setVisible(bool);
 	void move(sf::Vector2f);
+	virtual param getVal() {
+		param return_param;
+		return_param.int_val = 0;
+		return return_param;
+	}
 	virtual void update() {}
 	virtual ~Object() {}
 	virtual void draw(sf::RenderTarget&, sf::RenderStates) {}
