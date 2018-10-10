@@ -34,6 +34,7 @@ public:
 	bool isEdited();
 	bool isDisplayOpen();
 	bool verifyClose();
+	void update();
 	void clickDisplayOpen();
 	void clickDisplayClose();
 	void clickFileNew();

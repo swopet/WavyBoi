@@ -15,6 +15,7 @@ private:
 	sfe::Movie * movie;
 public:
 	Video();
+	void update();
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	void loadFromFile(std::string);
 	ClickResponse processLeftClick(sf::Vector2i);

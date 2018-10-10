@@ -22,7 +22,8 @@ public:
 	std::string getName();
 	void setVisible(bool);
 	void move(sf::Vector2f);
-	virtual ~Object() {};
+	virtual void update() {}
+	virtual ~Object() {}
 	virtual void draw(sf::RenderTarget&, sf::RenderStates) {}
 	virtual ClickResponse processLeftClick(sf::Vector2i vec) {
 		ClickResponse response;

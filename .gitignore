@@ -3,3 +3,6 @@ Release/*
 Debug/*
 *.mp4
 .vs/
+*.obj
+*.log
+*.tlog

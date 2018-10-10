@@ -37,6 +37,12 @@ bool AnimationManager::verifyClose(){
 	}
 }
 
+void AnimationManager::update() {
+	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
+		(*it)->update();
+	}
+}
+
 void AnimationManager::clickDisplayOpen(){
 	std::cout << "Clicked Display -> Open" << std::endl;
 	state.display_open = true;
