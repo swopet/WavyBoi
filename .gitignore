@@ -1,2 +1,5 @@
 *.dll
-release/*.exe
+Release/*
+Debug/*
+*.mp4
+.vs/
