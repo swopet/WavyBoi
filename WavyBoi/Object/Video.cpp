@@ -10,6 +10,7 @@ Video::Video(){
 	init();
 }
 
+
 void Video::update() {
 	if (movie != NULL) {
 		movie->update();
@@ -36,8 +37,10 @@ void Video::init(){
 void Video::draw(sf::RenderTarget& target, sf::RenderStates states){
 	main_box.setPosition(center - size/2.0f);
 	video_box.setPosition(center - video_box.getSize()/2.0f);
-	left_circle.setPosition(center - sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0) - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
-	right_circle.setPosition(center + sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0) - sf::Vector2f(right_circle.getRadius(), right_circle.getRadius()));
+	left_pos = center - sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
+	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
+	right_pos = center + sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
+	right_circle.setPosition(right_pos - sf::Vector2f(right_circle.getRadius(), right_circle.getRadius()));
 	target.draw(main_box);
 	target.draw(video_box);
 	target.draw(left_circle);
@@ -84,11 +87,34 @@ Parameter * Video::getNewParameter()
 	return new Parameter(PARAM_TYPE::TEXTURE, getVal(), name);
 }
 
+sf::Vector2f Video::getLeftPos()
+{
+	return left_pos;
+}
+
+sf::Vector2f Video::getRightPos()
+{
+	return right_pos;
+}
+
+bool Video::checkOverlap(sf::RectangleShape select_box)
+{
+	return checkIntersection(select_box, main_box);
+}
+
 ClickResponse Video::processLeftClick(sf::Vector2i mouse_pos){
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	if (mouse_pos.x >= center.x - size.x/2.0f &&
+	if (length(sf::Vector2f(mouse_pos) - left_pos) <= left_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_LEFT;
+	}
+	else if (length(sf::Vector2f(mouse_pos) - right_pos) <= right_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_RIGHT;
+	}
+	else if (mouse_pos.x >= center.x - size.x/2.0f &&
 		mouse_pos.y >= center.y - size.y/2.0f &&
 		mouse_pos.x < center.x + size.x/2.0f &&
 		mouse_pos.y < center.y + size.y/2.0f){
@@ -97,6 +123,56 @@ ClickResponse Video::processLeftClick(sf::Vector2i mouse_pos){
 	}
 	else {
 		
+	}
+	return response;
+}
+
+ClickResponse Video::processLeftClickHeld(sf::Vector2i mouse_pos) {
+	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
+	if (length(sf::Vector2f(mouse_pos) - left_pos) <= left_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_LEFT;
+	}
+	else if (length(sf::Vector2f(mouse_pos) - right_pos) <= right_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_RIGHT;
+	}
+	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
+		mouse_pos.y >= center.y - size.y / 2.0f &&
+		mouse_pos.x < center.x + size.x / 2.0f &&
+		mouse_pos.y < center.y + size.y / 2.0f) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::SELECTED;
+	}
+	else {
+
+	}
+	return response;
+}
+
+ClickResponse Video::processLeftClickRelease(sf::Vector2i mouse_pos) {
+	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
+	if (length(sf::Vector2f(mouse_pos) - left_pos) <= left_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_LEFT;
+	}
+	else if (length(sf::Vector2f(mouse_pos) - right_pos) <= right_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_RIGHT;
+	}
+	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
+		mouse_pos.y >= center.y - size.y / 2.0f &&
+		mouse_pos.x < center.x + size.x / 2.0f &&
+		mouse_pos.y < center.y + size.y / 2.0f) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::SELECTED;
+	}
+	else {
+
 	}
 	return response;
 }

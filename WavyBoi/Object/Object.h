@@ -12,6 +12,7 @@ enum class OBJECT_TYPE {
 	NONE
 };
 
+
 class Object {
 private:
 protected:
@@ -22,6 +23,9 @@ protected:
 public:
 	std::string getName();
 	void setVisible(bool);
+	virtual bool checkOverlap(sf::RectangleShape);
+	virtual sf::Vector2f getLeftPos();
+	virtual sf::Vector2f getRightPos();
 	virtual void move(sf::Vector2f);
 	virtual Parameter * getNewParameter() {
 		param new_param;
@@ -41,5 +45,17 @@ public:
 		response.clicked = false;
 		response.type = CLICK_RESPONSE::NONE;
 		return response; 
+	}
+	virtual ClickResponse processLeftClickHeld(sf::Vector2i vec) {
+		ClickResponse response;
+		response.clicked = false;
+		response.type = CLICK_RESPONSE::NONE;
+		return response;
+	}
+	virtual ClickResponse processLeftClickRelease(sf::Vector2i vec) {
+		ClickResponse response;
+		response.clicked = false;
+		response.type = CLICK_RESPONSE::NONE;
+		return response;
 	}
 };

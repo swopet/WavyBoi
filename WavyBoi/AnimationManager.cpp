@@ -6,9 +6,10 @@ AnimationManager::AnimationManager(){
 	state.project_name = "untitled";
 	state.project_path = "";
 	state.out_res = sf::Vector2u(600,400);
-	
 	Video * new_video = new Video();
+	Video * new_video_2 = new Video();
 	objects.push_back(new_video);
+	objects.push_back(new_video_2);
 	channels[0].inputs.push_back(new Link(new_video, NULL, new_video->getNewParameter()));
 }
 
@@ -18,6 +19,17 @@ std::string AnimationManager::getName(){
 
 std::vector<Object *> AnimationManager::getObjects(){
 	return objects;
+}
+
+std::vector<Link*> AnimationManager::getLinks()
+{
+	return links;
+}
+
+void AnimationManager::addLink(Link * new_link)
+{
+	//TODO: check for loops!!
+	links.push_back(new_link);
 }
 
 bool AnimationManager::isEdited(){
@@ -58,6 +70,9 @@ void AnimationManager::updateFPS(sf::Time frame_time)
 
 void AnimationManager::update() {
 	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
+		(*it)->update();
+	}
+	for (std::vector<Link *>::iterator it = links.begin(); it != links.end(); ++it) {
 		(*it)->update();
 	}
 	for (int i = 0; i < 4; i++) {

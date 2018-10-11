@@ -32,11 +32,14 @@ class AnimationManager {
 private:
 	AnimationManagerState state;
 	std::vector<Object *> objects;
+	std::vector<Link *> links;
 	ObjectNode channels[4];
 public:
 	AnimationManager();
 	std::string getName();
 	std::vector<Object *> getObjects();
+	std::vector<Link *> getLinks();
+	void addLink(Link *);
 	bool isEdited();
 	bool isDisplayOpen();
 	bool verifyClose();

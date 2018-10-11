@@ -92,6 +92,9 @@
     <ClCompile Include="Object\VideoLoop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\SFML-2.5.0-windows-vc15-32-bit\SFML-2.5.0\bin\openal32.dll" />

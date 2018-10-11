@@ -79,9 +79,16 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	animation_manager->update();
 	window->setActive(true);
 	window->clear();
+	drawLinks(animation_manager);
 	drawTopMenu(animation_manager);
 	drawObjects(animation_manager);
 	drawFPS(animation_manager);
+	if (state.selecting || state.selected) {
+		drawSelectBox();
+	}
+	if (state.linking) {
+		drawNewLink();
+	}
     window->display();
 	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;
@@ -100,6 +107,15 @@ void ControlWindow::drawObjects(AnimationManager * animation_manager){
 	}
 }
 
+void ControlWindow::drawSelectBox() {
+	sf::RectangleShape box(sf::Vector2f(state.select_end_pos - state.select_start_pos));
+	box.setPosition(sf::Vector2f(state.select_start_pos));
+	box.setOutlineColor(state.selecting ? sf::Color(0, 0, 64, 192) : sf::Color(0, 0, 64, 128) );
+	box.setOutlineThickness(2.0f);
+	box.setFillColor(state.selecting ? sf::Color(0, 0, 192, 192) : sf::Color(0, 0, 192, 128));
+	window->draw(box);
+}
+
 void ControlWindow::drawFPS(AnimationManager * animation_manager) {
 	if ((state.clock.getElapsedTime() - state.last_fps_draw).asMilliseconds() > TIME_PER_FPS_UPDATE_MS) {
 		state.last_fps_draw = state.clock.getElapsedTime();
@@ -110,6 +126,17 @@ void ControlWindow::drawFPS(AnimationManager * animation_manager) {
 	fps_text.setFillColor(sf::Color::Cyan);
 	fps_text.setPosition(sf::Vector2f(window->getSize().x - width, 0));
 	window->draw(fps_text);
+}
+
+void ControlWindow::drawLinks(AnimationManager * animation_manager) {
+	std::vector<Link *> links = animation_manager->getLinks();
+	for (std::vector<Link *>::iterator it = links.begin(); it != links.end(); ++it) {
+		(*it)->draw(*window, sf::RenderStates());
+	}
+}
+
+void ControlWindow::drawNewLink() {
+	state.new_link->draw(*window, sf::RenderStates());
 }
 
 void ControlWindow::close(){
@@ -137,6 +164,25 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 			if (processed) break;
 		}
 	}
+	//check if clicked on selected box
+	if (state.selected) {
+		sf::RectangleShape select_box(sf::Vector2f(state.select_end_pos - state.select_start_pos));
+		select_box.setSize(sf::Vector2f(state.select_end_pos - state.select_start_pos));
+		select_box.setPosition(sf::Vector2f(state.select_start_pos));
+		sf::RectangleShape mouse_box(sf::Vector2f(0, 0));
+		mouse_box.setPosition(sf::Vector2f(mouse_pos));
+		//if the click is within the boundaries, start moving, otherwise turn off the selection
+		if (checkIntersection(mouse_box, select_box)) {
+			state.moving = true;
+			std::cout << "clicked on selected box" << std::endl;
+			processed = true;
+		}
+		else {
+			state.selected = false;
+			state.selected_objects.clear();
+			std::cout << "clicked out of selected box" << std::endl;
+		}
+	}
 	//check if clicked on an object
 	if (!processed){
 		std::vector<Object *> objects = animation_manager->getObjects();
@@ -146,8 +192,17 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 			if (processed){
 				switch(response.type){
 					case CLICK_RESPONSE::SELECTED:
-						state.selected.push_back(*it);
-						//add the object to the selected stack in control_window
+						state.selected_objects.push_back(*it);
+						state.moving = true;
+						//add the object to the selected_objects stack in control_window
+						break;
+					case CLICK_RESPONSE::GOT_LEFT:
+						std::cout << "got left side of " << (*it)->getName() << std::endl;
+						break;
+					case CLICK_RESPONSE::GOT_RIGHT:
+						std::cout << "got right side of " << (*it)->getName() << std::endl;
+						state.new_link = new Link((*it), NULL, (*it)->getNewParameter());
+						state.linking = true;
 						break;
 					default:
 						break;
@@ -155,6 +210,10 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 				break;
 			}
 		}
+	}
+	if (!processed) {
+		state.selecting = true;
+		state.select_start_pos = mouse_pos;
 	}
 	state.left_mouse_held = true;
 	state.last_mouse_pos = mouse_pos;
@@ -164,13 +223,58 @@ void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 	sf::Vector2i mouse_pos = sf::Mouse::getPosition(*window);
 	sf::Vector2i diff = mouse_pos - state.last_mouse_pos;
 	state.last_mouse_pos = mouse_pos;
-	for (std::vector<Object *>::iterator it = state.selected.begin(); it != state.selected.end(); ++it){
-		(*it)->move(sf::Vector2f(diff));
+	if (state.moving) {
+		for (std::vector<Object *>::iterator it = state.selected_objects.begin(); it != state.selected_objects.end(); ++it) {
+			(*it)->move(sf::Vector2f(diff));
+		}
+		state.select_start_pos += diff;
+		state.select_end_pos += diff;
+	}
+	else if (state.linking) {
+		state.new_link->setOutPos(sf::Vector2f(mouse_pos));
+	}
+	else if (state.selecting) {
+		std::vector<Object *> objects = animation_manager->getObjects();
+		state.selected_objects.clear();
+		sf::RectangleShape select_box(sf::Vector2f(state.select_end_pos - state.select_start_pos));
+		select_box.setSize(sf::Vector2f(state.select_end_pos - state.select_start_pos));
+		select_box.setPosition(sf::Vector2f(state.select_start_pos));
+		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
+			if ((*it)->checkOverlap(select_box)) state.selected_objects.push_back(*it);
+		}
+		state.select_end_pos = mouse_pos;
 	}
 }
-void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos,AnimationManager * animation_manager){
-	while (state.selected.size() > 0){
-		state.selected.pop_back();
+void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {
+	if (!(state.selecting || state.selected)){
+		state.selected_objects.clear();
 	}
 	state.left_mouse_held = false;
+	if (state.linking) {
+		std::vector<Object *> objects = animation_manager->getObjects();
+		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
+			ClickResponse response = (*it)->processLeftClick(mouse_pos);
+			if (response.clicked) {
+				if (response.type == CLICK_RESPONSE::GOT_LEFT) {
+					if (state.new_link->setOutObject((*it))) {
+						//give control of the link to the animation manager
+						animation_manager->addLink(state.new_link);
+						state.new_link = NULL;
+						break;
+					}
+				}
+			}
+		}
+		if (state.new_link != NULL) {
+			delete state.new_link;
+			state.new_link = NULL;
+		}
+		state.linking = false;
+	}
+	if (state.moving) state.moving = false;
+	if (state.selecting) {
+		state.select_end_pos = mouse_pos;
+		state.selecting = false;
+		state.selected = state.selected_objects.size() > 0;
+	}
 }
