@@ -80,15 +80,15 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	window->setActive(true);
 	window->clear();
 	drawLinks(animation_manager);
-	drawTopMenu(animation_manager);
 	drawObjects(animation_manager);
-	drawFPS(animation_manager);
 	if (state.selecting || state.selected) {
 		drawSelectBox();
 	}
 	if (state.linking) {
 		drawNewLink();
 	}
+	drawTopMenu(animation_manager);
+	drawFPS(animation_manager);
     window->display();
 	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;
@@ -165,7 +165,7 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 		}
 	}
 	//check if clicked on selected box
-	if (state.selected) {
+	if (!processed && state.selected) {
 		sf::RectangleShape select_box(sf::Vector2f(state.select_end_pos - state.select_start_pos));
 		select_box.setSize(sf::Vector2f(state.select_end_pos - state.select_start_pos));
 		select_box.setPosition(sf::Vector2f(state.select_start_pos));

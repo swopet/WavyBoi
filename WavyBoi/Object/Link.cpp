@@ -50,7 +50,8 @@ void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 		sf::Vertex(in_pos),
 		sf::Vertex(out_pos)
 	};
-	target.draw(line, LINE_THICKNESS, sf::Lines);
+	glLineWidth(LINK_LINE_THICKNESS);
+	target.draw(line, 2, sf::Lines);
 }
 
 ClickResponse Link::processLeftClick(sf::Vector2i mouse_pos){

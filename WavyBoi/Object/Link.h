@@ -1,8 +1,11 @@
 #pragma once
+
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 #include <Object/Object.h>
 #include <Object/Parameter.h>
 #include <Object/Link.h>
-constexpr auto LINE_THICKNESS = 2;
+constexpr auto LINK_LINE_THICKNESS = 2;
 
 class Link : public Object {
 private:
