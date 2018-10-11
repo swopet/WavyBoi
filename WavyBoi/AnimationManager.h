@@ -19,6 +19,7 @@ struct AnimationManagerState {
 	std::string project_name;
 	std::string project_path;
 	sf::Vector2u out_res;
+	double fps;
 };
 
 struct ObjectNode {
@@ -40,6 +41,8 @@ public:
 	bool isDisplayOpen();
 	bool verifyClose();
 	ObjectNode * getChannels();
+	float getFPS();
+	void updateFPS(sf::Time);
 	void update();
 	void clickDisplayOpen();
 	void clickDisplayClose();

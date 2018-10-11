@@ -43,6 +43,19 @@ ObjectNode * AnimationManager::getChannels()
 	return channels;
 }
 
+float AnimationManager::getFPS()
+{
+	return state.fps;
+}
+
+void AnimationManager::updateFPS(sf::Time frame_time)
+{
+	float curr_fps = 1000000.0f / (float)frame_time.asMicroseconds();
+	state.fps = curr_fps;
+}
+
+
+
 void AnimationManager::update() {
 	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
 		(*it)->update();

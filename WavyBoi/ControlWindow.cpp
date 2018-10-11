@@ -8,6 +8,7 @@ ControlWindow::ControlWindow(AnimationManager * animation_manager){
 	state.window_size = sf::Vector2u(1600,900);
 	state.menu_height = 24;
 	font = NULL;
+	state.last_fps_draw = state.clock.getElapsedTime();
 	loadFont("C:/Users/Trevor/Stuff/VS/WavyBoi/resources/fonts/Montserrat-Medium.otf");
 	sf::Vector2i pos(0,0);
 	Menu * file_menu = new Menu();
@@ -80,6 +81,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	window->clear();
 	drawTopMenu(animation_manager);
 	drawObjects(animation_manager);
+	drawFPS(animation_manager);
     window->display();
 	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;
@@ -96,6 +98,18 @@ void ControlWindow::drawObjects(AnimationManager * animation_manager){
 	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it){
 		(*it)->draw(*window,sf::RenderStates());
 	}
+}
+
+void ControlWindow::drawFPS(AnimationManager * animation_manager) {
+	if ((state.clock.getElapsedTime() - state.last_fps_draw).asMilliseconds() > TIME_PER_FPS_UPDATE_MS) {
+		state.last_fps_draw = state.clock.getElapsedTime();
+		state.curr_fps = animation_manager->getFPS();
+	}
+	sf::Text fps_text(std::to_string((int)state.curr_fps) + " FPS",*font,16);
+	float width = fps_text.findCharacterPos(fps_text.getString().getSize()).x;
+	fps_text.setFillColor(sf::Color::Cyan);
+	fps_text.setPosition(sf::Vector2f(window->getSize().x - width, 0));
+	window->draw(fps_text);
 }
 
 void ControlWindow::close(){

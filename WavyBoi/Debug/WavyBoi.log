@@ -1,7 +1,44 @@
-﻿  DisplayWindow.cpp
-c:\users\trevor\stuff\vs\wavyboi\wavyboi\displaywindow.cpp(34): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+﻿  AnimationManager.cpp
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\animationmanager.cpp(48): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  ControlWindow.cpp
+  DisplayWindow.cpp
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\displaywindow.cpp(33): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
           with
           [
               T=unsigned int
           ]
+  Menu.cpp
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(60): warning C4244: 'argument': conversion from 'unsigned int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(61): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=int
+          ]
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(74): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(76): warning C4244: 'argument': conversion from 'unsigned int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(77): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=int
+          ]
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(97): warning C4018: '>=': signed/unsigned mismatch
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(98): warning C4018: '<': signed/unsigned mismatch
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(123): warning C4018: '>=': signed/unsigned mismatch
+c:\users\trevor\stuff\vs\wavyboi\wavyboi\menu.cpp(124): warning C4018: '<': signed/unsigned mismatch
+  Image.cpp
+  Link.cpp
+  Object.cpp
+  Video.cpp
+  VideoLoop.cpp
+  WavyBoi.cpp
+  Generating Code...
   WavyBoi.vcxproj -> C:\Users\Trevor\Stuff\VS\WavyBoi\Debug\WavyBoi.exe

@@ -5,13 +5,16 @@
 #include <Object/Object.h>
 #include <sfeMovie/Movie.hpp>
 #include <Object\Parameter.h>
-#define VIDEO_OUTLINE_THICKNESS 2
+constexpr auto VIDEO_OUTLINE_THICKNESS = 2;
+constexpr auto VIDEO_CIRCLE_RADIUS = 4;
 
 class Video : public Object {
 private:
 	sf::Vector2f size;
 	sf::RectangleShape main_box;
 	sf::RectangleShape video_box;
+	sf::CircleShape left_circle;
+	sf::CircleShape right_circle;
 	void init();
 	sfe::Movie * movie;
 public:

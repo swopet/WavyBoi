@@ -20,8 +20,13 @@ void Video::update() {
 void Video::init(){
 	main_box = sf::RectangleShape(size);
 	main_box.setOutlineThickness(-VIDEO_OUTLINE_THICKNESS);
-	main_box.setOutlineColor(sf::Color(191,191,191));
+	main_box.setOutlineColor(sf::Color(192,192,192));
 	main_box.setFillColor(sf::Color(0,0,0));
+	left_circle = sf::CircleShape(VIDEO_CIRCLE_RADIUS + VIDEO_OUTLINE_THICKNESS);
+	left_circle.setOutlineThickness(-VIDEO_OUTLINE_THICKNESS);
+	left_circle.setOutlineColor(sf::Color(192, 192, 192));
+	left_circle.setFillColor(sf::Color(128, 128, 128));
+	right_circle = left_circle;
 	video_box = sf::RectangleShape(sf::Vector2f(0,0));
 	video_box.setFillColor(sf::Color(128, 128, 128));
 	movie = NULL;
@@ -31,8 +36,12 @@ void Video::init(){
 void Video::draw(sf::RenderTarget& target, sf::RenderStates states){
 	main_box.setPosition(center - size/2.0f);
 	video_box.setPosition(center - video_box.getSize()/2.0f);
+	left_circle.setPosition(center - sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0) - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
+	right_circle.setPosition(center + sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0) - sf::Vector2f(right_circle.getRadius(), right_circle.getRadius()));
 	target.draw(main_box);
 	target.draw(video_box);
+	target.draw(left_circle);
+	target.draw(right_circle);
 }
 
 void Video::loadFromFile(std::string file_name){ //load from full path
