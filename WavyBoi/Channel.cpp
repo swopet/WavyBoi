@@ -71,6 +71,48 @@ Channel::Channel(int new_id) {
 	video_box.setFillColor(sf::Color(128, 128, 128));
 }
 
+ClickResponse Channel::processLeftClickHeld(sf::Vector2i mouse_pos) {
+	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
+	if (length(sf::Vector2f(mouse_pos) - left_pos) <= left_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_LEFT;
+	}
+	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
+		mouse_pos.y >= center.y - size.y / 2.0f &&
+		mouse_pos.x < center.x + size.x / 2.0f &&
+		mouse_pos.y < center.y + size.y / 2.0f) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::SELECTED;
+	}
+	else {
+
+	}
+	return response;
+}
+
+ClickResponse Channel::processLeftClickRelease(sf::Vector2i mouse_pos) {
+	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
+	if (length(sf::Vector2f(mouse_pos) - left_pos) <= left_circle.getRadius()) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_LEFT;
+	}
+	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
+		mouse_pos.y >= center.y - size.y / 2.0f &&
+		mouse_pos.x < center.x + size.x / 2.0f &&
+		mouse_pos.y < center.y + size.y / 2.0f) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::SELECTED;
+	}
+	else {
+
+	}
+	return response;
+}
+
 Channel::Channel()
 {
 }

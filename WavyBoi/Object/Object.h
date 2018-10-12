@@ -27,6 +27,7 @@ public:
 	void setCenter(sf::Vector2f new_center) {
 		center = new_center;
 	}
+	OBJECT_TYPE getType() { return type; }
 	virtual void setParameter(Parameter *){}
 	virtual bool checkOverlap(sf::RectangleShape);
 	virtual sf::Vector2f getLeftPos();

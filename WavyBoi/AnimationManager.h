@@ -14,6 +14,8 @@ rendering. */
 #include <Channel.h>
 #include <Common.h>
 #include <map>
+#include <vector>
+#include <unordered_set>
 
 struct AnimationManagerState {
 	bool edited;
@@ -25,9 +27,9 @@ struct AnimationManagerState {
 };
 
 struct ObjectNode {
-	std::vector<Link *> inputs;
+	std::unordered_set<Link *> inputs;
 	Object * obj;
-	std::vector<Link *> outputs;
+	std::unordered_set<Link *> outputs;
 	bool updated;
 };
 
@@ -46,6 +48,8 @@ public:
 	std::vector<Channel *> getChannels();
 	std::vector<Object *> getObjects();
 	std::vector<Link *> getLinks();
+	void deleteObject(Object *);
+	void deleteLink(Link *);
 	void addLink(Link *);
 	void addObject(Object *);
 	void addChannel(Channel *);

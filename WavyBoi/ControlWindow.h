@@ -37,6 +37,7 @@ public:
 	ControlWindow();
 	ControlWindow(AnimationManager *);
 	bool update(AnimationManager *);
+	void deleteSelected(AnimationManager *);
 	void drawTopMenu(AnimationManager *);
 	void drawObjects(AnimationManager *);
 	void drawChannels(AnimationManager *);

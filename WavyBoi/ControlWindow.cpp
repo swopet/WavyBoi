@@ -58,6 +58,11 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 				
 			}
 		}
+		if (event.type == sf::Event::KeyPressed) {
+			if (event.key.code == sf::Keyboard::Delete) {
+				deleteSelected(animation_manager);
+			}
+		}
 	}
 	for (std::vector<Menu *>::iterator it = menu_tabs.begin(); it != menu_tabs.end(); ++it){
 		if ((*it)->getType() == MENU_TYPE::DISPLAY){
@@ -93,6 +98,21 @@ bool ControlWindow::update(AnimationManager * animation_manager){
     window->display();
 	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;
+}
+
+void ControlWindow::deleteSelected(AnimationManager * animation_manager)
+{
+	if (state.selected) {
+		while (!state.selected_links.empty()) {
+			animation_manager->deleteLink(state.selected_links.back());
+			state.selected_links.pop_back();
+		}
+		while (!state.selected_objects.empty()) {
+			animation_manager->deleteObject(state.selected_objects.back());
+			state.selected_objects.pop_back();
+		}
+	}
+	state.selected = false;
 }
 
 void ControlWindow::drawTopMenu(AnimationManager * animation_manager){
@@ -271,7 +291,7 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 	if (state.linking) {
 		std::vector<Object *> objects = animation_manager->getObjects();
 		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
-			ClickResponse response = (*it)->processLeftClick(mouse_pos);
+			ClickResponse response = (*it)->processLeftClickRelease(mouse_pos);
 			if (response.clicked) {
 				if (response.type == CLICK_RESPONSE::GOT_LEFT) {
 					if (state.new_link->setOutObject((*it))) {
@@ -279,6 +299,22 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 						animation_manager->addLink(state.new_link);
 						state.new_link = NULL;
 						break;
+					}
+				}
+			}
+		}
+		if (state.new_link != NULL) {
+			std::vector<Channel *> channels = animation_manager->getChannels();
+			for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
+				ClickResponse response = (*it)->processLeftClickRelease(mouse_pos);
+				if (response.clicked){ 
+					if (response.type == CLICK_RESPONSE::GOT_LEFT) {
+						if (state.new_link->setOutObject((*it))) {
+							//give control of the link to the animation manager
+							animation_manager->addLink(state.new_link);
+							state.new_link = NULL;
+							break;
+						}
 					}
 				}
 			}

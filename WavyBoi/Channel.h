@@ -24,6 +24,8 @@ public:
 	sf::Vector2f getLeftPos();
 	const sf::Texture * getTexture();
 	Channel(int);
+	ClickResponse processLeftClickHeld(sf::Vector2i mouse_pos);
+	ClickResponse processLeftClickRelease(sf::Vector2i mouse_pos);
 	Channel();
 	~Channel();
 };
