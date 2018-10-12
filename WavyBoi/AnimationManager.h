@@ -20,6 +20,7 @@ rendering. */
 struct AnimationManagerState {
 	bool edited;
 	bool display_open = false;
+	bool delete_selected = false;
 	std::string project_name;
 	std::string project_path;
 	sf::Vector2u out_res;
@@ -53,6 +54,7 @@ public:
 	void addLink(Link *);
 	void addObject(Object *);
 	void addChannel(Channel *);
+	bool isDeleteRequested();
 	bool isEdited();
 	bool isDisplayOpen();
 	bool verifyClose();

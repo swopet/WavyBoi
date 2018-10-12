@@ -64,6 +64,9 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 			}
 		}
 	}
+	if (animation_manager->isDeleteRequested()) {
+		deleteSelected(animation_manager);
+	}
 	for (std::vector<Menu *>::iterator it = menu_tabs.begin(); it != menu_tabs.end(); ++it){
 		if ((*it)->getType() == MENU_TYPE::DISPLAY){
 			if (animation_manager->isDisplayOpen()){

@@ -31,7 +31,6 @@ void Video::init(){
 	video_box = sf::RectangleShape(sf::Vector2f(0,0));
 	video_box.setFillColor(sf::Color(128, 128, 128));
 	movie = NULL;
-	loadFromFile("C:/Users/Trevor/Stuff/WavyBoi/test_files/mandelbrot.mp4");
 }
 
 void Video::draw(sf::RenderTarget& target, sf::RenderStates states){

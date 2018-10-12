@@ -7,7 +7,9 @@ AnimationManager::AnimationManager(){
 	state.project_path = "";
 	state.out_res = sf::Vector2u(600,400);
 	Video * new_video = new Video();
+	new_video->loadFromFile("C:/Users/Trevor/Stuff/WavyBoi/test_files/mandelbrot.mp4");
 	Video * new_video_2 = new Video();
+	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/WavyBoi/test_files/dogs.mp4");
 	addObject(new_video);
 	addObject(new_video_2);
 	Channel * new_channel = new Channel(0);
@@ -130,6 +132,11 @@ void AnimationManager::addChannel(Channel * new_channel)
 	root_objects.push_back(new_channel);
 }
 
+bool AnimationManager::isDeleteRequested()
+{
+	return state.delete_selected;
+}
+
 bool AnimationManager::isEdited(){
 	return state.edited;
 }
@@ -167,6 +174,7 @@ void AnimationManager::updateFPS(sf::Time frame_time)
 
 
 void AnimationManager::update() {
+	state.delete_selected = false;
 	for (std::map<Link *, bool>::iterator it = updated_links.begin(); it != updated_links.end(); ++it) {
 		it->second = false;
 	}
@@ -258,15 +266,16 @@ void AnimationManager::clickEditCut(){
 
 //TODO
 void AnimationManager::clickEditCopy(){
-	std::cout << "Clicked Edit -> Cut" << std::endl;
+	std::cout << "Clicked Edit -> Copy" << std::endl;
 }
 
 //TODO
 void AnimationManager::clickEditPaste(){
-	std::cout << "Clicked Edit -> Cut" << std::endl;
+	std::cout << "Clicked Edit -> Caste" << std::endl;
 }
 
 //TODO
 void AnimationManager::clickEditDelete(){
-	std::cout << "Clicked Edit -> Cut" << std::endl;
+	state.delete_selected = true;
+	std::cout << "Clicked Edit -> Delete" << std::endl;
 }
