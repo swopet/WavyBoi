@@ -6,3 +6,5 @@ Debug/*
 *.obj
 *.log
 *.tlog
+*.vcxproj*
+*db

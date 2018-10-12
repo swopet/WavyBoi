@@ -21,6 +21,7 @@ struct ControlWindowState {
 	sf::Vector2i select_end_pos;
 	sf::Vector2i last_mouse_pos;
 	std::vector<Object *> selected_objects;
+	std::vector<Link *> selected_links;
 	sf::Clock clock;
 	sf::Time last_fps_draw;
 	float curr_fps;
@@ -38,6 +39,7 @@ public:
 	bool update(AnimationManager *);
 	void drawTopMenu(AnimationManager *);
 	void drawObjects(AnimationManager *);
+	void drawChannels(AnimationManager *);
 	void drawSelectBox();
 	void drawFPS(AnimationManager * animation_manager);
 	void drawLinks(AnimationManager * animation_manager);

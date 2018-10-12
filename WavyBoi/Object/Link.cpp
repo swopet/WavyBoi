@@ -37,12 +37,19 @@ void Link::update()
 	if (out != NULL) {
 		out_pos = out->getLeftPos();
 	}
-	parameter->setValue(in->getVal());
+	if (in != NULL) {
+		parameter->setValue(in->getVal());
+	}
 }
 
 Parameter * Link::getParameterFromLink()
 {
 	return parameter;
+}
+
+bool Link::checkOverlap(sf::RectangleShape select_rect)
+{
+	return checkIntersection(select_rect,in_pos,out_pos);
 }
 
 void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
@@ -60,6 +67,16 @@ ClickResponse Link::processLeftClick(sf::Vector2i mouse_pos){
 	response.type = CLICK_RESPONSE::NONE;
 	
 	return response;
+}
+
+Object * Link::getInObj()
+{
+	return in;
+}
+
+Object * Link::getOutObj()
+{
+	return out;
 }
 
 void Link::setOutPos(sf::Vector2f new_out_pos)

@@ -20,8 +20,11 @@ public:
 	~Link();
 	void update();
 	Parameter * getParameterFromLink();
+	bool checkOverlap(sf::RectangleShape);
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	ClickResponse processLeftClick(sf::Vector2i);
+	Object * getInObj();
+	Object * getOutObj();
 	void setOutPos(sf::Vector2f);
 	bool setOutObject(Object *);
 };

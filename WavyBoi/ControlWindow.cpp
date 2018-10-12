@@ -81,6 +81,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	window->clear();
 	drawLinks(animation_manager);
 	drawObjects(animation_manager);
+	drawChannels(animation_manager);
 	if (state.selecting || state.selected) {
 		drawSelectBox();
 	}
@@ -104,6 +105,14 @@ void ControlWindow::drawObjects(AnimationManager * animation_manager){
 	std::vector<Object *> objects = animation_manager->getObjects();
 	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it){
 		(*it)->draw(*window,sf::RenderStates());
+	}
+}
+
+void ControlWindow::drawChannels(AnimationManager * animation_manager)
+{
+	std::vector<Channel *> channels = animation_manager->getChannels();
+	for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
+		(*it)->draw(*window, sf::RenderStates());
 	}
 }
 
@@ -180,6 +189,7 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 		else {
 			state.selected = false;
 			state.selected_objects.clear();
+			state.selected_links.clear();
 			std::cout << "clicked out of selected box" << std::endl;
 		}
 	}
@@ -224,23 +234,30 @@ void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 	sf::Vector2i diff = mouse_pos - state.last_mouse_pos;
 	state.last_mouse_pos = mouse_pos;
 	if (state.moving) {
-		for (std::vector<Object *>::iterator it = state.selected_objects.begin(); it != state.selected_objects.end(); ++it) {
-			(*it)->move(sf::Vector2f(diff));
+		if (!state.selected_objects.empty()) { //can only move objects, not links
+			for (std::vector<Object *>::iterator it = state.selected_objects.begin(); it != state.selected_objects.end(); ++it) {
+				(*it)->move(sf::Vector2f(diff));
+			}
+			state.select_start_pos += diff;
+			state.select_end_pos += diff;
 		}
-		state.select_start_pos += diff;
-		state.select_end_pos += diff;
 	}
 	else if (state.linking) {
 		state.new_link->setOutPos(sf::Vector2f(mouse_pos));
 	}
 	else if (state.selecting) {
 		std::vector<Object *> objects = animation_manager->getObjects();
+		std::vector<Link *> links = animation_manager->getLinks();
 		state.selected_objects.clear();
+		state.selected_links.clear();
 		sf::RectangleShape select_box(sf::Vector2f(state.select_end_pos - state.select_start_pos));
 		select_box.setSize(sf::Vector2f(state.select_end_pos - state.select_start_pos));
 		select_box.setPosition(sf::Vector2f(state.select_start_pos));
 		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
 			if ((*it)->checkOverlap(select_box)) state.selected_objects.push_back(*it);
+		}
+		for (std::vector<Link *>::iterator it = links.begin(); it != links.end(); ++it) {
+			if ((*it)->checkOverlap(select_box)) state.selected_links.push_back(*it);
 		}
 		state.select_end_pos = mouse_pos;
 	}
@@ -248,6 +265,7 @@ void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {
 	if (!(state.selecting || state.selected)){
 		state.selected_objects.clear();
+		state.selected_links.clear();
 	}
 	state.left_mouse_held = false;
 	if (state.linking) {
@@ -275,6 +293,6 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 	if (state.selecting) {
 		state.select_end_pos = mouse_pos;
 		state.selecting = false;
-		state.selected = state.selected_objects.size() > 0;
+		state.selected = (state.selected_objects.size() > 0 || state.selected_links.size() > 0);
 	}
 }

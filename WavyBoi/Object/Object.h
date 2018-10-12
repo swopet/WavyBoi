@@ -9,6 +9,7 @@ enum class OBJECT_TYPE {
 	LINK,
 	VIDEO_LOOP,
 	IMAGE,
+	CHANNEL,
 	NONE
 };
 
@@ -23,6 +24,10 @@ protected:
 public:
 	std::string getName();
 	void setVisible(bool);
+	void setCenter(sf::Vector2f new_center) {
+		center = new_center;
+	}
+	virtual void setParameter(Parameter *){}
 	virtual bool checkOverlap(sf::RectangleShape);
 	virtual sf::Vector2f getLeftPos();
 	virtual sf::Vector2f getRightPos();
