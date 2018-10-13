@@ -11,6 +11,9 @@ Link::Link(Object * obj_in, Object *obj_out, Parameter *new_parameter)
 	if (out != NULL) {
 		out_pos = in->getLeftPos();
 	}
+	else {
+		out_pos = in_pos;
+	}
 	parameter = new_parameter;
 	type = OBJECT_TYPE::LINK;
 }
@@ -35,7 +38,7 @@ void Link::update()
 		in_pos = in->getRightPos();
 	}
 	if (out != NULL) {
-		out_pos = out->getLeftPos();
+		out_pos = out->getLeftPos(out_ind);
 	}
 	if (in != NULL) {
 		parameter->setValue(in->getVal());
@@ -59,6 +62,16 @@ void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 	};
 	glLineWidth(LINK_LINE_THICKNESS);
 	target.draw(line, 2, sf::Lines);
+}
+
+void Link::setOutInd(int new_ind)
+{
+	out_ind = new_ind;
+}
+
+int Link::getOutInd()
+{
+	return out_ind;
 }
 
 ClickResponse Link::processLeftClick(sf::Vector2i mouse_pos){

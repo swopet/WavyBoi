@@ -31,7 +31,7 @@ class ControlWindow {
 private:
 	ControlWindowState state;
 	sf::RenderWindow * window;
-	sf::Font * font;
+	sf::Font * font = NULL;
 	std::vector<Menu *> menu_tabs;
 public:
 	ControlWindow();

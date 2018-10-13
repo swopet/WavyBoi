@@ -11,6 +11,7 @@ rendering. */
 #include <Object/Object.h>
 #include <Object/Video.h>
 #include <Object/Link.h>
+#include <Multiplexer.h>
 #include <Channel.h>
 #include <Common.h>
 #include <map>
@@ -18,7 +19,7 @@ rendering. */
 #include <unordered_set>
 
 struct AnimationManagerState {
-	bool edited;
+	bool edited = false;
 	bool display_open = false;
 	bool delete_selected = false;
 	std::string project_name;
@@ -29,7 +30,7 @@ struct AnimationManagerState {
 
 struct ObjectNode {
 	std::unordered_set<Link *> inputs;
-	Object * obj;
+	Object * obj = NULL;
 	std::unordered_set<Link *> outputs;
 	bool updated;
 };
@@ -49,6 +50,8 @@ public:
 	std::vector<Channel *> getChannels();
 	std::vector<Object *> getObjects();
 	std::vector<Link *> getLinks();
+	void decrementLinkOutIndsGreaterThan(int, Object *);
+	void pushToTop(Object *);
 	void deleteObject(Object *);
 	void deleteLink(Link *);
 	void addLink(Link *);

@@ -8,3 +8,5 @@ Debug/*
 *.tlog
 *.vcxproj*
 *db
+*.xml
+*.pch*

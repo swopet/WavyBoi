@@ -7,7 +7,8 @@ enum class PARAM_TYPE {
 	TEXTURE,
 	TEXT,
 	FLOAT,
-	INT
+	INT,
+	NONE
 };
 
 typedef union {
@@ -19,7 +20,7 @@ typedef union {
 
 class Parameter{
 private:
-	PARAM_TYPE type;
+	PARAM_TYPE type = PARAM_TYPE::NONE;
 	param value;
 	std::string name;
 public:

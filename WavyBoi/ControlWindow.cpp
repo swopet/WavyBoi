@@ -5,6 +5,7 @@
 
 ControlWindow::ControlWindow(AnimationManager * animation_manager){
 	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->getName());
+	window->setVerticalSyncEnabled(true);
 	state.window_size = sf::Vector2u(1600,900);
 	state.menu_height = 24;
 	font = NULL;
@@ -219,7 +220,7 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 	//check if clicked on an object
 	if (!processed){
 		std::vector<Object *> objects = animation_manager->getObjects();
-		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it){
+		for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it){
 			ClickResponse response = (*it)->processLeftClick(mouse_pos);
 			processed = response.clicked;
 			if (processed){
@@ -236,10 +237,15 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 						std::cout << "got right side of " << (*it)->getName() << std::endl;
 						state.new_link = new Link((*it), NULL, (*it)->getNewParameter());
 						state.linking = true;
+						state.linking = true;
+						break;
+					case CLICK_RESPONSE::DELETED_MUX_INPUT:
+						animation_manager->decrementLinkOutIndsGreaterThan(response.ind,*it);
 						break;
 					default:
 						break;
 				}
+				animation_manager->pushToTop(*it);
 				break;
 			}
 		}
@@ -247,6 +253,7 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 	if (!processed) {
 		state.selecting = true;
 		state.select_start_pos = mouse_pos;
+		state.select_end_pos = mouse_pos;
 	}
 	state.left_mouse_held = true;
 	state.last_mouse_pos = mouse_pos;
@@ -293,11 +300,12 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 	state.left_mouse_held = false;
 	if (state.linking) {
 		std::vector<Object *> objects = animation_manager->getObjects();
-		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
+		for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
 			ClickResponse response = (*it)->processLeftClickRelease(mouse_pos);
 			if (response.clicked) {
 				if (response.type == CLICK_RESPONSE::GOT_LEFT) {
 					if (state.new_link->setOutObject((*it))) {
+						state.new_link->setOutInd(response.ind);
 						//give control of the link to the animation manager
 						animation_manager->addLink(state.new_link);
 						state.new_link = NULL;

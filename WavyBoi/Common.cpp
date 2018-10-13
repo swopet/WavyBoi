@@ -9,6 +9,15 @@ sf::Vector2f getBottomRight(sf::RectangleShape rect) {
 	return sf::Vector2f(rect.getSize().x < 0 ? rect.getPosition().x : (rect.getPosition().x + rect.getSize().x), rect.getSize().y < 0 ? rect.getPosition().y : (rect.getPosition().y + rect.getSize().y));
 }
 
+sf::Texture add_20x20_tex;
+sf::Texture delete_20x20_tex;
+
+void loadApplicationTextures()
+{
+	add_20x20_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("add_20x20.png"));
+	delete_20x20_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("delete_20x20.png"));
+}
+
 bool checkIntersection(sf::RectangleShape rect1, sf::RectangleShape rect2) {
 	sf::Vector2f rec1_topleft = getTopLeft(rect1);
 	sf::Vector2f rec1_bottomright = getBottomRight(rect1);

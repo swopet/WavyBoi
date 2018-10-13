@@ -1,10 +1,21 @@
 #include "pch.h"
 #include "Channel.h"
 
-void Channel::setParameter(Parameter * parameter)
+void Channel::setParamsToDefault()
 {
-	if (parameter->getType() == PARAM_TYPE::TEXTURE) {
-		render_texture = parameter->getValue().texture;
+	render_texture = NULL;
+}
+
+void Channel::setParameter(Parameter * parameter, int ind)
+{
+	switch (ind) {
+	case 0:
+		if (parameter->getType() == PARAM_TYPE::TEXTURE) {
+			render_texture = parameter->getValue().texture;
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -35,16 +46,39 @@ void Channel::update()
 }
 
 void Channel::draw(sf::RenderTarget& target, sf::RenderStates states) {
-	main_box.setPosition(center - size / 2.0f);
-	video_box.setPosition(center - video_box.getSize() / 2.0f);
-	left_pos = center - sf::Vector2f((size.x - CHANNEL_OUTLINE_THICKNESS) / 2.0f, 0);
+	main_box.setPosition(position - size / 2.0f);
+	video_box.setPosition(position - video_box.getSize() / 2.0f);
+	left_pos = position - sf::Vector2f((size.x - CHANNEL_OUTLINE_THICKNESS) / 2.0f, 0);
 	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
 	target.draw(main_box);
 	target.draw(video_box);
 	target.draw(left_circle);
 }
 
-sf::Vector2f Channel::getLeftPos() {
+bool Channel::getMultipleInputsAllowed(int ind)
+{
+	switch (ind) {
+	case 0: //this is the video input, no dupes
+		return false;
+		break;
+	default: //this is the parameter node, dupes allowed
+		return true;
+		break;
+	}
+}
+
+PARAM_TYPE Channel::getParamTypeForInput(int ind = 0)
+{
+	switch (ind) {
+	case 0:
+		return PARAM_TYPE::TEXTURE;
+		break;
+	default:
+		return PARAM_TYPE::NONE;
+	}
+}
+
+sf::Vector2f Channel::getLeftPos(int ind = 0) {
 	return left_pos;
 }
 
@@ -58,7 +92,7 @@ Channel::Channel(int new_id) {
 	name = "Output Channel " + std::to_string(id);
 	type = OBJECT_TYPE::CHANNEL;
 	size = sf::Vector2f(160 + CHANNEL_OUTLINE_THICKNESS * 2, 90 + CHANNEL_OUTLINE_THICKNESS * 2);
-	center = sf::Vector2f(1000, 100 * (id+1));
+	position = sf::Vector2f(1000, 100 * (id+1));
 	main_box = sf::RectangleShape(size);
 	main_box.setOutlineThickness(-CHANNEL_OUTLINE_THICKNESS);
 	main_box.setOutlineColor(sf::Color(192, 192, 192));
@@ -79,10 +113,10 @@ ClickResponse Channel::processLeftClickHeld(sf::Vector2i mouse_pos) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_LEFT;
 	}
-	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
-		mouse_pos.y >= center.y - size.y / 2.0f &&
-		mouse_pos.x < center.x + size.x / 2.0f &&
-		mouse_pos.y < center.y + size.y / 2.0f) {
+	else if (mouse_pos.x >= position.x - size.x / 2.0f &&
+		mouse_pos.y >= position.y - size.y / 2.0f &&
+		mouse_pos.x < position.x + size.x / 2.0f &&
+		mouse_pos.y < position.y + size.y / 2.0f) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}
@@ -100,10 +134,10 @@ ClickResponse Channel::processLeftClickRelease(sf::Vector2i mouse_pos) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_LEFT;
 	}
-	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
-		mouse_pos.y >= center.y - size.y / 2.0f &&
-		mouse_pos.x < center.x + size.x / 2.0f &&
-		mouse_pos.y < center.y + size.y / 2.0f) {
+	else if (mouse_pos.x >= position.x - size.x / 2.0f &&
+		mouse_pos.y >= position.y - size.y / 2.0f &&
+		mouse_pos.x < position.x + size.x / 2.0f &&
+		mouse_pos.y < position.y + size.y / 2.0f) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}

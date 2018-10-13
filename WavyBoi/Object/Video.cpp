@@ -6,7 +6,7 @@ Video::Video(){
 	name = "unnamed video";
 	type = OBJECT_TYPE::VIDEO;
 	size = sf::Vector2f(80+VIDEO_OUTLINE_THICKNESS*2,60+VIDEO_OUTLINE_THICKNESS*2);
-	center = sf::Vector2f(100,100);
+	position = sf::Vector2f(100,100);
 	init();
 }
 
@@ -34,11 +34,11 @@ void Video::init(){
 }
 
 void Video::draw(sf::RenderTarget& target, sf::RenderStates states){
-	main_box.setPosition(center - size/2.0f);
-	video_box.setPosition(center - video_box.getSize()/2.0f);
-	left_pos = center - sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
+	main_box.setPosition(position - size/2.0f);
+	video_box.setPosition(position - video_box.getSize()/2.0f);
+	left_pos = position - sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
 	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
-	right_pos = center + sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
+	right_pos = position + sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
 	right_circle.setPosition(right_pos - sf::Vector2f(right_circle.getRadius(), right_circle.getRadius()));
 	target.draw(main_box);
 	target.draw(video_box);
@@ -86,7 +86,7 @@ Parameter * Video::getNewParameter()
 	return new Parameter(PARAM_TYPE::TEXTURE, getVal(), name);
 }
 
-sf::Vector2f Video::getLeftPos()
+sf::Vector2f Video::getLeftPos(int id = 0)
 {
 	return left_pos;
 }
@@ -113,10 +113,10 @@ ClickResponse Video::processLeftClick(sf::Vector2i mouse_pos){
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
 	}
-	else if (mouse_pos.x >= center.x - size.x/2.0f &&
-		mouse_pos.y >= center.y - size.y/2.0f &&
-		mouse_pos.x < center.x + size.x/2.0f &&
-		mouse_pos.y < center.y + size.y/2.0f){
+	else if (mouse_pos.x >= position.x - size.x/2.0f &&
+		mouse_pos.y >= position.y - size.y/2.0f &&
+		mouse_pos.x < position.x + size.x/2.0f &&
+		mouse_pos.y < position.y + size.y/2.0f){
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}
@@ -138,10 +138,10 @@ ClickResponse Video::processLeftClickHeld(sf::Vector2i mouse_pos) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
 	}
-	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
-		mouse_pos.y >= center.y - size.y / 2.0f &&
-		mouse_pos.x < center.x + size.x / 2.0f &&
-		mouse_pos.y < center.y + size.y / 2.0f) {
+	else if (mouse_pos.x >= position.x - size.x / 2.0f &&
+		mouse_pos.y >= position.y - size.y / 2.0f &&
+		mouse_pos.x < position.x + size.x / 2.0f &&
+		mouse_pos.y < position.y + size.y / 2.0f) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}
@@ -163,10 +163,10 @@ ClickResponse Video::processLeftClickRelease(sf::Vector2i mouse_pos) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
 	}
-	else if (mouse_pos.x >= center.x - size.x / 2.0f &&
-		mouse_pos.y >= center.y - size.y / 2.0f &&
-		mouse_pos.x < center.x + size.x / 2.0f &&
-		mouse_pos.y < center.y + size.y / 2.0f) {
+	else if (mouse_pos.x >= position.x - size.x / 2.0f &&
+		mouse_pos.y >= position.y - size.y / 2.0f &&
+		mouse_pos.x < position.x + size.x / 2.0f &&
+		mouse_pos.y < position.y + size.y / 2.0f) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}

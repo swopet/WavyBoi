@@ -24,7 +24,7 @@ public:
 	Video();
 	param getVal();
 	Parameter * getNewParameter();
-	sf::Vector2f getLeftPos();
+	sf::Vector2f getLeftPos(int);
 	sf::Vector2f getRightPos();
 	bool checkOverlap(sf::RectangleShape);
 	void update();

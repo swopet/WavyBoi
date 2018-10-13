@@ -19,20 +19,29 @@ private:
 protected:
 	bool visible;
 	std::string name;
-	OBJECT_TYPE type;
-	sf::Vector2f center;
+	OBJECT_TYPE type = OBJECT_TYPE::NONE;
+	sf::Vector2f position;
 public:
 	std::string getName();
 	void setVisible(bool);
-	void setCenter(sf::Vector2f new_center) {
-		center = new_center;
+	void setPosition(sf::Vector2f new_position) {
+		position = new_position;
 	}
-	OBJECT_TYPE getType() { return type; }
-	virtual void setParameter(Parameter *){}
+	OBJECT_TYPE getObjectType() { return type; }
+	virtual void setParamsToDefault() {};
+	virtual bool getMultipleInputsAllowed(int) { return true; }
+	virtual PARAM_TYPE getParamTypeForInput(int ind = 0) { return PARAM_TYPE::NONE; }
+	virtual void setParameter(Parameter * parameter, int ind){}
+	void setParameter(Parameter * parameter) {
+		setParameter(parameter, 0);
+	}
 	virtual bool checkOverlap(sf::RectangleShape);
-	virtual sf::Vector2f getLeftPos();
-	virtual sf::Vector2f getRightPos();
-	virtual void move(sf::Vector2f);
+	virtual sf::Vector2f getLeftPos(int) { return position; }
+	sf::Vector2f getLeftPos() { return getLeftPos(0); }
+	virtual sf::Vector2f getRightPos() { return position;	}
+	virtual void move(sf::Vector2f offset) {
+		position = position + offset;
+	}
 	virtual Parameter * getNewParameter() {
 		param new_param;
 		new_param.int_val = 0;

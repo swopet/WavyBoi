@@ -14,18 +14,4 @@ bool Object::checkOverlap(sf::RectangleShape)
 	return false;
 }
 
-sf::Vector2f Object::getLeftPos()
-{
-	return center;
-}
-
-sf::Vector2f Object::getRightPos()
-{
-	return center;
-}
-
-void Object::move(sf::Vector2f offset){
-	center = center + offset;
-}
-
 

@@ -7,11 +7,17 @@ AnimationManager::AnimationManager(){
 	state.project_path = "";
 	state.out_res = sf::Vector2u(600,400);
 	Video * new_video = new Video();
-	new_video->loadFromFile("C:/Users/Trevor/Stuff/WavyBoi/test_files/mandelbrot.mp4");
+	new_video->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/mandelbrot.mp4");
 	Video * new_video_2 = new Video();
-	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/WavyBoi/test_files/dogs.mp4");
+	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/dogs.mp4");
+	Video * new_video_3 = new Video();
+	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
+	Multiplexer * new_multiplexer = new Multiplexer();
+	new_multiplexer->setPosition(sf::Vector2f(100, 100));
+	addObject(new_multiplexer);
 	addObject(new_video);
 	addObject(new_video_2);
+	addObject(new_video_3);
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 }
@@ -27,6 +33,28 @@ std::vector<Object *> AnimationManager::getObjects(){
 std::vector<Link*> AnimationManager::getLinks()
 {
 	return links;
+}
+
+void AnimationManager::decrementLinkOutIndsGreaterThan(int ind, Object * obj)
+{
+	std::vector<Link *> links_to_remove;
+	for (std::unordered_set<Link *>::iterator it = obj_graph[obj].inputs.begin(); it != obj_graph[obj].inputs.end(); ++it) {
+		if ((*it)->getOutInd() > ind) (*it)->setOutInd((*it)->getOutInd() - 1);
+		else if ((*it)->getOutInd() == ind) links_to_remove.push_back(*it);
+	}
+	for (std::vector<Link*>::iterator it = links_to_remove.begin(); it != links_to_remove.end(); ++it){
+		deleteLink(*it);
+	}
+}
+
+void AnimationManager::pushToTop(Object * obj)
+{
+	std::vector<Object *>::iterator it = objects.begin();
+	while (*it != obj) ++it;
+	if (it != objects.end()) {
+		objects.erase(it);
+		objects.push_back(obj);
+	}
 }
 
 void AnimationManager::deleteObject(Object * object_to_delete) {
@@ -85,9 +113,15 @@ void AnimationManager::addLink(Link * new_link)
 	std::cout << "added new link: " << new_link->getName() << std::endl;
 	//TODO: check for loops!!
 	//We expect new_link->getOutObj() to not be null, otherwise we should have never entered this routine
-	if (new_link->getOutObj()->getType() == OBJECT_TYPE::CHANNEL) {
-		if (obj_graph[new_link->getOutObj()].inputs.size() > 0) {
-			Link * link_to_delete = *(obj_graph[new_link->getOutObj()].inputs.begin());
+	if (new_link->getOutObj()->getMultipleInputsAllowed(new_link->getOutInd()) == false) {
+		Link * link_to_delete = NULL;
+		for (std::unordered_set<Link *>::iterator it = obj_graph[new_link->getOutObj()].inputs.begin(); it != obj_graph[new_link->getOutObj()].inputs.end(); ++it) {
+			if ((*it)->getOutInd() == new_link->getOutInd()) {
+				link_to_delete = *it;
+				break;
+			}
+		}
+		if (link_to_delete != NULL) {
 			deleteLink(link_to_delete);
 		}
 	}
@@ -179,6 +213,7 @@ void AnimationManager::update() {
 		it->second = false;
 	}
 	for (std::map<Object *, ObjectNode>::iterator it = obj_graph.begin(); it != obj_graph.end(); ++it) {
+		it->first->setParamsToDefault();
 		it->second.updated = false;
 	}
 	for (std::vector<Object *>::iterator it = root_objects.begin(); it != root_objects.end(); ++it) {
@@ -200,7 +235,7 @@ void AnimationManager::update() {
 						(*out_link_it)->update();
 						updated_links[*out_link_it] = true;
 						Object * new_obj = (*out_link_it)->getOutObj();
-						new_obj->setParameter((*out_link_it)->getParameterFromLink());
+						new_obj->setParameter((*out_link_it)->getParameterFromLink(),(*out_link_it)->getOutInd());
 						if (new_obj != NULL) {
 							objects_to_update.push_back(new_obj);
 						}
