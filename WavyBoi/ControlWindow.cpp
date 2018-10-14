@@ -1,8 +1,6 @@
 #include <pch.h>
 #include <ControlWindow.h>
 
-
-
 ControlWindow::ControlWindow(AnimationManager * animation_manager){
 	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->getName());
 	window->setVerticalSyncEnabled(true);
@@ -99,6 +97,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	}
 	drawTopMenu(animation_manager);
 	drawFPS(animation_manager);
+	audio_handler->draw(*window, sf::RenderStates());
     window->display();
 	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;

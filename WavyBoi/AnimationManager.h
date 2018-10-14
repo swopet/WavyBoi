@@ -12,11 +12,14 @@ rendering. */
 #include <Object/Video.h>
 #include <Object/Link.h>
 #include <Multiplexer.h>
+#include <AudioHandler.h>
 #include <Channel.h>
 #include <Common.h>
 #include <map>
 #include <vector>
 #include <unordered_set>
+
+extern AudioHandler * audio_handler;
 
 struct AnimationManagerState {
 	bool edited = false;
