@@ -12,12 +12,18 @@ AnimationManager::AnimationManager(){
 	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/dogs.mp4");
 	Video * new_video_3 = new Video();
 	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
+	FreqBandBlock * new_freq_band = new FreqBandBlock();
+	new_freq_band->setPosition(sf::Vector2f(10, 200));
+	Comparator * new_comparator = new Comparator();
+	new_comparator->setPosition(sf::Vector2f(100, 200));
+	addObject(new_comparator);
 	Multiplexer * new_multiplexer = new Multiplexer();
 	new_multiplexer->setPosition(sf::Vector2f(100, 100));
 	addObject(new_multiplexer);
 	addObject(new_video);
 	addObject(new_video_2);
 	addObject(new_video_3);
+	addObject(new_freq_band);
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 }

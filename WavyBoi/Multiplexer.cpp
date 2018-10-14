@@ -22,11 +22,21 @@ param Multiplexer::getVal()
 
 void Multiplexer::setParameter(Parameter * parameter, int ind)
 {
+	if (ind == 0) {
+		if (parameter->getType() == PARAM_TYPE::INT) {
+			curr_selection = parameter->getValue().int_val + 1;
+		}
+	}
 	if (ind == 1) {
 		out_type = parameter->getType();
 	}
-	if (ind == curr_selection){
-		curr_value = parameter->getValue();
+	if (ind == curr_selection) {
+		if (parameter->getType() == out_type) {
+			curr_value = parameter->getValue();
+		}
+		else {
+			
+		}
 	}
 }
 

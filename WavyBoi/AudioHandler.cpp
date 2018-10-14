@@ -12,7 +12,7 @@ AudioHandler::AudioHandler()
 	}
 	//we want at least ~15 FPS fidelity on audio signal processing. to get a sample size of <size> we need a sample rate of size*30 Hz, plus a little extra to be safe
 	audio_recorder.setSize(size);
-	audio_recorder.start(size * 15 * 1.2);
+	audio_recorder.start(192000);
 }
 
 
@@ -27,8 +27,18 @@ void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 	sf::Vector2f base_pos(10, 800);
 	const double * freq_vals = audio_recorder.getFrequencies();
 	draw_vertices[0] = sf::Vertex(base_pos);
+	double max = 0;
+	double freq = 0;
 	for (int i = 0; i < 1000; i++) { //freq_vals[0] is frequency at E_0, freq_vals[198] is frequency at G_8
 		draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f(i + 1, 50 * -freq_vals[i]/curr_max));
+		if (freq_vals[i] > max) {
+			
+			max = freq_vals[i];
+			freq = freqAtKey((double)i / 10.);
+		}
+		else if (freq_vals[i] == max) {
+			freq = (freq + freqAtKey((double)i / 10.)) / 2.0;
+		}
 	}
 	draw_vertices[1001] = sf::Vertex(base_pos + sf::Vector2f(1002, 0));
 	target.draw(draw_vertices, 1002, sf::LineStrip);
@@ -51,7 +61,7 @@ void AudioHandler::update()
 	double curr_total = 0;
 	double ctr = 0;
 	while (freqAtKey((double)i / 10.) < 60) {
-		curr_total += freq_vals[i];
+		curr_total += 1 - (1-freq_vals[i])*(1-freq_vals[i]);
 		ctr++;
 		if (freq_vals[i] > sub_bass_max) sub_bass_max = freq_vals[i];
 		i++;
@@ -60,12 +70,15 @@ void AudioHandler::update()
 	curr_total = 0;
 	ctr = 0;
 	while (freqAtKey((double)i / 10.) < 250) {
-		curr_total += freq_vals[i];
-		ctr++;
 		if (freq_vals[i] > bass_max) bass_max = freq_vals[i];
+		if (freq_vals[i] / bass_max > 0.1) {
+			curr_total += freq_vals[i];
+			ctr++;
+		}
 		i++;
 	}
-	bass_avg = curr_total / ctr / bass_max;
+	if (ctr == 0) bass_avg = 0;
+	else bass_avg = curr_total / ctr / bass_max;
 	curr_total = 0;
 	ctr = 0;
 	while (freqAtKey((double)i / 10.) < 500) {

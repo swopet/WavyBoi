@@ -25,36 +25,34 @@ class WavyBoiRecorder : public sf::SoundRecorder
 		f = (double *)malloc(size * sizeof(double));
 		x = (double *)malloc(size * sizeof(double));
 		last_f = (double *)malloc(1000 * sizeof(double));
-		setProcessingInterval(sf::milliseconds(60)); //we want 30 FPS fidelity on audio processing. to get a sample size of 16384, we need 30*16384 = 1000000 samples per second
+		setProcessingInterval(sf::milliseconds(size * 1000/192000 / 0.9)); //we want 30 FPS fidelity on audio processing. to get a sample size of 16384, we need 30*16384 = 1000000 samples per second
 		// initialize whatever has to be done before the capture starts
 		last_time = clock.getElapsedTime();
 		fft_object = new ffft::FFTReal<double>(size);
+		std::cout << "FFT length: " << fft_object->get_length() << std::endl;
 		// return true to start the capture, or false to cancel it
 		return true;
 	}
 
 	virtual bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount)
 	{
-		sf::Time sample_time = clock.getElapsedTime() - last_time;
-		// do something useful with the new chunk of samples
-		
+		sf::Time elapsed_time = clock.getElapsedTime() - last_time;
 		for (int i = 0; i < size; i++) {
-			if (i < sampleCount)
-				x[i] = (double)samples[i];
-			else x[i] = 0;
+			x[i] = (double)samples[i];
 		}
 		fft_object->do_fft(f, x);
 		fft_object->rescale(f);
 		double total = 0;
 		for (int i = 0; i < 1000; i++) {
 			double freq = freqAtKey(((double)i) / 10.);
-			int ind = (int)(freq/(sampleCount / sample_time.asSeconds() / sampleCount / 2.0));
-			last_f[i] = sqrt(f[ind]*f[ind] + f[size/2+ind]*f[size/2+ind]);
+			int ind = (int)(freq * elapsed_time.asSeconds());
+			if (ind < size / 2)
+				last_f[i] = sqrt(f[ind] * f[ind] + f[size / 2 + ind] * f[size / 2 + ind]);
+			else
+				last_f[i] = 0;
 			total += last_f[i];
 		}
 		double avg = total / 1000.;
-		std::cout << sampleCount << "\r";
-		// return true to continue the capture, or false to stop it
 		last_time = clock.getElapsedTime();
 		return true;
 	}
@@ -80,14 +78,17 @@ public:
 class AudioHandler
 {
 private:
-	long size = 65536;
+	long size = 16384;
 	WavyBoiRecorder audio_recorder;
 	double curr_max = 0;
 	double sub_bass_max; //20 to 60 Hz
 	double sub_bass_avg;
+	
 	double bass_max; //60 to 250 Hz
 	double bass_avg;
+	
 	double lower_mid_max; //250 to 500 Hz
+	
 	double lower_mid_avg;
 	double mid_max; //500 Hz to 2 kHz
 	double mid_avg;
@@ -103,6 +104,27 @@ public:
 	void resetLevels();
 	void draw(sf::RenderTarget &, sf::RenderStates);
 	void update();
+	double getSubBass() {
+		return sub_bass_avg;
+	}
+	double getBass() {
+		return bass_avg;
+	}
+	double getLowerMid() {
+		return lower_mid_avg;
+	}
+	double getMid() {
+		return mid_avg;
+	}
+	double getUpperMid() {
+		return upper_mid_avg;
+	}
+	double getPresence() {
+		return presence_avg;
+	}
+	double getBrilliance () {
+		return brilliance_avg;
+	}
 };
 
 extern AudioHandler * audio_handler;

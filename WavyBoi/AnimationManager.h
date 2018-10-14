@@ -13,6 +13,8 @@ rendering. */
 #include <Object/Link.h>
 #include <Multiplexer.h>
 #include <AudioHandler.h>
+#include <FreqBandBlock.h>
+#include <Comparator.h>
 #include <Channel.h>
 #include <Common.h>
 #include <map>
