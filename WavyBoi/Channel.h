@@ -2,9 +2,6 @@
 #include "Object/Object.h"
 #include "Object/Parameter.h"
 
-constexpr auto CHANNEL_OUTLINE_THICKNESS = 2;
-constexpr auto CHANNEL_CIRCLE_RADIUS = 4;
-
 class Channel :
 	public Object
 {

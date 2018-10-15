@@ -6,8 +6,6 @@
 #include <sfeMovie/Movie.hpp>
 #include <Object\Parameter.h>
 #include <Common.h>
-constexpr auto VIDEO_OUTLINE_THICKNESS = 2;
-constexpr auto VIDEO_CIRCLE_RADIUS = 4;
 
 class Video : public Object {
 private:

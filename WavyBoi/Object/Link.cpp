@@ -52,16 +52,21 @@ Parameter * Link::getParameterFromLink()
 
 bool Link::checkOverlap(sf::RectangleShape select_rect)
 {
-	return checkIntersection(select_rect,in_pos,out_pos);
+	return (checkIntersection(select_rect,in_pos, sf::Vector2f(in_pos.x + 10, in_pos.y))
+			|| checkIntersection(select_rect,sf::Vector2f(in_pos.x + 10, in_pos.y), sf::Vector2f(in_pos.x + 10, out_pos.y))
+		|| checkIntersection(select_rect, sf::Vector2f(in_pos.x + 10, out_pos.y), out_pos));
 }
 
 void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 	sf::Vertex line[] = {
 		sf::Vertex(in_pos),
+		sf::Vertex(sf::Vector2f(in_pos.x+10,in_pos.y)),
+		sf::Vertex(sf::Vector2f(in_pos.x+10,out_pos.y)),
 		sf::Vertex(out_pos)
 	};
-	glLineWidth(LINK_LINE_THICKNESS);
-	target.draw(line, 2, sf::Lines);
+	glLineWidth(gui.outline_thickness);
+	glColor3f(gui.obj_outline_color.r, gui.obj_outline_color.g, gui.obj_outline_color.b);
+	target.draw(line, 4, sf::LineStrip);
 }
 
 void Link::setOutInd(int new_ind)

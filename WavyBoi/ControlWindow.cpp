@@ -5,21 +5,19 @@ ControlWindow::ControlWindow(AnimationManager * animation_manager){
 	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->getName());
 	window->setVerticalSyncEnabled(true);
 	state.window_size = sf::Vector2u(1600,900);
-	state.menu_height = 24;
 	font = NULL;
 	state.last_fps_draw = state.clock.getElapsedTime();
-	loadFont("C:/Users/Trevor/Stuff/VS/WavyBoi/resources/fonts/Montserrat-Medium.otf");
 	sf::Vector2i pos(0,0);
 	Menu * file_menu = new Menu();
-	file_menu->initialize(MENU_TYPE::FILE,font,pos,state.menu_height);
+	file_menu->initialize(MENU_TYPE::FILE,pos);
 	menu_tabs.push_back(file_menu);
 	pos = pos + sf::Vector2i(file_menu->get_width(),0);
 	Menu * edit_menu = new Menu();
-	edit_menu->initialize(MENU_TYPE::EDIT,font,pos,state.menu_height);
+	edit_menu->initialize(MENU_TYPE::EDIT,pos);
 	menu_tabs.push_back(edit_menu);
 	pos = pos + sf::Vector2i(edit_menu->get_width(),0);
 	Menu * display_menu = new Menu();
-	display_menu->initialize(MENU_TYPE::DISPLAY,font,pos,state.menu_height);
+	display_menu->initialize(MENU_TYPE::DISPLAY,pos);
 	menu_tabs.push_back(display_menu);
 }
 
@@ -173,18 +171,6 @@ void ControlWindow::drawNewLink() {
 
 void ControlWindow::close(){
 	window->close();
-}
-
-bool ControlWindow::loadFont(std::string font_name){
-	if (font != NULL){
-		delete font;
-	}
-	font = new sf::Font();
-	if (!font->loadFromFile(font_name)){
-		std::cerr << "Could not load font " << font_name << std::endl;
-		return false;
-	}
-	return true;
 }
 
 void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * animation_manager){

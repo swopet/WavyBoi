@@ -17,7 +17,7 @@ bool Menu::getOptionEnabled(int pos){
 	return menu_options.at(pos).enabled;
 }
 
-void Menu::initialize(MENU_TYPE new_type,sf::Font * new_font,sf::Vector2i new_pos,unsigned int new_height){
+void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 	type = new_type;
 	switch(type){
 		case MENU_TYPE::FILE:
@@ -43,44 +43,43 @@ void Menu::initialize(MENU_TYPE new_type,sf::Font * new_font,sf::Vector2i new_po
 			name = "New";
 		break;
 	}
-	font = new_font;
-	height = new_height;
+	height = gui.menu_text_height;
 	//get thiccest menu option
 	menu_options_width = 0;
 	for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
-		text = sf::Text((*it).name,*font,height);
+		text = sf::Text((*it).name,gui.font,height);
 		unsigned int width = (unsigned int)text.findCharacterPos((*it).name.length()).x;
 		if (width > menu_options_width) menu_options_width = width;
 	}
-	menu_options_width += MENU_BORDER_THICKNESS*4;
+	menu_options_width += gui.outline_thickness*4;
 	pos = new_pos;
-	text = sf::Text(name,*font,new_height);
-	text.setPosition(new_pos.x+MENU_BORDER_THICKNESS*2,new_pos.y+MENU_BORDER_THICKNESS*2);
+	text = sf::Text(name,gui.font,gui.menu_text_height);
+	text.setPosition(new_pos.x+gui.outline_thickness*2,new_pos.y+gui.outline_thickness*2);
 	text.setFillColor(sf::Color::White);
-	rect = sf::RectangleShape(sf::Vector2f(text.findCharacterPos(name.length()).x-pos.x+MENU_BORDER_THICKNESS*2,height+MENU_BORDER_THICKNESS*4));
+	rect = sf::RectangleShape(sf::Vector2f(text.findCharacterPos(name.length()).x-pos.x+gui.outline_thickness*2,height+gui.outline_thickness*4));
 	rect.setPosition(new_pos.x,new_pos.y);
 	rect.setFillColor(sf::Color(127,127,127));
-	rect.setOutlineThickness(-MENU_BORDER_THICKNESS);
+	rect.setOutlineThickness(-gui.outline_thickness);
 	rect.setOutlineColor(sf::Color(63,63,63));
 }
 
 void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 	target.draw(rect);
 	target.draw(text);
-	sf::Vector2i temp_pos = sf::Vector2i(pos.x,pos.y+height+MENU_BORDER_THICKNESS*4);
+	sf::Vector2i temp_pos = sf::Vector2i(pos.x,pos.y+height+gui.outline_thickness*4);
 	if (is_open){
 		for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
-			sf::Text temp_text((*it).name,*font,height);
-			temp_text.setPosition(temp_pos.x+MENU_BORDER_THICKNESS*2,temp_pos.y+MENU_BORDER_THICKNESS*2);
+			sf::Text temp_text((*it).name,gui.font,height);
+			temp_text.setPosition(temp_pos.x+gui.outline_thickness*2,temp_pos.y+gui.outline_thickness*2);
 			temp_text.setFillColor(sf::Color::White);
-			sf::RectangleShape temp_rect(sf::Vector2f(menu_options_width,height+MENU_BORDER_THICKNESS*4));
+			sf::RectangleShape temp_rect(sf::Vector2f(menu_options_width,height+gui.outline_thickness*4));
 			temp_rect.setPosition(temp_pos.x,temp_pos.y);
 			(*it).enabled ? temp_rect.setFillColor(sf::Color(127,127,127)) : temp_rect.setFillColor(sf::Color(95,95,95));
-			temp_rect.setOutlineThickness(-MENU_BORDER_THICKNESS);
+			temp_rect.setOutlineThickness(-gui.outline_thickness);
 			temp_rect.setOutlineColor(sf::Color(63,63,63));
 			target.draw(temp_rect);
 			target.draw(temp_text);
-			temp_pos = sf::Vector2i(temp_pos.x,temp_pos.y+height+MENU_BORDER_THICKNESS*4);
+			temp_pos = sf::Vector2i(temp_pos.x,temp_pos.y+height+gui.outline_thickness*4);
 		}
 	}
 }
@@ -93,9 +92,9 @@ void Menu::update(sf::Vector2i mouse_pos){
 			&& mouse_pos.y < pos.y + rect.getSize().y)
 			||
 			(mouse_pos.x >= pos.x
-			&& mouse_pos.y >= pos.y + (height+MENU_BORDER_THICKNESS*4)
+			&& mouse_pos.y >= pos.y + (height+gui.outline_thickness*4)
 			&& mouse_pos.x < pos.x + menu_options_width
-			&& mouse_pos.y < pos.y + (menu_options.size()+1) * (height+MENU_BORDER_THICKNESS*4))) return;
+			&& mouse_pos.y < pos.y + (menu_options.size()+1) * (height+gui.outline_thickness*4))) return;
 		else is_open = false;
 	}
 }
@@ -119,9 +118,9 @@ bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation
 					continue;
 				}
 				if (mouse_pos.x >= pos.x
-				    && mouse_pos.y >= pos.y + ctr * (height+MENU_BORDER_THICKNESS*4)
+				    && mouse_pos.y >= pos.y + ctr * (height+gui.outline_thickness*4)
 					&& mouse_pos.x < pos.x + menu_options_width
-					&& mouse_pos.y < pos.y + (ctr+1) * (height+MENU_BORDER_THICKNESS*4)){
+					&& mouse_pos.y < pos.y + (ctr+1) * (height+gui.outline_thickness*4)){
 						void (AnimationManager::*clickFunc)() = (*it).clickFunc;
 						(animation_manager->*clickFunc)();
 						is_open = false;

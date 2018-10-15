@@ -5,7 +5,6 @@
 #include <Object/Object.h>
 #include <Object/Parameter.h>
 #include <Object/Link.h>
-constexpr auto LINK_LINE_THICKNESS = 2;
 
 class Link : public Object {
 private:

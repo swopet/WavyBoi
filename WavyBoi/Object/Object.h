@@ -3,6 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include <Common.h>
 #include <Object/Parameter.h>
+#include <GUISettings.h>
+
+extern GUISettings gui;
 
 enum class OBJECT_TYPE {
 	VIDEO,

@@ -76,16 +76,16 @@ void Comparator::setParameter(Parameter * parameter, int ind)
 
 void Comparator::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	sf::RectangleShape main_box(sf::Vector2f(20 + COMPARATOR_OUTLINE_THICKNESS * 2, 40 + COMPARATOR_OUTLINE_THICKNESS * 2));
+	sf::RectangleShape main_box(sf::Vector2f(20 + gui.outline_thickness * 2, 40 + gui.outline_thickness * 2));
 	main_box.setPosition(position);
-	main_box.setOutlineColor(sf::Color(192, 192, 192));
-	main_box.setOutlineThickness(-COMPARATOR_OUTLINE_THICKNESS);
-	main_box.setFillColor(sf::Color(128, 128, 128));
+	main_box.setOutlineColor(gui.obj_outline_color);
+	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setFillColor(gui.obj_fill_color);
 	target.draw(main_box);
-	sf::CircleShape circle(COMPARATOR_OUTLINE_THICKNESS + COMPARATOR_CIRCLE_RADIUS);
-	circle.setOutlineColor(sf::Color(192, 192, 192));
-	circle.setOutlineThickness(-COMPARATOR_OUTLINE_THICKNESS);
-	circle.setFillColor(sf::Color(128, 128, 128));
+	sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
+	circle.setOutlineColor(gui.obj_outline_color);
+	circle.setOutlineThickness(-gui.outline_thickness);
+	circle.setFillColor(gui.obj_fill_color);
 	circle.setPosition(getLeftPos(0) - sf::Vector2f(circle.getRadius(),circle.getRadius()));
 	target.draw(circle);
 	circle.setPosition(getLeftPos(1) - sf::Vector2f(circle.getRadius(), circle.getRadius()));
@@ -115,23 +115,23 @@ void Comparator::draw(sf::RenderTarget & target, sf::RenderStates states)
 	}
 	sf::Text text(comp_string, font, 20);
 	text.setFillColor(sf::Color(255, 255, 255));
-	text.setPosition(position + sf::Vector2f(COMPARATOR_OUTLINE_THICKNESS*2, COMPARATOR_OUTLINE_THICKNESS + 10));
+	text.setPosition(position + sf::Vector2f(gui.outline_thickness*2, gui.outline_thickness + 10));
 	target.draw(text);
 }
 
 sf::Vector2f Comparator::getLeftPos(int ind)
 {
 	if (ind == 0) {
-		return sf::Vector2f(position + sf::Vector2f(COMPARATOR_OUTLINE_THICKNESS / 2, COMPARATOR_OUTLINE_THICKNESS /2 + 10));
+		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness /2 + 10));
 	}
 	if (ind == 1) {
-		return sf::Vector2f(position + sf::Vector2f(COMPARATOR_OUTLINE_THICKNESS / 2, COMPARATOR_OUTLINE_THICKNESS / 2 + 30));
+		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness / 2 + 30));
 	}
 }
 
 sf::Vector2f Comparator::getRightPos()
 {
-	return position + sf::Vector2f(3*COMPARATOR_OUTLINE_THICKNESS/2 + 20, COMPARATOR_OUTLINE_THICKNESS + 20);
+	return position + sf::Vector2f(3*gui.outline_thickness/2 + 20, gui.outline_thickness + 20);
 }
 
 Comparator::Comparator()
@@ -154,7 +154,7 @@ ClickResponse Comparator::processLeftClick(sf::Vector2i mouse_pos)
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - getRightPos()) <= COMPARATOR_CIRCLE_RADIUS + COMPARATOR_OUTLINE_THICKNESS) {
+	if (length(sf::Vector2f(mouse_pos) - getRightPos()) <= gui.obj_circle_radius + gui.outline_thickness) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
 	}
@@ -168,7 +168,7 @@ ClickResponse Comparator::processLeftClickRelease(sf::Vector2i mouse_pos)
 	response.type = CLICK_RESPONSE::NONE;
 	for (int i = 0; i <= 2; i++) {
 		sf::Vector2f pos = getLeftPos(i);
-		if (length(sf::Vector2f(mouse_pos) - pos) <= COMPARATOR_OUTLINE_THICKNESS + COMPARATOR_CIRCLE_RADIUS) {
+		if (length(sf::Vector2f(mouse_pos) - pos) <= gui.outline_thickness + gui.obj_circle_radius) {
 			response.clicked = true;
 			response.ind = i;
 			response.type = CLICK_RESPONSE::GOT_LEFT;

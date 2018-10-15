@@ -29,7 +29,7 @@ void Channel::update()
 	if (render_texture != NULL) {
 		sf::Vector2f tex_size = sf::Vector2f(render_texture->getSize());
 		if (tex_size.y != 0) { //don't know why it would but just to be sure
-			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(CHANNEL_OUTLINE_THICKNESS, CHANNEL_OUTLINE_THICKNESS);
+			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(gui.outline_thickness, gui.outline_thickness);
 			//fit the preview video to the inside of the video object
 			float movie_ratio = tex_size.x / tex_size.y;
 			float main_box_ratio = main_box_size.x / main_box_size.y;
@@ -48,7 +48,7 @@ void Channel::update()
 void Channel::draw(sf::RenderTarget& target, sf::RenderStates states) {
 	main_box.setPosition(position - size / 2.0f);
 	video_box.setPosition(position - video_box.getSize() / 2.0f);
-	left_pos = position - sf::Vector2f((size.x - CHANNEL_OUTLINE_THICKNESS) / 2.0f, 0);
+	left_pos = position - sf::Vector2f((size.x - gui.outline_thickness) / 2.0f, 0);
 	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
 	target.draw(main_box);
 	target.draw(video_box);
@@ -91,18 +91,18 @@ Channel::Channel(int new_id) {
 	id = new_id;
 	name = "Output Channel " + std::to_string(id);
 	type = OBJECT_TYPE::CHANNEL;
-	size = sf::Vector2f(160 + CHANNEL_OUTLINE_THICKNESS * 2, 90 + CHANNEL_OUTLINE_THICKNESS * 2);
+	size = sf::Vector2f(160 + gui.outline_thickness * 2, 90 + gui.outline_thickness * 2);
 	position = sf::Vector2f(1000, 100 * (id+1));
 	main_box = sf::RectangleShape(size);
-	main_box.setOutlineThickness(-CHANNEL_OUTLINE_THICKNESS);
-	main_box.setOutlineColor(sf::Color(192, 192, 192));
+	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setOutlineColor(gui.obj_outline_color);
 	main_box.setFillColor(sf::Color(0, 0, 0));
-	left_circle = sf::CircleShape(CHANNEL_CIRCLE_RADIUS + CHANNEL_OUTLINE_THICKNESS);
-	left_circle.setOutlineThickness(-CHANNEL_OUTLINE_THICKNESS);
-	left_circle.setOutlineColor(sf::Color(192, 192, 192));
-	left_circle.setFillColor(sf::Color(128, 128, 128));
+	left_circle = sf::CircleShape(gui.obj_circle_radius + gui.outline_thickness);
+	left_circle.setOutlineThickness(-gui.outline_thickness);
+	left_circle.setOutlineColor(gui.obj_outline_color);
+	left_circle.setFillColor(gui.obj_fill_color);
 	video_box = sf::RectangleShape(sf::Vector2f(0, 0));
-	video_box.setFillColor(sf::Color(128, 128, 128));
+	video_box.setFillColor(gui.obj_fill_color);
 }
 
 ClickResponse Channel::processLeftClickHeld(sf::Vector2i mouse_pos) {

@@ -2,8 +2,6 @@
 #include "Object/Object.h"
 #include <AudioHandler.h>
 extern AudioHandler * audio_handler;
-constexpr auto FREQBAND_OUTLINE_THICKNESS = 2;
-constexpr auto FREQBAND_CIRCLE_RADIUS = 4;
 
 class FreqBandBlock :
 	public Object

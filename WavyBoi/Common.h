@@ -4,7 +4,7 @@
 #include <math.h>
 #include <iostream>
 #include <string>
-constexpr auto TEXTURE_PATH = "C:/Users/Trevor/Stuff/VS/WavyBoi/resources/textures/";
+
 enum class CLICK_RESPONSE {
 	NONE,
 	PROCESSED,
@@ -20,11 +20,9 @@ struct ClickResponse {
 	int ind = 0;
 };
 
-extern sf::Texture add_20x20_tex;
-extern sf::Texture delete_20x20_tex;
-void loadApplicationTextures();
-
 bool checkIntersection(sf::RectangleShape rec1, sf::RectangleShape rec2);
+
+bool checkIntersection(sf::RectangleShape rec1, sf::Vector2f);
 
 bool checkIntersection(sf::RectangleShape rect, sf::Vector2f point1, sf::Vector2f point2);
 

@@ -45,21 +45,21 @@ param FreqBandBlock::getVal()
 
 sf::Vector2f FreqBandBlock::getRightPos()
 {
-	return position + sf::Vector2f(40 + 3 * FREQBAND_OUTLINE_THICKNESS / 2, 10 + FREQBAND_OUTLINE_THICKNESS);
+	return position + sf::Vector2f(40 + 3 * gui.outline_thickness / 2, 10 + gui.outline_thickness);
 }
 
 void FreqBandBlock::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	sf::RectangleShape main_box(sf::Vector2f(40 + FREQBAND_OUTLINE_THICKNESS * 2, 20 + FREQBAND_OUTLINE_THICKNESS * 2));
-	main_box.setOutlineColor(sf::Color(192, 192, 192));
-	main_box.setOutlineThickness(-FREQBAND_OUTLINE_THICKNESS);
-	main_box.setFillColor(sf::Color(128, 128, 128));
+	sf::RectangleShape main_box(sf::Vector2f(40 + gui.outline_thickness * 2, 20 + gui.outline_thickness * 2));
+	main_box.setOutlineColor(gui.obj_outline_color);
+	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setFillColor(gui.obj_fill_color);
 	main_box.setPosition(position);
 	target.draw(main_box);
-	sf::CircleShape right_circle(FREQBAND_CIRCLE_RADIUS + FREQBAND_OUTLINE_THICKNESS);
-	right_circle.setOutlineColor(sf::Color(192, 192, 192));
-	right_circle.setOutlineThickness(-FREQBAND_OUTLINE_THICKNESS);
-	right_circle.setFillColor(sf::Color(128, 128, 128));
+	sf::CircleShape right_circle(gui.obj_circle_radius + gui.outline_thickness);
+	right_circle.setOutlineColor(gui.obj_outline_color);
+	right_circle.setOutlineThickness(-gui.outline_thickness);
+	right_circle.setFillColor(gui.obj_fill_color);
 	right_circle.setPosition(getRightPos() - sf::Vector2f(right_circle.getRadius(),right_circle.getRadius()));
 	target.draw(right_circle);
 }
@@ -69,9 +69,17 @@ ClickResponse FreqBandBlock::processLeftClick(sf::Vector2i mouse_pos)
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - getRightPos()) <= FREQBAND_CIRCLE_RADIUS + FREQBAND_OUTLINE_THICKNESS) {
+	if (length(sf::Vector2f(mouse_pos) - getRightPos()) <= gui.obj_circle_radius + gui.outline_thickness) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
+		return response;
+	}
+	sf::RectangleShape main_box(sf::Vector2f(40 + gui.outline_thickness * 2, 20 + gui.outline_thickness * 2));
+	main_box.setPosition(position);
+	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::SELECTED;
+		return response;
 	}
 	return response;
 }

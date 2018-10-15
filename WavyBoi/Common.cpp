@@ -9,14 +9,7 @@ sf::Vector2f getBottomRight(sf::RectangleShape rect) {
 	return sf::Vector2f(rect.getSize().x < 0 ? rect.getPosition().x : (rect.getPosition().x + rect.getSize().x), rect.getSize().y < 0 ? rect.getPosition().y : (rect.getPosition().y + rect.getSize().y));
 }
 
-sf::Texture add_20x20_tex;
-sf::Texture delete_20x20_tex;
 
-void loadApplicationTextures()
-{
-	add_20x20_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("add_20x20.png"));
-	delete_20x20_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("delete_20x20.png"));
-}
 
 bool checkIntersection(sf::RectangleShape rect1, sf::RectangleShape rect2) {
 	sf::Vector2f rec1_topleft = getTopLeft(rect1);
@@ -53,6 +46,15 @@ bool checkIntersection(sf::Vector2f line1_point1, sf::Vector2f line1_point2, sf:
 	float uA = ((x4 - x3)*(y1 - y3) - (y4 - y3)*(x1 - x3)) / ((y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1));
 	float uB = ((x2 - x1)*(y1 - y3) - (y2 - y1)*(x1 - x3)) / ((y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1));
 	return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);
+}
+
+bool checkIntersection(sf::RectangleShape rect, sf::Vector2f pos) {
+	sf::Vector2f top_left = getTopLeft(rect);
+	sf::Vector2f bottom_right = getBottomRight(rect);
+	return (pos.x >= top_left.x
+		&& pos.y >= top_left.y
+		&& pos.x < bottom_right.x
+		&& pos.y < bottom_right.y);
 }
 
 float length(sf::Vector2f vec) {

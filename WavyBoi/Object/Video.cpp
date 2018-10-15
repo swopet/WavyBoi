@@ -5,7 +5,7 @@
 Video::Video(){
 	name = "unnamed video";
 	type = OBJECT_TYPE::VIDEO;
-	size = sf::Vector2f(80+VIDEO_OUTLINE_THICKNESS*2,60+VIDEO_OUTLINE_THICKNESS*2);
+	size = sf::Vector2f(80+gui.outline_thickness*2,60+gui.outline_thickness*2);
 	position = sf::Vector2f(100,100);
 	init();
 }
@@ -20,25 +20,25 @@ void Video::update() {
 
 void Video::init(){
 	main_box = sf::RectangleShape(size);
-	main_box.setOutlineThickness(-VIDEO_OUTLINE_THICKNESS);
-	main_box.setOutlineColor(sf::Color(192,192,192));
+	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setOutlineColor(gui.obj_outline_color);
 	main_box.setFillColor(sf::Color(0,0,0));
-	left_circle = sf::CircleShape(VIDEO_CIRCLE_RADIUS + VIDEO_OUTLINE_THICKNESS);
-	left_circle.setOutlineThickness(-VIDEO_OUTLINE_THICKNESS);
-	left_circle.setOutlineColor(sf::Color(192, 192, 192));
-	left_circle.setFillColor(sf::Color(128, 128, 128));
+	left_circle = sf::CircleShape(gui.obj_circle_radius + gui.outline_thickness);
+	left_circle.setOutlineThickness(-gui.outline_thickness);
+	left_circle.setOutlineColor(gui.obj_outline_color);
+	left_circle.setFillColor(gui.obj_fill_color);
 	right_circle = left_circle;
 	video_box = sf::RectangleShape(sf::Vector2f(0,0));
-	video_box.setFillColor(sf::Color(128, 128, 128));
+	video_box.setFillColor(gui.obj_fill_color);
 	movie = NULL;
 }
 
 void Video::draw(sf::RenderTarget& target, sf::RenderStates states){
 	main_box.setPosition(position - size/2.0f);
 	video_box.setPosition(position - video_box.getSize()/2.0f);
-	left_pos = position - sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
+	left_pos = position - sf::Vector2f((size.x - gui.outline_thickness) / 2.0f, 0);
 	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
-	right_pos = position + sf::Vector2f((size.x - VIDEO_OUTLINE_THICKNESS) / 2.0f, 0);
+	right_pos = position + sf::Vector2f((size.x - gui.outline_thickness) / 2.0f, 0);
 	right_circle.setPosition(right_pos - sf::Vector2f(right_circle.getRadius(), right_circle.getRadius()));
 	target.draw(main_box);
 	target.draw(video_box);
@@ -58,7 +58,7 @@ void Video::loadFromFile(std::string file_name){ //load from full path
 		movie->play();
 		sf::Vector2f movie_size = movie->getSize();
 		if (movie_size.y != 0) { //don't know why it would but just to be sure
-			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(VIDEO_OUTLINE_THICKNESS,VIDEO_OUTLINE_THICKNESS);
+			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(gui.outline_thickness,gui.outline_thickness);
 			//fit the preview video to the inside of the video object
 			float movie_ratio = movie_size.x / movie_size.y;
 			float main_box_ratio = main_box_size.x / main_box_size.y;

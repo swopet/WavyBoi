@@ -13,7 +13,6 @@ extern AudioHandler * audio_handler;
 
 struct ControlWindowState {
 	sf::Vector2u window_size;
-	unsigned int menu_height;
 	bool left_mouse_held = false;
 	bool moving = false;
 	bool selecting = false;
@@ -49,7 +48,6 @@ public:
 	void drawLinks(AnimationManager * animation_manager);
 	void drawNewLink();
 	void close();
-	bool loadFont(std::string);
 	void processLeftClick(sf::Vector2i,AnimationManager *);
 	void processLeftClickHeld(AnimationManager *);
 	void processLeftClickRelease(sf::Vector2i,AnimationManager *);
