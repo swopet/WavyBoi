@@ -7,18 +7,27 @@ ControlWindow::ControlWindow(AnimationManager * animation_manager){
 	state.window_size = sf::Vector2u(1600,900);
 	font = NULL;
 	state.last_fps_draw = state.clock.getElapsedTime();
-	sf::Vector2i pos(0,0);
+	InitializeMenuTabs();
+}
+
+void ControlWindow::InitializeMenuTabs() {
+	sf::Vector2i pos(0, 0);
 	Menu * file_menu = new Menu();
-	file_menu->initialize(MENU_TYPE::FILE,pos);
+	file_menu->initialize(MENU_TYPE::FILE, pos);
 	menu_tabs.push_back(file_menu);
-	pos = pos + sf::Vector2i(file_menu->get_width(),0);
+	pos = pos + sf::Vector2i(file_menu->get_width(), 0);
 	Menu * edit_menu = new Menu();
-	edit_menu->initialize(MENU_TYPE::EDIT,pos);
+	edit_menu->initialize(MENU_TYPE::EDIT, pos);
 	menu_tabs.push_back(edit_menu);
-	pos = pos + sf::Vector2i(edit_menu->get_width(),0);
+	pos = pos + sf::Vector2i(edit_menu->get_width(), 0);
+	Menu * new_menu = new Menu();
+	new_menu->initialize(MENU_TYPE::NEW, pos);
+	menu_tabs.push_back(new_menu);
+	pos = pos + sf::Vector2i(new_menu->get_width(), 0);
 	Menu * display_menu = new Menu();
-	display_menu->initialize(MENU_TYPE::DISPLAY,pos);
+	display_menu->initialize(MENU_TYPE::DISPLAY, pos);
 	menu_tabs.push_back(display_menu);
+	
 }
 
 ControlWindow::ControlWindow(){
@@ -104,6 +113,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 void ControlWindow::deleteSelected(AnimationManager * animation_manager)
 {
 	if (state.selected) {
+		std::cout << "links to delete: " << state.selected_links.size() << std::endl;
 		while (!state.selected_links.empty()) {
 			animation_manager->deleteLink(state.selected_links.back());
 			state.selected_links.pop_back();
@@ -151,7 +161,7 @@ void ControlWindow::drawFPS(AnimationManager * animation_manager) {
 		state.last_fps_draw = state.clock.getElapsedTime();
 		state.curr_fps = animation_manager->getFPS();
 	}
-	sf::Text fps_text(std::to_string((int)state.curr_fps) + " FPS",*font,16);
+	sf::Text fps_text(std::to_string((int)state.curr_fps) + " FPS",gui.font,16);
 	float width = fps_text.findCharacterPos(fps_text.getString().getSize()).x;
 	fps_text.setFillColor(sf::Color::Cyan);
 	fps_text.setPosition(sf::Vector2f(window->getSize().x - width, 0));
@@ -269,7 +279,10 @@ void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 		select_box.setSize(sf::Vector2f(state.select_end_pos - state.select_start_pos));
 		select_box.setPosition(sf::Vector2f(state.select_start_pos));
 		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
-			if ((*it)->checkOverlap(select_box)) state.selected_objects.push_back(*it);
+			if ((*it)->checkOverlap(select_box)) {
+				state.selected_objects.push_back(*it);
+				std::cout << "selected an object" << std::endl;
+			}
 		}
 		for (std::vector<Link *>::iterator it = links.begin(); it != links.end(); ++it) {
 			if ((*it)->checkOverlap(select_box)) state.selected_links.push_back(*it);

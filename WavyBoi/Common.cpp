@@ -42,7 +42,7 @@ bool checkIntersection(sf::Vector2f line1_point1, sf::Vector2f line1_point2, sf:
 	y2 = line1_point2.y;
 	y3 = line2_point1.y;
 	y4 = line2_point2.y;
-	if (((y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1)) == 0) return true;
+	if (((y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1)) == 0) return false;
 	float uA = ((x4 - x3)*(y1 - y3) - (y4 - y3)*(x1 - x3)) / ((y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1));
 	float uB = ((x2 - x1)*(y1 - y3) - (y2 - y1)*(x1 - x3)) / ((y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1));
 	return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);

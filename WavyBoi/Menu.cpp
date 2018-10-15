@@ -41,6 +41,26 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 		break;
 		case MENU_TYPE::NEW:
 			name = "New";
+			menu_options.push_back(MenuOption(std::string("Comparator"), NULL, true, true));
+			menu_options.push_back(MenuOption(std::string("Operator"), NULL, true, true));
+		break;
+		case MENU_TYPE::COMPARATOR:
+			name = "";
+			menu_options.push_back(MenuOption(std::string("<"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("<="), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string(">"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string(">="), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("=="), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("!="), NULL, true, false));
+		break;
+		case MENU_TYPE::OPERATOR:
+			name = "";
+			menu_options.push_back(MenuOption(std::string("+"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("-"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("/"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("*"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("^"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("%"), NULL, true, false));
 		break;
 	}
 	height = gui.menu_text_height;
@@ -53,6 +73,34 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 	}
 	menu_options_width += gui.outline_thickness*4;
 	pos = new_pos;
+	int submenu_index = 0;
+	sf::Vector2i new_menu_pos = pos + sf::Vector2i(menu_options_width, 0);
+	for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it) {
+		if ((*it).has_submenu) {
+			switch (type) {
+			case MENU_TYPE::NEW:
+
+				Menu * new_menu;
+				switch (submenu_index) {
+				case 0:
+					new_menu = new Menu();
+					new_menu->initialize(MENU_TYPE::COMPARATOR, new_menu_pos);
+					submenus.push_back(new_menu);
+					break;
+				case 1:
+					new_menu = new Menu();
+					new_menu->initialize(MENU_TYPE::OPERATOR, new_menu_pos);
+					submenus.push_back(new_menu);
+					break;
+				default:
+					break;
+				}
+				break;
+			}
+			submenu_index++;
+			new_menu_pos = new_menu_pos + sf::Vector2i(0, height + gui.outline_thickness * 4);
+		}
+	}
 	text = sf::Text(name,gui.font,gui.menu_text_height);
 	text.setPosition(new_pos.x+gui.outline_thickness*2,new_pos.y+gui.outline_thickness*2);
 	text.setFillColor(sf::Color::White);
@@ -64,8 +112,10 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 }
 
 void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
-	target.draw(rect);
-	target.draw(text);
+	if (name.length() > 0) {
+		target.draw(rect);
+		target.draw(text);
+	}
 	sf::Vector2i temp_pos = sf::Vector2i(pos.x,pos.y+height+gui.outline_thickness*4);
 	if (is_open){
 		for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
@@ -82,6 +132,10 @@ void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 			temp_pos = sf::Vector2i(temp_pos.x,temp_pos.y+height+gui.outline_thickness*4);
 		}
 	}
+	for (std::vector<Menu *>::iterator it = submenus.begin(); it != submenus.end(); ++it) {
+		if ((*it)->is_open)
+			(*it)->draw(target, states);
+	}
 }
 
 void Menu::update(sf::Vector2i mouse_pos){
@@ -95,8 +149,17 @@ void Menu::update(sf::Vector2i mouse_pos){
 			&& mouse_pos.y >= pos.y + (height+gui.outline_thickness*4)
 			&& mouse_pos.x < pos.x + menu_options_width
 			&& mouse_pos.y < pos.y + (menu_options.size()+1) * (height+gui.outline_thickness*4))) return;
-		else is_open = false;
+		else {
+			is_open = false;
+			for (std::vector<Menu *>::iterator it = submenus.begin(); it != submenus.end(); ++it) {
+				(*it)->update(mouse_pos);
+				if ((*it)->is_open) {
+					is_open = true;
+				}
+			}
+		}
 	}
+	
 }
 
 bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
@@ -107,11 +170,17 @@ bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation
 		//process the click
 		std::cout << "clicked on " << name << std::endl;
 		is_open = !is_open;
+		if (!is_open){
+			for (std::vector<Menu *>::iterator it = submenus.begin(); it != submenus.end(); ++it) {
+				(*it)->is_open = false;
+			}
+		}
 		return true;
 	}
 	else {
 		if (is_open){
 			int ctr = 1;
+			std::vector<Menu *>::iterator submenu_it = submenus.begin();
 			for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
 				if (!(*it).enabled){
 					ctr++;
@@ -122,13 +191,34 @@ bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation
 					&& mouse_pos.x < pos.x + menu_options_width
 					&& mouse_pos.y < pos.y + (ctr+1) * (height+gui.outline_thickness*4)){
 						void (AnimationManager::*clickFunc)() = (*it).clickFunc;
-						(animation_manager->*clickFunc)();
-						is_open = false;
-						return true;
+						if (clickFunc != NULL) {
+							(animation_manager->*clickFunc)();
+							is_open = false;
+							return true;
+						}
+						else if ((*it).has_submenu){
+							(*submenu_it)->is_open = !(*submenu_it)->is_open;
+							for (std::vector<Menu *>::iterator submenu_it_other = submenus.begin(); submenu_it_other != submenus.end(); ++submenu_it_other) {
+								if (*submenu_it != *submenu_it_other) (*submenu_it_other)->is_open = false;
+							}
+							return true;
+						}
+						else {
+							//here if I haven't made a callback function for this bad boi yet
+							is_open = false;
+							return true;
+						}
 				}
-				ctr++;	
+				if ((*it).has_submenu) ++submenu_it;
+				ctr++;
 			}
 			//check if the click is in the menu dropdown
+			//check if the click is in an open submenu dropdown
+			for (std::vector<Menu *>::iterator submenu_it = submenus.begin(); submenu_it != submenus.end(); ++submenu_it) {
+				if ((*submenu_it)->processLeftClick(mouse_pos, animation_manager)) {
+					return true;
+				}
+			}
 			return false;
 		}
 		return false;

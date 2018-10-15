@@ -76,12 +76,35 @@ void Comparator::setParameter(Parameter * parameter, int ind)
 
 void Comparator::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	sf::RectangleShape main_box(sf::Vector2f(20 + gui.outline_thickness * 2, 40 + gui.outline_thickness * 2));
+	sf::RectangleShape main_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
 	main_box.setPosition(position);
 	main_box.setOutlineColor(gui.obj_outline_color);
 	main_box.setOutlineThickness(-gui.outline_thickness);
 	main_box.setFillColor(gui.obj_fill_color);
+	sf::RectangleShape tex_box(sf::Vector2f(32, 32));
+	tex_box.setPosition(position + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
 	target.draw(main_box);
+	switch (func) {
+	case COMPARATOR::LT:
+		tex_box.setTexture((out_val.int_val) ? &gui.lt_true_32x32_tex : &gui.lt_false_32x32_tex);
+		break;
+	case COMPARATOR::LTE:
+		tex_box.setTexture((out_val.int_val) ? &gui.lte_true_32x32_tex : &gui.lte_false_32x32_tex);
+		break;
+	case COMPARATOR::GT:
+		tex_box.setTexture((out_val.int_val) ? &gui.gt_true_32x32_tex : &gui.gt_false_32x32_tex);
+		break;
+	case COMPARATOR::GTE:
+		tex_box.setTexture((out_val.int_val) ? &gui.gte_true_32x32_tex : &gui.gte_false_32x32_tex);
+		break;
+	case COMPARATOR::EQ:
+		tex_box.setTexture((out_val.int_val) ? &gui.eq_true_32x32_tex : &gui.eq_false_32x32_tex);
+		break;
+	case COMPARATOR::NEQ:
+		tex_box.setTexture((out_val.int_val) ? &gui.neq_true_32x32_tex : &gui.neq_false_32x32_tex);
+		break;
+	}
+	target.draw(tex_box);
 	sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
 	circle.setOutlineColor(gui.obj_outline_color);
 	circle.setOutlineThickness(-gui.outline_thickness);
@@ -92,46 +115,21 @@ void Comparator::draw(sf::RenderTarget & target, sf::RenderStates states)
 	target.draw(circle);
 	circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
 	target.draw(circle);
-	std::string comp_string = "";
-	switch (func) {
-	case COMPARATOR::LT:
-		comp_string = "<";
-		break;
-	case COMPARATOR::LTE:
-		comp_string = "<=";
-		break;
-	case COMPARATOR::EQ:
-		comp_string = "==";
-		break;
-	case COMPARATOR::NEQ:
-		comp_string = "!=";
-		break;
-	case COMPARATOR::GT:
-		comp_string = ">";
-		break;
-	case COMPARATOR::GTE:
-		comp_string = ">=";
-		break;
-	}
-	sf::Text text(comp_string, font, 20);
-	text.setFillColor(sf::Color(255, 255, 255));
-	text.setPosition(position + sf::Vector2f(gui.outline_thickness*2, gui.outline_thickness + 10));
-	target.draw(text);
 }
 
 sf::Vector2f Comparator::getLeftPos(int ind)
 {
 	if (ind == 0) {
-		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness /2 + 10));
+		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness + 8));
 	}
 	if (ind == 1) {
-		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness / 2 + 30));
+		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness + 24));
 	}
 }
 
 sf::Vector2f Comparator::getRightPos()
 {
-	return position + sf::Vector2f(3*gui.outline_thickness/2 + 20, gui.outline_thickness + 20);
+	return position + sf::Vector2f(3*gui.outline_thickness/2 + 32, gui.outline_thickness + 16);
 }
 
 Comparator::Comparator()
@@ -157,7 +155,25 @@ ClickResponse Comparator::processLeftClick(sf::Vector2i mouse_pos)
 	if (length(sf::Vector2f(mouse_pos) - getRightPos()) <= gui.obj_circle_radius + gui.outline_thickness) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
+		return response;
 	}
+	sf::RectangleShape switch_box(sf::Vector2f(12,12));
+	sf::RectangleShape move_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
+	move_box.setPosition(position);
+	switch_box.setPosition(position + move_box.getSize()/2.0f - switch_box.getSize()/2.0f);
+	if (checkIntersection(switch_box, sf::Vector2f(mouse_pos))) {
+		func = (COMPARATOR)((int)func + 1);
+		if (func == COMPARATOR::RESET) func = (COMPARATOR)0;
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+		return response;
+	}
+	if (checkIntersection(move_box, sf::Vector2f(mouse_pos))) {
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::SELECTED;
+		return response;
+	}
+
 	return response;
 }
 

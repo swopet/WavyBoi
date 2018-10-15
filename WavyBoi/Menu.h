@@ -9,17 +9,20 @@
 extern GUISettings gui;
 
 struct MenuOption {
-	MenuOption(std::string new_name, void (AnimationManager::*newFunc)(), bool new_enabled) : name(new_name), clickFunc(newFunc), enabled(new_enabled) {}
+	MenuOption(std::string new_name, void (AnimationManager::*newFunc)(), bool new_enabled, bool new_has_submenu = false) : name(new_name), clickFunc(newFunc), enabled(new_enabled), has_submenu(new_has_submenu) {}
 	std::string name;
 	void (AnimationManager::*clickFunc)();
 	bool enabled;
+	bool has_submenu;
 };
 
 enum class MENU_TYPE {
 	FILE,
 	EDIT,
 	NEW,
-	DISPLAY
+	DISPLAY,
+	COMPARATOR,
+	OPERATOR
 };
 
 class Menu{
@@ -33,6 +36,7 @@ private:
 	unsigned int height;
 	unsigned int menu_options_width;
 	std::vector<MenuOption> menu_options;
+	std::vector<Menu *> submenus;
 public:
 	Menu();
 	MENU_TYPE getType();

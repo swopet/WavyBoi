@@ -52,9 +52,10 @@ Parameter * Link::getParameterFromLink()
 
 bool Link::checkOverlap(sf::RectangleShape select_rect)
 {
-	return (checkIntersection(select_rect,in_pos, sf::Vector2f(in_pos.x + 10, in_pos.y))
-			|| checkIntersection(select_rect,sf::Vector2f(in_pos.x + 10, in_pos.y), sf::Vector2f(in_pos.x + 10, out_pos.y))
+	bool return_value = (checkIntersection(select_rect, in_pos, sf::Vector2f(in_pos.x + 10, in_pos.y))
+		|| checkIntersection(select_rect, sf::Vector2f(in_pos.x + 10, in_pos.y), sf::Vector2f(in_pos.x + 10, out_pos.y))
 		|| checkIntersection(select_rect, sf::Vector2f(in_pos.x + 10, out_pos.y), out_pos));
+	return return_value;
 }
 
 void Link::draw(sf::RenderTarget& target, sf::RenderStates states){

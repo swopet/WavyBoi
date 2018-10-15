@@ -38,6 +38,7 @@ private:
 public:
 	ControlWindow();
 	ControlWindow(AnimationManager *);
+	void InitializeMenuTabs();
 	bool update(AnimationManager *);
 	void deleteSelected(AnimationManager *);
 	void drawTopMenu(AnimationManager *);

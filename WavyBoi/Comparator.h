@@ -2,12 +2,13 @@
 #include "Object/Object.h"
 
 enum class COMPARATOR {
-	LT,
+	LT = 0,
 	LTE,
 	EQ,
 	NEQ,
 	GT,
-	GTE
+	GTE,
+	RESET
 };
 
 class Comparator :
