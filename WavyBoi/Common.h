@@ -11,13 +11,15 @@ enum class CLICK_RESPONSE {
 	DELETED_MUX_INPUT,
 	SELECTED,
 	GOT_RIGHT,
-	GOT_LEFT
+	GOT_LEFT,
+	GOT_TEXT_FIELD
 };
 
 struct ClickResponse {
 	bool clicked = false;
 	CLICK_RESPONSE type = CLICK_RESPONSE::NONE;
 	int ind = 0;
+	std::string field = "";
 };
 
 bool checkIntersection(sf::RectangleShape rec1, sf::RectangleShape rec2);

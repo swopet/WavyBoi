@@ -31,6 +31,7 @@ public:
 	void setPosition(sf::Vector2f new_position) {
 		position = new_position;
 	}
+	virtual void processNewString(std::string field, std::string input) {}
 	OBJECT_TYPE getObjectType() { return type; }
 	virtual void setParamsToDefault() {};
 	virtual bool getMultipleInputsAllowed(int) { return true; }
@@ -72,6 +73,18 @@ public:
 		return response;
 	}
 	virtual ClickResponse processLeftClickRelease(sf::Vector2i vec) {
+		ClickResponse response;
+		response.clicked = false;
+		response.type = CLICK_RESPONSE::NONE;
+		return response;
+	}
+	virtual ClickResponse processDoubleLeftClick(sf::Vector2i vec) {
+		ClickResponse response;
+		response.clicked = false;
+		response.type = CLICK_RESPONSE::NONE;
+		return response;
+	}
+	virtual ClickResponse processMouseWheel(sf::Vector2i, int) {
 		ClickResponse response;
 		response.clicked = false;
 		response.type = CLICK_RESPONSE::NONE;

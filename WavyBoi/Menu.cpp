@@ -43,25 +43,32 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 			name = "New";
 			menu_options.push_back(MenuOption(std::string("Comparator"), NULL, true, true));
 			menu_options.push_back(MenuOption(std::string("Operator"), NULL, true, true));
+			menu_options.push_back(MenuOption(std::string("Number"), NULL, true, true));
 		break;
 		case MENU_TYPE::COMPARATOR:
 			name = "";
-			menu_options.push_back(MenuOption(std::string("<"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("<="), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string(">"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string(">="), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("=="), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("!="), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("<"), &AnimationManager::clickNewLT, true, false));
+			menu_options.push_back(MenuOption(std::string("<="), &AnimationManager::clickNewLTE, true, false));
+			menu_options.push_back(MenuOption(std::string(">"), &AnimationManager::clickNewGT, true, false));
+			menu_options.push_back(MenuOption(std::string(">="), &AnimationManager::clickNewGTE, true, false));
+			menu_options.push_back(MenuOption(std::string("=="), &AnimationManager::clickNewEQ, true, false));
+			menu_options.push_back(MenuOption(std::string("!="), &AnimationManager::clickNewNEQ, true, false));
 		break;
 		case MENU_TYPE::OPERATOR:
 			name = "";
-			menu_options.push_back(MenuOption(std::string("+"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("-"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("/"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("*"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("^"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("%"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("+"), &AnimationManager::clickNewPlus, true, false));
+			menu_options.push_back(MenuOption(std::string("-"), &AnimationManager::clickNewMinus, true, false));
+			menu_options.push_back(MenuOption(std::string("/"), &AnimationManager::clickNewDividedby, true, false));
+			menu_options.push_back(MenuOption(std::string("*"), &AnimationManager::clickNewTimes, true, false));
+			menu_options.push_back(MenuOption(std::string("^"), &AnimationManager::clickNewExponent, true, false));
+			menu_options.push_back(MenuOption(std::string("%"), &AnimationManager::clickNewModulo, true, false));
 		break;
+		case MENU_TYPE::NUMBER:
+			name = "";
+			menu_options.push_back(MenuOption(std::string("Integer"), &AnimationManager::clickNewInt, true, false));
+			menu_options.push_back(MenuOption(std::string("Float"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("PI"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("e"), NULL, true, false));
 	}
 	height = gui.menu_text_height;
 	//get thiccest menu option
@@ -90,6 +97,11 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 				case 1:
 					new_menu = new Menu();
 					new_menu->initialize(MENU_TYPE::OPERATOR, new_menu_pos);
+					submenus.push_back(new_menu);
+					break;
+				case 2:
+					new_menu = new Menu();
+					new_menu->initialize(MENU_TYPE::NUMBER, new_menu_pos);
 					submenus.push_back(new_menu);
 					break;
 				default:

@@ -17,6 +17,7 @@ rendering. */
 #include <Comparator.h>
 #include <Channel.h>
 #include <Common.h>
+#include <IntObject.h>
 #include <map>
 #include <vector>
 #include <unordered_set>
@@ -79,4 +80,17 @@ public:
 	void clickEditCopy();
 	void clickEditPaste();
 	void clickEditDelete();
+	void clickNewLT();
+	void clickNewLTE();
+	void clickNewGTE();
+	void clickNewGT();
+	void clickNewEQ();
+	void clickNewNEQ();
+	void clickNewPlus();
+	void clickNewMinus();
+	void clickNewTimes();
+	void clickNewDividedby();
+	void clickNewModulo();
+	void clickNewExponent();
+	void clickNewInt();
 };

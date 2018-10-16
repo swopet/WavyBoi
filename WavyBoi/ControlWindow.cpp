@@ -27,7 +27,6 @@ void ControlWindow::InitializeMenuTabs() {
 	Menu * display_menu = new Menu();
 	display_menu->initialize(MENU_TYPE::DISPLAY, pos);
 	menu_tabs.push_back(display_menu);
-	
 }
 
 ControlWindow::ControlWindow(){
@@ -50,8 +49,10 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 				
 			}
 			if (event.mouseButton.button == sf::Mouse::Middle){
-				
 			}
+		}
+		if (event.type == sf::Event::MouseWheelScrolled) {
+			processMouseWheel(sf::Vector2i(event.mouseWheelScroll.x, event.mouseWheelScroll.y), event.mouseWheelScroll.delta, animation_manager);
 		}
 		if (event.type == sf::Event::MouseButtonReleased){
 			if (event.mouseButton.button == sf::Mouse::Left){
@@ -67,6 +68,21 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 		if (event.type == sf::Event::KeyPressed) {
 			if (event.key.code == sf::Keyboard::Delete) {
 				deleteSelected(animation_manager);
+			}
+			if (event.key.code == sf::Keyboard::Enter) {
+				if (state.entering_text) {
+					state.new_text_obj->processNewString(state.text_field, state.text_entered);
+					state.text_field = "";
+					state.text_entered = "";
+					state.new_text_obj = NULL;
+					state.entering_text = false;
+				}
+			}
+		}
+		if (event.type == sf::Event::TextEntered) {
+			if (state.entering_text) {
+
+				state.text_entered += static_cast<char>(event.text.unicode);
 			}
 		}
 	}
@@ -105,6 +121,9 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	drawTopMenu(animation_manager);
 	drawFPS(animation_manager);
 	audio_handler->draw(*window, sf::RenderStates());
+	if (state.entering_text) {
+		drawTextEntered();
+	}
     window->display();
 	window->setTitle("WavyBoi - " + animation_manager->getName() + (animation_manager->isEdited() ? "*" : ""));
 	return false;
@@ -156,6 +175,22 @@ void ControlWindow::drawSelectBox() {
 	window->draw(box);
 }
 
+void ControlWindow::drawTextEntered() {
+	state.text_text.setString(state.text_entered);
+	state.text_text.setFont(gui.font);
+	state.text_text.setCharacterSize(gui.input_text_height);
+	state.text_text.setPosition(0, 0);
+	state.text_box.setSize(sf::Vector2f(gui.outline_thickness*2, gui.outline_thickness*2) + sf::Vector2f(state.text_text.findCharacterPos(state.text_entered.length()).x, gui.input_text_height));
+	state.text_text.setPosition(sf::Vector2f(state.last_mouse_pos) + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
+	state.text_box.setPosition(sf::Vector2f(state.last_mouse_pos));
+	state.text_text.setFillColor(sf::Color::White);
+	state.text_box.setFillColor(gui.obj_fill_color);
+	state.text_box.setOutlineColor(gui.obj_outline_color);
+	state.text_box.setOutlineThickness(gui.outline_thickness);
+	window->draw(state.text_box);
+	window->draw(state.text_text);
+}
+
 void ControlWindow::drawFPS(AnimationManager * animation_manager) {
 	if ((state.clock.getElapsedTime() - state.last_fps_draw).asMilliseconds() > TIME_PER_FPS_UPDATE_MS) {
 		state.last_fps_draw = state.clock.getElapsedTime();
@@ -183,7 +218,17 @@ void ControlWindow::close(){
 	window->close();
 }
 
-void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * animation_manager){
+void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
+	if (state.entering_text) {
+		if (!checkIntersection(state.text_box, sf::Vector2f(mouse_pos))) {
+			state.entering_text = false;
+		}
+	}
+	if ((state.clock.getElapsedTime() - state.last_left_click).asMilliseconds() < 300) {
+		processDoubleLeftClick(mouse_pos, animation_manager);
+		state.selecting = false;
+		return;
+	}
 	bool processed = false;
 	//check if clicked on menu tabs first
 	if (!processed){
@@ -252,6 +297,7 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos,AnimationManager * a
 	}
 	state.left_mouse_held = true;
 	state.last_mouse_pos = mouse_pos;
+	state.last_left_click = state.clock.getElapsedTime();
 }
 void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 	if (!state.left_mouse_held) return;
@@ -339,5 +385,38 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 		state.select_end_pos = mouse_pos;
 		state.selecting = false;
 		state.selected = (state.selected_objects.size() > 0 || state.selected_links.size() > 0);
+	}
+}
+
+void ControlWindow::processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {
+	bool processed = false;
+	std::cout << "double clicked" << std::endl;
+	std::vector<Object *> objects = animation_manager->getObjects();
+	for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
+		ClickResponse response = (*it)->processDoubleLeftClick(mouse_pos);
+		if (response.clicked) {
+			if (response.type == CLICK_RESPONSE::GOT_TEXT_FIELD) {
+				state.entering_text = true;
+				state.new_text_obj = *it;
+				state.text_entered = "";
+				state.text_field = response.field;
+				state.last_mouse_pos = mouse_pos;
+			}
+			processed = true;
+			break;
+		}
+	}
+	//edit text with a double click
+}
+
+void ControlWindow::processMouseWheel(sf::Vector2i mouse_pos, int delta, AnimationManager * animation_manager) {
+	bool processed = false;
+	std::vector<Object *>objects = animation_manager->getObjects();
+	for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
+		ClickResponse response = (*it)->processMouseWheel(mouse_pos,delta);
+		if (response.clicked) {
+			processed = true;
+			break;
+		}
 	}
 }

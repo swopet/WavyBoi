@@ -22,7 +22,8 @@ enum class MENU_TYPE {
 	NEW,
 	DISPLAY,
 	COMPARATOR,
-	OPERATOR
+	OPERATOR,
+	NUMBER
 };
 
 class Menu{

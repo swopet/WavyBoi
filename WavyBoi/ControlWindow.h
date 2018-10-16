@@ -18,13 +18,26 @@ struct ControlWindowState {
 	bool selecting = false;
 	bool selected = false;
 	bool linking = false;
+	//Entering Text
+	sf::RectangleShape text_box;
+	sf::Text text_text;
+	bool entering_text = false;
+	std::string text_entered;
+	std::string text_field;
+	Object * new_text_obj;
+	//Linking
 	Link * new_link = NULL;
+	//Selecting
 	sf::Vector2i select_start_pos;
 	sf::Vector2i select_end_pos;
-	sf::Vector2i last_mouse_pos;
 	std::vector<Object *> selected_objects;
 	std::vector<Link *> selected_links;
+	//Moving
+	sf::Vector2i last_mouse_pos;
+	//Double Click
 	sf::Clock clock;
+	sf::Time last_left_click;
+	//FPS
 	sf::Time last_fps_draw;
 	float curr_fps;
 };
@@ -45,6 +58,7 @@ public:
 	void drawObjects(AnimationManager *);
 	void drawChannels(AnimationManager *);
 	void drawSelectBox();
+	void drawTextEntered();
 	void drawFPS(AnimationManager * animation_manager);
 	void drawLinks(AnimationManager * animation_manager);
 	void drawNewLink();
@@ -52,4 +66,6 @@ public:
 	void processLeftClick(sf::Vector2i,AnimationManager *);
 	void processLeftClickHeld(AnimationManager *);
 	void processLeftClickRelease(sf::Vector2i,AnimationManager *);
+	void processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager);
+	void processMouseWheel(sf::Vector2i mouse_pos, int delta, AnimationManager * animation_manager);
 };

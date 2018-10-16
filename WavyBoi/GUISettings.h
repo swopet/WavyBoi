@@ -5,6 +5,7 @@ constexpr auto TEXTURE_PATH = "C:/Users/Trevor/Stuff/VS/WavyBoi/resources/textur
 struct GUISettings {
 	sf::Font font;
 	int menu_text_height;
+	int input_text_height;
 	int outline_thickness;
 	sf::Color menu_outline_color;
 	sf::Color menu_fill_color;
@@ -29,6 +30,16 @@ struct GUISettings {
 	sf::Texture lt_false_32x32_tex;
 	sf::Texture lte_true_32x32_tex;
 	sf::Texture lte_false_32x32_tex;
+	//ARITHMETIC
+	sf::Texture plus_32x32_tex;
+	sf::Texture minus_32x32_tex;
+	sf::Texture times_32x32_tex;
+	sf::Texture dividedby_32x32_tex;
+	sf::Texture modulo_32x32_tex;
+	sf::Texture exponent_32x32_tex;
+	//BOOLEAN
+	sf::Texture and_32x32_tex;
+	sf::Texture or_32x32_tex;
 };
 
 extern GUISettings gui;

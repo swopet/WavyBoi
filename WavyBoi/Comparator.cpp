@@ -2,67 +2,87 @@
 #include "Comparator.h"
 
 
-void Comparator::update()
+void Operator::update()
 {
-	if (left_type != right_type) out_val.int_val = 0;
-	else {
-		switch (left_type) {
-		case PARAM_TYPE::FLOAT:
-			switch (func) {
-			case COMPARATOR::LT:
-				out_val.int_val = (left_val.float_val < right_val.float_val) ? 1 : 0;
-				break;
-			case COMPARATOR::LTE:
-				out_val.int_val = (left_val.float_val <= right_val.float_val) ? 1 : 0;
-				break;
-			case COMPARATOR::EQ:
-				out_val.int_val = (left_val.float_val == right_val.float_val) ? 1 : 0;
-				break;
-			case COMPARATOR::NEQ:
-				out_val.int_val = (left_val.float_val != right_val.float_val) ? 1 : 0;
-				break;
-			case COMPARATOR::GT:
-				out_val.int_val = (left_val.float_val > right_val.float_val) ? 1 : 0;
-				break;
-			case COMPARATOR::GTE:
-				out_val.int_val = (left_val.float_val >= right_val.float_val) ? 1 : 0;
-				break;
-			}
+	float l_val = (left_type == PARAM_TYPE::FLOAT) ? left_val.float_val : (float)left_val.int_val;
+	float r_val = (right_type == PARAM_TYPE::FLOAT) ? right_val.float_val : (float)right_val.int_val;
+	float o_val = 0.0;
+	switch (op_type) {
+	case OPERATOR::ARITHMETIC:
+		switch (func.arithmetic) {
+		case ARITHMETIC::PLUS:
+			o_val = l_val + r_val;
+			if (left_type == PARAM_TYPE::INT) out_val.int_val = (int)o_val;
+			else out_val.float_val = o_val;
 			break;
-		case PARAM_TYPE::INT:
-			switch (func) {
-			case COMPARATOR::LT:
-				out_val.int_val = (left_val.int_val < right_val.int_val) ? 1 : 0;
-				break;
-			case COMPARATOR::LTE:
-				out_val.int_val = (left_val.int_val <= right_val.int_val) ? 1 : 0;
-				break;
-			case COMPARATOR::EQ:
-				out_val.int_val = (left_val.int_val == right_val.int_val) ? 1 : 0;
-				break;
-			case COMPARATOR::NEQ:
-				out_val.int_val = (left_val.int_val != right_val.int_val) ? 1 : 0;
-				break;
-			case COMPARATOR::GT:
-				out_val.int_val = (left_val.int_val > right_val.int_val) ? 1 : 0;
-				break;
-			case COMPARATOR::GTE:
-				out_val.int_val = (left_val.int_val >= right_val.int_val) ? 1 : 0;
-				break;
-			}
+		case ARITHMETIC::MINUS:
+			o_val = l_val - r_val;
+			if (left_type == PARAM_TYPE::INT) out_val.int_val = (int)o_val;
+			else out_val.float_val = o_val;
 			break;
-		default:
-			out_val.int_val = 0;
+		case ARITHMETIC::TIMES:
+			o_val = l_val * r_val;
+			if (left_type == PARAM_TYPE::INT) out_val.int_val = (int)o_val;
+			else out_val.float_val = o_val;
+			break;
+		case ARITHMETIC::DIVIDEDBY:
+			if (r_val != 0)
+				o_val = l_val / r_val;
+			if (left_type == PARAM_TYPE::INT) out_val.int_val = (int)o_val;
+			else out_val.float_val = o_val;
+			break;
+		case ARITHMETIC::MODULO:
+			o_val = fmodf(l_val,r_val);
+			if (left_type == PARAM_TYPE::INT) out_val.int_val = (int)o_val;
+			else out_val.float_val = o_val;
+			break;
+		case ARITHMETIC::EXPONENT:
+			o_val = powf(l_val,r_val);
+			if (left_type == PARAM_TYPE::INT) out_val.int_val = (int)o_val;
+			else out_val.float_val = o_val;
 			break;
 		}
+		break;
+	case OPERATOR::BOOLEAN:
+		switch (func.boolean) {
+		case BOOLEAN_OP::AND:
+			out_val.int_val = (l_val != 0 && r_val != 0);
+			break;
+		case BOOLEAN_OP::OR:
+			out_val.int_val = (l_val != 0 || r_val != 0);
+			break;
+		}
+		break;
+	case OPERATOR::COMPARATOR:
+		switch (func.comparator) {
+		case COMPARATOR::EQ:
+			out_val.int_val = (l_val == r_val);
+			break;
+		case COMPARATOR::NEQ:
+			out_val.int_val = (l_val != r_val);
+			break;
+		case COMPARATOR::LT:
+			out_val.int_val = (l_val < r_val);
+			break;
+		case COMPARATOR::LTE:
+			out_val.int_val = (l_val <= r_val);
+			break;
+		case COMPARATOR::GT:
+			out_val.int_val = (l_val > r_val);
+			break;
+		case COMPARATOR::GTE:
+			out_val.int_val = (l_val >= r_val);
+			break;
+		}
+		break;
 	}
 }
 
-param Comparator::getVal() {
+param Operator::getVal() {
 	return out_val;
 }
 
-void Comparator::setParameter(Parameter * parameter, int ind)
+void Operator::setParameter(Parameter * parameter, int ind)
 {
 	if (ind == 0) {
 		left_type = parameter->getType();
@@ -74,7 +94,7 @@ void Comparator::setParameter(Parameter * parameter, int ind)
 	}
 }
 
-void Comparator::draw(sf::RenderTarget & target, sf::RenderStates states)
+void Operator::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
 	sf::RectangleShape main_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
 	main_box.setPosition(position);
@@ -84,25 +104,51 @@ void Comparator::draw(sf::RenderTarget & target, sf::RenderStates states)
 	sf::RectangleShape tex_box(sf::Vector2f(32, 32));
 	tex_box.setPosition(position + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
 	target.draw(main_box);
-	switch (func) {
-	case COMPARATOR::LT:
-		tex_box.setTexture((out_val.int_val) ? &gui.lt_true_32x32_tex : &gui.lt_false_32x32_tex);
-		break;
-	case COMPARATOR::LTE:
-		tex_box.setTexture((out_val.int_val) ? &gui.lte_true_32x32_tex : &gui.lte_false_32x32_tex);
-		break;
-	case COMPARATOR::GT:
-		tex_box.setTexture((out_val.int_val) ? &gui.gt_true_32x32_tex : &gui.gt_false_32x32_tex);
-		break;
-	case COMPARATOR::GTE:
-		tex_box.setTexture((out_val.int_val) ? &gui.gte_true_32x32_tex : &gui.gte_false_32x32_tex);
-		break;
-	case COMPARATOR::EQ:
-		tex_box.setTexture((out_val.int_val) ? &gui.eq_true_32x32_tex : &gui.eq_false_32x32_tex);
-		break;
-	case COMPARATOR::NEQ:
-		tex_box.setTexture((out_val.int_val) ? &gui.neq_true_32x32_tex : &gui.neq_false_32x32_tex);
-		break;
+	switch (op_type) {
+	case OPERATOR::COMPARATOR:
+		switch (func.comparator) {
+		case COMPARATOR::LT:
+			tex_box.setTexture((out_val.int_val) ? &gui.lt_true_32x32_tex : &gui.lt_false_32x32_tex);
+			break;
+		case COMPARATOR::LTE:
+			tex_box.setTexture((out_val.int_val) ? &gui.lte_true_32x32_tex : &gui.lte_false_32x32_tex);
+			break;
+		case COMPARATOR::GT:
+			tex_box.setTexture((out_val.int_val) ? &gui.gt_true_32x32_tex : &gui.gt_false_32x32_tex);
+			break;
+		case COMPARATOR::GTE:
+			tex_box.setTexture((out_val.int_val) ? &gui.gte_true_32x32_tex : &gui.gte_false_32x32_tex);
+			break;
+		case COMPARATOR::EQ:
+			tex_box.setTexture((out_val.int_val) ? &gui.eq_true_32x32_tex : &gui.eq_false_32x32_tex);
+			break;
+		case COMPARATOR::NEQ:
+			tex_box.setTexture((out_val.int_val) ? &gui.neq_true_32x32_tex : &gui.neq_false_32x32_tex);
+			break;
+		}
+		break; //OPERATOR::COMPARATOR
+	case OPERATOR::ARITHMETIC:
+		switch (func.arithmetic) {
+		case ARITHMETIC::PLUS:
+			tex_box.setTexture(&gui.plus_32x32_tex);
+			break;
+		case ARITHMETIC::MINUS:
+			tex_box.setTexture(&gui.minus_32x32_tex);
+			break;
+		case ARITHMETIC::TIMES:
+			tex_box.setTexture(&gui.times_32x32_tex);
+			break;
+		case ARITHMETIC::DIVIDEDBY:
+			tex_box.setTexture(&gui.dividedby_32x32_tex);
+			break;
+		case ARITHMETIC::MODULO:
+			tex_box.setTexture(&gui.modulo_32x32_tex);
+			break;
+		case ARITHMETIC::EXPONENT:
+			tex_box.setTexture(&gui.exponent_32x32_tex);
+			break;
+		}
+		break; //OPERATOR::ARITHMETIC
 	}
 	target.draw(tex_box);
 	sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
@@ -117,7 +163,7 @@ void Comparator::draw(sf::RenderTarget & target, sf::RenderStates states)
 	target.draw(circle);
 }
 
-sf::Vector2f Comparator::getLeftPos(int ind)
+sf::Vector2f Operator::getLeftPos(int ind)
 {
 	if (ind == 0) {
 		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness + 8));
@@ -127,27 +173,32 @@ sf::Vector2f Comparator::getLeftPos(int ind)
 	}
 }
 
-sf::Vector2f Comparator::getRightPos()
+sf::Vector2f Operator::getRightPos()
 {
 	return position + sf::Vector2f(3*gui.outline_thickness/2 + 32, gui.outline_thickness + 16);
 }
 
-Comparator::Comparator()
+Operator::Operator(COMPARATOR new_type) {
+	op_type = OPERATOR::COMPARATOR;
+	func.comparator = new_type;
+}
+
+Operator::Operator(ARITHMETIC new_type)
 {
-	func = COMPARATOR::GT;
-	font.loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/resources/fonts/Montserrat-Medium.otf");
-	left_type = PARAM_TYPE::FLOAT;
-	right_type = PARAM_TYPE::FLOAT;
-	left_val.float_val = 1.0;
-	right_val.float_val = 0.2;
+	op_type = OPERATOR::ARITHMETIC;
+	func.arithmetic = new_type;
+}
+
+Operator::Operator()
+{
 }
 
 
-Comparator::~Comparator()
+Operator::~Operator()
 {
 }
 
-ClickResponse Comparator::processLeftClick(sf::Vector2i mouse_pos)
+ClickResponse Operator::processLeftClick(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;
 	response.clicked = false;
@@ -157,17 +208,8 @@ ClickResponse Comparator::processLeftClick(sf::Vector2i mouse_pos)
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
 		return response;
 	}
-	sf::RectangleShape switch_box(sf::Vector2f(12,12));
 	sf::RectangleShape move_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
 	move_box.setPosition(position);
-	switch_box.setPosition(position + move_box.getSize()/2.0f - switch_box.getSize()/2.0f);
-	if (checkIntersection(switch_box, sf::Vector2f(mouse_pos))) {
-		func = (COMPARATOR)((int)func + 1);
-		if (func == COMPARATOR::RESET) func = (COMPARATOR)0;
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::PROCESSED;
-		return response;
-	}
 	if (checkIntersection(move_box, sf::Vector2f(mouse_pos))) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
@@ -177,7 +219,7 @@ ClickResponse Comparator::processLeftClick(sf::Vector2i mouse_pos)
 	return response;
 }
 
-ClickResponse Comparator::processLeftClickRelease(sf::Vector2i mouse_pos)
+ClickResponse Operator::processLeftClickRelease(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;
 	response.clicked = false;
@@ -192,4 +234,41 @@ ClickResponse Comparator::processLeftClickRelease(sf::Vector2i mouse_pos)
 		}
 	}
 	return response;
+}
+
+ClickResponse Operator::processMouseWheel(sf::Vector2i mouse_pos, int delta)
+{
+	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
+	sf::RectangleShape switch_box(sf::Vector2f(12, 12));
+	sf::RectangleShape move_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
+	move_box.setPosition(position);
+	switch_box.setPosition(position + move_box.getSize() / 2.0f - switch_box.getSize() / 2.0f);
+	if (checkIntersection(switch_box, sf::Vector2f(mouse_pos))) {
+		int int_func;
+		switch (op_type) {
+		case OPERATOR::COMPARATOR:
+			int_func = ((int)func.comparator + delta);
+			if (int_func >= (int)COMPARATOR::RESET_RIGHT) int_func = ((int)COMPARATOR::RESET_LEFT + 1);
+			if (int_func <= (int)COMPARATOR::RESET_LEFT) int_func = ((int)COMPARATOR::RESET_RIGHT - 1);
+			func.comparator = (COMPARATOR)int_func;
+			break;
+		case OPERATOR::ARITHMETIC:
+			int_func = ((int)func.arithmetic + delta);
+			if (int_func >= (int)ARITHMETIC::RESET_RIGHT) int_func = ((int)ARITHMETIC::RESET_LEFT + 1);
+			if (int_func <= (int)ARITHMETIC::RESET_LEFT) int_func = ((int)ARITHMETIC::RESET_RIGHT - 1);
+			func.arithmetic = (ARITHMETIC)int_func;
+			break;
+		case OPERATOR::BOOLEAN:
+			int_func = ((int)func.boolean + delta);
+			if (int_func >= (int)BOOLEAN_OP::RESET_RIGHT) int_func = ((int)BOOLEAN_OP::RESET_LEFT + 1);
+			if (int_func <= (int)BOOLEAN_OP::RESET_LEFT) int_func = ((int)BOOLEAN_OP::RESET_RIGHT - 1);
+			func.boolean = (BOOLEAN_OP)int_func;
+			break;
+		}
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+		return response;
+	}
 }

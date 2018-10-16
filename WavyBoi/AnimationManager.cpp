@@ -14,9 +14,6 @@ AnimationManager::AnimationManager(){
 	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
 	FreqBandBlock * new_freq_band = new FreqBandBlock();
 	new_freq_band->setPosition(sf::Vector2f(10, 200));
-	Comparator * new_comparator = new Comparator();
-	new_comparator->setPosition(sf::Vector2f(100, 200));
-	addObject(new_comparator);
 	Multiplexer * new_multiplexer = new Multiplexer();
 	new_multiplexer->setPosition(sf::Vector2f(100, 100));
 	addObject(new_multiplexer);
@@ -319,4 +316,83 @@ void AnimationManager::clickEditPaste(){
 void AnimationManager::clickEditDelete(){
 	state.delete_selected = true;
 	std::cout << "Clicked Edit -> Delete" << std::endl;
+}
+
+void AnimationManager::clickNewLT() {
+	Operator * new_LT = new Operator(COMPARATOR::LT);
+	new_LT->setPosition(sf::Vector2f(32, 32));
+	addObject(new_LT);
+}
+
+void AnimationManager::clickNewLTE() {
+	Operator * new_LTE = new Operator(COMPARATOR::LTE);
+	new_LTE->setPosition(sf::Vector2f(32, 32));
+	addObject(new_LTE);
+}
+
+void AnimationManager::clickNewGTE() {
+	Operator * new_GTE = new Operator(COMPARATOR::GTE);
+	new_GTE->setPosition(sf::Vector2f(32, 32));
+	addObject(new_GTE);
+}
+
+void AnimationManager::clickNewGT() {
+	Operator * new_GT = new Operator(COMPARATOR::GT);
+	new_GT->setPosition(sf::Vector2f(32, 32));
+	addObject(new_GT);
+}
+
+void AnimationManager::clickNewEQ() {
+	Operator * new_EQ = new Operator(COMPARATOR::EQ);
+	new_EQ->setPosition(sf::Vector2f(32, 32));
+	addObject(new_EQ);
+}
+
+void AnimationManager::clickNewNEQ() {
+	Operator * new_NEQ = new Operator(COMPARATOR::NEQ);
+	new_NEQ->setPosition(sf::Vector2f(32, 32));
+	addObject(new_NEQ);
+}
+
+void AnimationManager::clickNewPlus() {
+	Operator * new_plus = new Operator(ARITHMETIC::PLUS);
+	new_plus->setPosition(sf::Vector2f(32, 32));
+	addObject(new_plus);
+}
+
+void AnimationManager::clickNewMinus() {
+	Operator * new_minus = new Operator(ARITHMETIC::MINUS);
+	new_minus->setPosition(sf::Vector2f(32, 32));
+	addObject(new_minus);
+}
+
+void AnimationManager::clickNewTimes() {
+	Operator * new_times = new Operator(ARITHMETIC::TIMES);
+	new_times->setPosition(sf::Vector2f(32, 32));
+	addObject(new_times);
+}
+
+void AnimationManager::clickNewDividedby() {
+	Operator * new_dividedby = new Operator(ARITHMETIC::DIVIDEDBY);
+	new_dividedby->setPosition(sf::Vector2f(32, 32));
+	addObject(new_dividedby);
+}
+
+void AnimationManager::clickNewModulo() {
+	Operator * new_modulo = new Operator(ARITHMETIC::MODULO);
+	new_modulo->setPosition(sf::Vector2f(32, 32));
+	addObject(new_modulo);
+}
+
+void AnimationManager::clickNewExponent() {
+	Operator * new_exponent = new Operator(ARITHMETIC::EXPONENT);
+	new_exponent->setPosition(sf::Vector2f(32, 32));
+	addObject(new_exponent);
+}
+
+void AnimationManager::clickNewInt() {
+	std::cout << "creating new int object" << std::endl;
+	IntObject * new_int = new IntObject();
+	new_int->setPosition(sf::Vector2f(32, 32));
+	addObject(new_int);
 }
