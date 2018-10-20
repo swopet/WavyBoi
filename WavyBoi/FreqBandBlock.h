@@ -20,5 +20,6 @@ public:
 	}
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	ClickResponse processLeftClick(sf::Vector2i);
+	ClickResponse processMouseWheel(sf::Vector2i mouse_pos, int delta);
 };
 

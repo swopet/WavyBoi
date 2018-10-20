@@ -7,11 +7,11 @@ AnimationManager::AnimationManager(){
 	state.project_path = "";
 	state.out_res = sf::Vector2u(600,400);
 	Video * new_video = new Video();
-	new_video->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/mandelbrot.mp4");
+	new_video->loadFromFile("../test_files/mandelbrot.mp4");
 	Video * new_video_2 = new Video();
-	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/dogs.mp4");
+	new_video_2->loadFromFile("../test_files/dogs.mp4");
 	Video * new_video_3 = new Video();
-	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
+	new_video_3->loadFromFile("../test_files/fish.mp4");
 	FreqBandBlock * new_freq_band = new FreqBandBlock();
 	new_freq_band->setPosition(sf::Vector2f(10, 200));
 	Multiplexer * new_multiplexer = new Multiplexer();

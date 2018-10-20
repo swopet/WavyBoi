@@ -15,7 +15,7 @@ class WavyBoiRecorder : public sf::SoundRecorder
 	sf::Clock clock;
 	sf::Time last_time;
 	ffft::FFTReal<double> * fft_object;
-	long size = 2048; //should be a power of 2
+	long size = 4096; //should be a power of 2
 	double * x;
 	double * f;
 	double * last_f;
@@ -25,7 +25,7 @@ class WavyBoiRecorder : public sf::SoundRecorder
 		f = (double *)malloc(size * sizeof(double));
 		x = (double *)malloc(size * sizeof(double));
 		last_f = (double *)malloc(1000 * sizeof(double));
-		setProcessingInterval(sf::milliseconds(size * 1000/192000 / 0.9)); //we want 30 FPS fidelity on audio processing. to get a sample size of 16384, we need 30*16384 = 1000000 samples per second
+		setProcessingInterval(sf::milliseconds(size * 1000./48000. / 0.9)); //we want 30 FPS fidelity on audio processing. to get a sample size of 16384, we need 30*16384 = 1000000 samples per second
 		// initialize whatever has to be done before the capture starts
 		last_time = clock.getElapsedTime();
 		fft_object = new ffft::FFTReal<double>(size);
@@ -41,12 +41,13 @@ class WavyBoiRecorder : public sf::SoundRecorder
 			x[i] = (double)samples[i];
 		}
 		fft_object->do_fft(f, x);
-		fft_object->rescale(f);
+		//fft_object->rescale(f);
 		double total = 0;
 		for (int i = 0; i < 1000; i++) {
 			double freq = freqAtKey(((double)i) / 10.);
-			int ind = (int)(freq * elapsed_time.asSeconds());
-			if (ind < size / 2)
+			unsigned int ind = (unsigned int)(freq * size/ 48000.);
+			if (i == 0) ind = 0;
+			if (ind < sampleCount / 2 && ind < size / 2)
 				last_f[i] = sqrt(f[ind] * f[ind] + f[size / 2 + ind] * f[size / 2 + ind]);
 			else
 				last_f[i] = 0;
@@ -60,9 +61,9 @@ class WavyBoiRecorder : public sf::SoundRecorder
 	virtual void onStop() // optional
 	{
 		delete fft_object;
-		delete f;
-		delete x;
-		delete last_f;
+		free(f);
+		free(x);
+		free(last_f);
 		// clean up whatever has to be done after the capture is finished
 	}
 public:
@@ -78,25 +79,25 @@ public:
 class AudioHandler
 {
 private:
-	long size = 16384;
+	long size = 1024;
 	WavyBoiRecorder audio_recorder;
-	double curr_max = 0;
-	double sub_bass_max; //20 to 60 Hz
+	double curr_max = 0.1;
+	double sub_bass_max = 0.1; //20 to 60 Hz
 	double sub_bass_avg;
 	
-	double bass_max; //60 to 250 Hz
+	double bass_max = 0.1; //60 to 250 Hz
 	double bass_avg;
 	
-	double lower_mid_max; //250 to 500 Hz
+	double lower_mid_max = 0.1; //250 to 500 Hz
 	
 	double lower_mid_avg;
-	double mid_max; //500 Hz to 2 kHz
+	double mid_max = 0.1; //500 Hz to 2 kHz
 	double mid_avg;
-	double upper_mid_max; //2 to 4 kHz
+	double upper_mid_max = 0.1; //2 to 4 kHz
 	double upper_mid_avg;
-	double presence_max; //4 to 6 kHz
+	double presence_max = 0.1; //4 to 6 kHz
 	double presence_avg;
-	double brilliance_max; //>6 kHz
+	double brilliance_max = 0.1; //>6 kHz
 	double brilliance_avg;
 public:
 	AudioHandler();

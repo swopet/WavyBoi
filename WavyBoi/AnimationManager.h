@@ -14,7 +14,7 @@ rendering. */
 #include <Multiplexer.h>
 #include <AudioHandler.h>
 #include <FreqBandBlock.h>
-#include <Comparator.h>
+#include <Operator.h>
 #include <Channel.h>
 #include <Common.h>
 #include <IntObject.h>
