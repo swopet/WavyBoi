@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 
+constexpr auto PI = 3.14159265358979;
+
 enum class CLICK_RESPONSE {
 	NONE,
 	PROCESSED,

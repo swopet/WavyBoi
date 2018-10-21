@@ -438,5 +438,8 @@ void AnimationManager::clickNewLog()
 
 void AnimationManager::clickNewClock()
 {
+	ClockObject * new_clock = new ClockObject();
+	new_clock->setPosition(sf::Vector2f(32, 32));
+	addObject(new_clock);
 	//TODO: add clock object
 }

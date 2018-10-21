@@ -43,4 +43,16 @@ void loadGUISettings() {
 	//BOLEAN
 	gui.and_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("and_32x32.png"));
 	gui.or_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("or_32x32.png"));
+	//VIDEO
+	gui.play_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("play_24x24.png"));
+	gui.pause_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("pause_24x24.png"));
+	gui.stop_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("stop_24x24.png"));
+	gui.loop_false_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("loop_false_24x24.png"));
+	gui.loop_true_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("loop_true_24x24.png"));
+	//CLOCK
+	gui.clock_72x72_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("clock_72x72.png"));
+	gui.seconds_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("seconds_24x24.png"));
+	gui.millisecoonds_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("milliseconds_24x24.png"));
+	gui.zero_s_true_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("zero_s_true_24x24.png"));
+	gui.zero_s_false_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("zero_s_false_24x24.png"));
 }

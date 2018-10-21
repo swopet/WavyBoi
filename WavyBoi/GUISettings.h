@@ -40,6 +40,18 @@ struct GUISettings {
 	//BOOLEAN
 	sf::Texture and_32x32_tex;
 	sf::Texture or_32x32_tex;
+	//VIDEO
+	sf::Texture play_24x24_tex;
+	sf::Texture pause_24x24_tex;
+	sf::Texture stop_24x24_tex;
+	sf::Texture loop_false_24x24_tex;
+	sf::Texture loop_true_24x24_tex;
+	//CLOCK
+	sf::Texture clock_72x72_tex;
+	sf::Texture seconds_24x24_tex;
+	sf::Texture millisecoonds_24x24_tex;
+	sf::Texture zero_s_true_24x24_tex;
+	sf::Texture zero_s_false_24x24_tex;
 };
 
 extern GUISettings gui;
