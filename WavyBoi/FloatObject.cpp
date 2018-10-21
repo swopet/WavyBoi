@@ -1,13 +1,13 @@
 #include "pch.h"
-#include "IntObject.h"
+#include "FloatObject.h"
 
 
-void IntObject::processNewString(std::string field, std::string input)
+void FloatObject::processNewString(std::string field, std::string input)
 {
 	if (field == "value") {
 		try {
-			int new_val = std::stoi(input);
-			out_val.int_val = new_val;
+			float new_val = std::stof(input);
+			out_val.float_val = new_val;
 			default_val = out_val;
 		}
 		catch (const std::invalid_argument& ia) {
@@ -16,7 +16,12 @@ void IntObject::processNewString(std::string field, std::string input)
 	}
 }
 
-void IntObject::draw(sf::RenderTarget & target, sf::RenderStates states)
+Parameter FloatObject::getParameter()
+{
+	return Parameter(PARAM_TYPE::FLOAT, out_val, name);
+}
+
+void FloatObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
 	target.draw(main_box);
 	target.draw(text);
@@ -24,17 +29,17 @@ void IntObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setOutlineColor(gui.obj_outline_color);
 	circle.setOutlineThickness(-gui.outline_thickness);
-	circle.setPosition(left_pos - sf::Vector2f(circle.getRadius(),circle.getRadius()));
+	circle.setPosition(left_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
 	target.draw(circle);
 	circle.setPosition(right_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
 	target.draw(circle);
 }
 
-void IntObject::update()
+void FloatObject::update()
 {
-	text = sf::Text(std::to_string(out_val.int_val), gui.font, gui.input_text_height);
+	text = sf::Text(std::to_string(out_val.float_val), gui.font, gui.input_text_height);
 	float box_width = text.findCharacterPos(text.getString().getSize()).x;
-	main_box = sf::RectangleShape(sf::Vector2f(box_width, gui.input_text_height) + sf::Vector2f(gui.outline_thickness * 4 + gui.obj_circle_radius*2, gui.outline_thickness * 4));
+	main_box = sf::RectangleShape(sf::Vector2f(box_width, gui.input_text_height) + sf::Vector2f(gui.outline_thickness * 4 + gui.obj_circle_radius * 2, gui.outline_thickness * 4));
 	main_box.setPosition(position);
 	main_box.setFillColor(gui.obj_fill_color);
 	main_box.setOutlineColor(gui.obj_outline_color);
@@ -42,26 +47,28 @@ void IntObject::update()
 
 	text.setPosition(position + sf::Vector2f(gui.obj_circle_radius, 0) + sf::Vector2f(gui.outline_thickness * 2, gui.outline_thickness * 2));
 	text.setFillColor(sf::Color::White);
-	left_pos = position + sf::Vector2f(gui.outline_thickness / 2.0f, main_box.getSize().y/2.0f);
-	right_pos = position + sf::Vector2f(main_box.getSize().x - gui.outline_thickness / 2.0f, main_box.getSize().y/2.0f);
+	left_pos = position + sf::Vector2f(gui.outline_thickness / 2.0f, main_box.getSize().y / 2.0f);
+	right_pos = position + sf::Vector2f(main_box.getSize().x - gui.outline_thickness / 2.0f, main_box.getSize().y / 2.0f);
 }
 
-void IntObject::setParameter(Parameter * parameter, int ind)
+void FloatObject::setParameter(Parameter * parameter, int ind)
 {
 	if (parameter->getType() == PARAM_TYPE::INT) {
-		out_val.int_val = parameter->getValue().int_val;
+		out_val.float_val = (float)parameter->getValue().int_val;
 	}
 	else if (parameter->getType() == PARAM_TYPE::FLOAT) {
-		out_val.int_val = (int)parameter->getValue().float_val;
+		out_val.float_val = parameter->getValue().float_val;
 	}
 }
 
-Parameter IntObject::getParameter()
+Parameter * FloatObject::getNewParameter()
 {
-	return Parameter(PARAM_TYPE::INT, out_val, name);
+	param new_param;
+	new_param.float_val = 0;
+	return new Parameter(PARAM_TYPE::FLOAT, new_param, name);
 }
 
-ClickResponse IntObject::processLeftClick(sf::Vector2i mouse_pos)
+ClickResponse FloatObject::processLeftClick(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;
 	response.clicked = false;
@@ -81,7 +88,7 @@ ClickResponse IntObject::processLeftClick(sf::Vector2i mouse_pos)
 	return response;
 }
 
-ClickResponse IntObject::processLeftClickRelease(sf::Vector2i mouse_pos)
+ClickResponse FloatObject::processLeftClickRelease(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;
 	response.clicked = false;
@@ -93,9 +100,9 @@ ClickResponse IntObject::processLeftClickRelease(sf::Vector2i mouse_pos)
 	return response;
 }
 
-ClickResponse IntObject::processDoubleLeftClick(sf::Vector2i mouse_pos)
+ClickResponse FloatObject::processDoubleLeftClick(sf::Vector2i mouse_pos)
 {
-	if (checkIntersection(main_box,sf::Vector2f(mouse_pos))){
+	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
 		ClickResponse response;
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_TEXT_FIELD;
@@ -105,19 +112,19 @@ ClickResponse IntObject::processDoubleLeftClick(sf::Vector2i mouse_pos)
 	return ClickResponse();
 }
 
-IntObject::IntObject()
+FloatObject::FloatObject()
 {
-	default_val.int_val = 0;
-	out_val.int_val = 0;
+	default_val.float_val = 0;
+	out_val.float_val = 0;
 }
 
-IntObject::IntObject(int new_val)
+FloatObject::FloatObject(float new_val)
 {
-	out_val.int_val = new_val;
-	default_val.int_val = new_val;
+	out_val.float_val = new_val;
+	default_val.float_val = new_val;
 }
 
 
-IntObject::~IntObject()
+FloatObject::~FloatObject()
 {
 }

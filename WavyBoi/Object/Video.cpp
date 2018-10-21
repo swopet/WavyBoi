@@ -13,9 +13,20 @@ Video::Video(){
 
 void Video::update() {
 	if (movie != NULL) {
+		sfe::Status status = movie->getStatus();
+		if (playing) {
+			if (status == sfe::Stopped) {
+				std::cout << "Movie stopped, continuing" << std::endl;
+				movie->play();
+			}
+		}
 		movie->update();
 		video_box.setTexture(&movie->getCurrentImage());
 	}
+}
+
+void Video::setSpeed(float new_speed) {
+	speed = new_speed;
 }
 
 void Video::init(){
@@ -56,6 +67,8 @@ void Video::loadFromFile(std::string file_name){ //load from full path
 	else {
 		std::cout << "Loaded" << file_name << std::endl;
 		movie->play();
+		movie->update();
+		playing = true;
 		sf::Vector2f movie_size = movie->getSize();
 		if (movie_size.y != 0) { //don't know why it would but just to be sure
 			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(gui.outline_thickness,gui.outline_thickness);
@@ -70,7 +83,8 @@ void Video::loadFromFile(std::string file_name){ //load from full path
 	}
 }
 
-param Video::getVal() {
+Parameter * Video::getNewParameter()
+{
 	param return_param;
 	if (movie != NULL) {
 		return_param.texture = &movie->getCurrentImage();
@@ -78,12 +92,20 @@ param Video::getVal() {
 	else {
 		return_param.texture = NULL;
 	}
-	return return_param;
+	return new Parameter(PARAM_TYPE::TEXTURE, return_param, name);
 }
 
-Parameter * Video::getNewParameter()
+Parameter Video::getParameter()
 {
-	return new Parameter(PARAM_TYPE::TEXTURE, getVal(), name);
+
+	param return_param;
+	if (movie != NULL) {
+		return_param.texture = &movie->getCurrentImage();
+	}
+	else {
+		return_param.texture = NULL;
+	}
+	return Parameter(PARAM_TYPE::TEXTURE,return_param,name);
 }
 
 sf::Vector2f Video::getLeftPos(int id = 0)

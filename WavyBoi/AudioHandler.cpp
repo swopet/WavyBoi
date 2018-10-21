@@ -30,7 +30,7 @@ void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 	double max = 0;
 	double freq = 0;
 	for (int i = 0; i < 1000; i++) { //freq_vals[0] is frequency at E_0, freq_vals[198] is frequency at G_8
-		draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f(i + 1, 50 * -freq_vals[i]/curr_max));
+		draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f((i)/10., 50 * -freq_vals[i]/curr_max));
 		if (freq_vals[i] > max) {
 			
 			max = freq_vals[i];
@@ -40,7 +40,7 @@ void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 			freq = (freq + freqAtKey((double)i / 10.)) / 2.0;
 		}
 	}
-	draw_vertices[1001] = sf::Vertex(base_pos + sf::Vector2f(1002, 0));
+	draw_vertices[1001] = sf::Vertex(base_pos + sf::Vector2f(100, 0));
 	target.draw(draw_vertices, 1002, sf::LineStrip);
 }
 
@@ -61,12 +61,15 @@ void AudioHandler::update()
 	double curr_total = 0;
 	double ctr = 0;
 	while (freqAtKey((double)i / 10.) < 60) {
-		curr_total += 1 - (1-freq_vals[i])*(1-freq_vals[i]);
-		ctr++;
 		if (freq_vals[i] > sub_bass_max) sub_bass_max = freq_vals[i];
+		if (freq_vals[i] / sub_bass_max > 0.1) {
+			curr_total += freq_vals[i];
+			ctr++;
+		}
 		i++;
 	}
-	sub_bass_avg = curr_total / ctr / sub_bass_max;
+	if (ctr == 0) sub_bass_avg = 0;
+	else sub_bass_avg = curr_total / ctr / sub_bass_max;
 	curr_total = 0;
 	ctr = 0;
 	while (freqAtKey((double)i / 10.) < 250) {

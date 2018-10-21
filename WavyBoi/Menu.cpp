@@ -44,6 +44,8 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 			menu_options.push_back(MenuOption(std::string("Comparator"), NULL, true, true));
 			menu_options.push_back(MenuOption(std::string("Operator"), NULL, true, true));
 			menu_options.push_back(MenuOption(std::string("Number"), NULL, true, true));
+			menu_options.push_back(MenuOption(std::string("Function"), NULL, true, true));
+			menu_options.push_back(MenuOption(std::string("Clock"), &AnimationManager::clickNewClock, true, false));
 		break;
 		case MENU_TYPE::COMPARATOR:
 			name = "";
@@ -66,9 +68,17 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 		case MENU_TYPE::NUMBER:
 			name = "";
 			menu_options.push_back(MenuOption(std::string("Integer"), &AnimationManager::clickNewInt, true, false));
-			menu_options.push_back(MenuOption(std::string("Float"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("PI"), NULL, true, false));
-			menu_options.push_back(MenuOption(std::string("e"), NULL, true, false));
+			menu_options.push_back(MenuOption(std::string("Float"), &AnimationManager::clickNewFloat, true, false));
+			menu_options.push_back(MenuOption(std::string("PI"), &AnimationManager::clickNewPI, true, false));
+			menu_options.push_back(MenuOption(std::string("e"), &AnimationManager::clickNewE, true, false));
+			break;
+		case MENU_TYPE::FUNCTION:
+			name = "";
+			menu_options.push_back(MenuOption(std::string("Cosine"), &AnimationManager::clickNewCos, true, false));
+			menu_options.push_back(MenuOption(std::string("Sine"), &AnimationManager::clickNewSin, true, false));
+			menu_options.push_back(MenuOption(std::string("Log"), &AnimationManager::clickNewLog, true, false));
+			menu_options.push_back(MenuOption(std::string("Tangent"), &AnimationManager::clickNewTan, true, false));
+			break;
 	}
 	height = gui.menu_text_height;
 	//get thiccest menu option
@@ -102,6 +112,11 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 				case 2:
 					new_menu = new Menu();
 					new_menu->initialize(MENU_TYPE::NUMBER, new_menu_pos);
+					submenus.push_back(new_menu);
+					break;
+				case 3:
+					new_menu = new Menu();
+					new_menu->initialize(MENU_TYPE::FUNCTION, new_menu_pos);
 					submenus.push_back(new_menu);
 					break;
 				default:

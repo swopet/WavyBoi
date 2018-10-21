@@ -14,6 +14,7 @@ private:
 	Parameter * parameter = NULL;
 	sf::Vector2f in_pos;
 	sf::Vector2f out_pos;
+	sf::Text text;
 public:
 	Link(Object *, Object *, Parameter *);
 	Link();
@@ -25,8 +26,10 @@ public:
 	void setOutInd(int);
 	int getOutInd();
 	ClickResponse processLeftClick(sf::Vector2i);
+	ClickResponse processDoubleLeftClick(sf::Vector2i mouse_pos);
 	Object * getInObj();
 	Object * getOutObj();
 	void setOutPos(sf::Vector2f);
 	bool setOutObject(Object *);
+	void processNewString(std::string field, std::string input);
 };

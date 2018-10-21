@@ -14,8 +14,7 @@ private:
 public:
 	Multiplexer();
 	~Multiplexer();
-
-	param getVal();
+	Parameter getParameter();
 	void setParameter(Parameter *, int);
 	Parameter * getNewParameter() {
 		return new Parameter(out_type,curr_value,name);

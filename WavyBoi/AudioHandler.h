@@ -25,7 +25,7 @@ class WavyBoiRecorder : public sf::SoundRecorder
 		f = (double *)malloc(size * sizeof(double));
 		x = (double *)malloc(size * sizeof(double));
 		last_f = (double *)malloc(1000 * sizeof(double));
-		setProcessingInterval(sf::milliseconds(size * 1000/192000 / 0.9)); //we want 30 FPS fidelity on audio processing. to get a sample size of 16384, we need 30*16384 = 1000000 samples per second
+		setProcessingInterval(sf::milliseconds(size * 1000./192000. / 0.9)); //we want 30 FPS fidelity on audio processing. to get a sample size of 16384, we need 30*16384 = 1000000 samples per second
 		// initialize whatever has to be done before the capture starts
 		last_time = clock.getElapsedTime();
 		fft_object = new ffft::FFTReal<double>(size);
@@ -41,11 +41,10 @@ class WavyBoiRecorder : public sf::SoundRecorder
 			x[i] = (double)samples[i];
 		}
 		fft_object->do_fft(f, x);
-		fft_object->rescale(f);
 		double total = 0;
 		for (int i = 0; i < 1000; i++) {
 			double freq = freqAtKey(((double)i) / 10.);
-			int ind = (int)(freq * elapsed_time.asSeconds());
+			int ind = (int)(freq * size / 192000.);
 			if (ind < size / 2)
 				last_f[i] = sqrt(f[ind] * f[ind] + f[size / 2 + ind] * f[size / 2 + ind]);
 			else

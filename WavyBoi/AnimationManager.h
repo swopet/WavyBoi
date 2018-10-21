@@ -18,6 +18,8 @@ rendering. */
 #include <Channel.h>
 #include <Common.h>
 #include <IntObject.h>
+#include <FloatObject.h>
+#include <math.h>
 #include <map>
 #include <vector>
 #include <unordered_set>
@@ -93,4 +95,12 @@ public:
 	void clickNewModulo();
 	void clickNewExponent();
 	void clickNewInt();
+	void clickNewFloat();
+	void clickNewPI();
+	void clickNewE();
+	void clickNewCos();
+	void clickNewSin();
+	void clickNewTan();
+	void clickNewLog();
+	void clickNewClock();
 };

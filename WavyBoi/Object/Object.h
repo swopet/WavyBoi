@@ -50,12 +50,15 @@ public:
 	virtual Parameter * getNewParameter() {
 		param new_param;
 		new_param.int_val = 0;
-		return new Parameter(PARAM_TYPE::INT, new_param, name);
+		return new Parameter(PARAM_TYPE::NONE, new_param, name);
 	}
-	virtual param getVal() {
+	virtual Parameter getParameter() {
+		Parameter return_parameter;
 		param return_param;
 		return_param.int_val = 0;
-		return return_param;
+		return_parameter.setType(PARAM_TYPE::NONE);
+		return_parameter.setValue(return_param);
+		return return_parameter;
 	}
 	virtual void update() {}
 	virtual ~Object() {}

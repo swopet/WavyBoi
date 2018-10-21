@@ -81,8 +81,13 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 		}
 		if (event.type == sf::Event::TextEntered) {
 			if (state.entering_text) {
-
-				state.text_entered += static_cast<char>(event.text.unicode);
+				if (event.text.unicode == 8) { //BACKSPACE
+					if (state.text_entered.length() > 0)
+						state.text_entered.pop_back();
+				}
+				else {
+					state.text_entered += static_cast<char>(event.text.unicode);
+				}
 			}
 		}
 	}
@@ -392,6 +397,7 @@ void ControlWindow::processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationMana
 	bool processed = false;
 	std::cout << "double clicked" << std::endl;
 	std::vector<Object *> objects = animation_manager->getObjects();
+	std::vector<Link *> links = animation_manager->getLinks();
 	for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
 		ClickResponse response = (*it)->processDoubleLeftClick(mouse_pos);
 		if (response.clicked) {
@@ -404,6 +410,22 @@ void ControlWindow::processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationMana
 			}
 			processed = true;
 			break;
+		}
+	}
+	if (!processed) {
+		for (std::vector<Link *>::reverse_iterator it = links.rbegin(); it != links.rend(); ++it) {
+			ClickResponse response = (*it)->processDoubleLeftClick(mouse_pos);
+			if (response.clicked) {
+				if (response.type == CLICK_RESPONSE::GOT_TEXT_FIELD) {
+					state.entering_text = true;
+					state.new_text_obj = *it;
+					state.text_entered = "";
+					state.text_field = response.field;
+					state.last_mouse_pos = mouse_pos;
+				}
+				processed = true;
+				break;
+			}
 		}
 	}
 	//edit text with a double click

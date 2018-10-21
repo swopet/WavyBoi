@@ -78,8 +78,8 @@ void Operator::update()
 	}
 }
 
-param Operator::getVal() {
-	return out_val;
+Parameter Operator::getParameter() {
+	return Parameter(left_type, out_val, name);
 }
 
 void Operator::setParameter(Parameter * parameter, int ind)
@@ -163,6 +163,16 @@ void Operator::draw(sf::RenderTarget & target, sf::RenderStates states)
 	target.draw(circle);
 }
 
+Parameter * Operator::getNewParameter()
+{
+	param new_param;
+	if (left_type == PARAM_TYPE::INT)
+		new_param.int_val = 0;
+	else if (left_type == PARAM_TYPE::FLOAT)
+		new_param.float_val = 0;
+	return new Parameter(left_type, new_param, name);
+}
+
 sf::Vector2f Operator::getLeftPos(int ind)
 {
 	if (ind == 0) {
@@ -171,6 +181,7 @@ sf::Vector2f Operator::getLeftPos(int ind)
 	if (ind == 1) {
 		return sf::Vector2f(position + sf::Vector2f(gui.outline_thickness / 2, gui.outline_thickness + 24));
 	}
+	return position;
 }
 
 sf::Vector2f Operator::getRightPos()
@@ -271,4 +282,5 @@ ClickResponse Operator::processMouseWheel(sf::Vector2i mouse_pos, int delta)
 		response.type = CLICK_RESPONSE::PROCESSED;
 		return response;
 	}
+	return response;
 }

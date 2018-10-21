@@ -28,6 +28,8 @@ public:
 	param getValue();
 	std::string getName();
 	void setValue(param);
+	void setType(PARAM_TYPE new_type);
+	void setName(std::string new_name);
 	Parameter(PARAM_TYPE, param, std::string);
 	Parameter();
 };

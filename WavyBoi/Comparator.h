@@ -53,9 +53,10 @@ private:
 	param out_val;
 public:
 	void update();
-	param getVal();
+	Parameter getParameter();
 	void setParameter(Parameter * parameter, int ind);
 	void draw(sf::RenderTarget &, sf::RenderStates);
+	virtual Parameter * getNewParameter();
 	sf::Vector2f getLeftPos(int);
 	sf::Vector2f getRightPos();
 	Operator();

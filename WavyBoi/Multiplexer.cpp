@@ -14,9 +14,9 @@ Multiplexer::~Multiplexer()
 
 }
 
-param Multiplexer::getVal()
+Parameter Multiplexer::getParameter()
 {
-	return curr_value;
+	return Parameter(out_type,curr_value,name);
 }
 
 void Multiplexer::setParameter(Parameter * parameter, int ind)
@@ -41,7 +41,7 @@ void Multiplexer::setParameter(Parameter * parameter, int ind)
 
 bool Multiplexer::getMultipleInputsAllowed(int ind)
 {
-	return (ind == 0);
+	return (false);
 }
 
 sf::Vector2f Multiplexer::getLeftPos(int ind)

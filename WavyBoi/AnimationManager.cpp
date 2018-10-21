@@ -7,11 +7,12 @@ AnimationManager::AnimationManager(){
 	state.project_path = "";
 	state.out_res = sf::Vector2u(600,400);
 	Video * new_video = new Video();
-	new_video->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/mandelbrot.mp4");
+	new_video->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/flecks.mp4");
 	Video * new_video_2 = new Video();
 	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/dogs.mp4");
 	Video * new_video_3 = new Video();
 	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
+	new_video_3->setSpeed(4.0f);
 	FreqBandBlock * new_freq_band = new FreqBandBlock();
 	new_freq_band->setPosition(sf::Vector2f(10, 200));
 	Multiplexer * new_multiplexer = new Multiplexer();
@@ -391,8 +392,51 @@ void AnimationManager::clickNewExponent() {
 }
 
 void AnimationManager::clickNewInt() {
-	std::cout << "creating new int object" << std::endl;
 	IntObject * new_int = new IntObject();
 	new_int->setPosition(sf::Vector2f(32, 32));
 	addObject(new_int);
+}
+
+void AnimationManager::clickNewFloat()
+{
+	FloatObject * new_float = new FloatObject();
+	new_float->setPosition(sf::Vector2f(32, 32));
+	addObject(new_float);
+}
+
+void AnimationManager::clickNewPI()
+{
+	FloatObject * new_float = new FloatObject(3.14159265358979f);
+	new_float->setPosition(sf::Vector2f(32, 32));
+	addObject(new_float);
+}
+
+void AnimationManager::clickNewE()
+{
+	FloatObject * new_float = new FloatObject(2.71828182846f);
+	new_float->setPosition(sf::Vector2f(32, 32));
+	addObject(new_float);
+}
+
+void AnimationManager::clickNewCos()
+{
+	//TODO: add cosine func object
+}
+
+void AnimationManager::clickNewSin()
+{
+	//TODO: add cosine func object
+}
+void AnimationManager::clickNewTan()
+{
+	//TODO: add cosine func object
+}
+void AnimationManager::clickNewLog()
+{
+	//TODO: add cosine func object
+}
+
+void AnimationManager::clickNewClock()
+{
+	//TODO: add clock object
 }

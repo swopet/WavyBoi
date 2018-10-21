@@ -15,6 +15,7 @@ Link::Link(Object * obj_in, Object *obj_out, Parameter *new_parameter)
 		out_pos = in_pos;
 	}
 	parameter = new_parameter;
+	name = parameter->getName();
 	type = OBJECT_TYPE::LINK;
 }
 
@@ -41,8 +42,18 @@ void Link::update()
 		out_pos = out->getLeftPos(out_ind);
 	}
 	if (in != NULL) {
-		parameter->setValue(in->getVal());
+		Parameter new_parameter = in->getParameter();
+		parameter->setValue(new_parameter.getValue());
+		parameter->setType(new_parameter.getType());
 	}
+
+	if (name.length() == 0) text.setString("...");
+	else text.setString(name);
+	text.setFont(gui.font);
+	text.setCharacterSize(gui.input_text_height);
+	text.setFillColor(sf::Color::White);
+	text.setPosition((sf::Vector2f(in_pos.x + 10 , out_pos.y) + out_pos) / 2.0f + sf::Vector2f(-text.getGlobalBounds().width / 2, 0));
+
 }
 
 Parameter * Link::getParameterFromLink()
@@ -68,6 +79,7 @@ void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 	glLineWidth(gui.outline_thickness);
 	glColor3f(gui.obj_outline_color.r, gui.obj_outline_color.g, gui.obj_outline_color.b);
 	target.draw(line, 4, sf::LineStrip);
+	target.draw(text);
 }
 
 void Link::setOutInd(int new_ind)
@@ -84,8 +96,22 @@ ClickResponse Link::processLeftClick(sf::Vector2i mouse_pos){
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	
 	return response;
+}
+
+ClickResponse Link::processDoubleLeftClick(sf::Vector2i mouse_pos)
+{
+	sf::FloatRect text_rect(text.getGlobalBounds());
+	sf::RectangleShape rect(sf::Vector2f(text_rect.width, text_rect.height));
+	rect.setPosition(text_rect.left, text_rect.top);
+	if (checkIntersection(rect, sf::Vector2f(mouse_pos))) {
+		ClickResponse response;
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::GOT_TEXT_FIELD;
+		response.field = "name";
+		return response;
+	}
+	return ClickResponse();
 }
 
 Object * Link::getInObj()
@@ -109,4 +135,11 @@ bool Link::setOutObject(Object * new_out_obj)
 	out = new_out_obj;
 	out_pos = out->getLeftPos();
 	return true;
+}
+
+void Link::processNewString(std::string field, std::string input)
+{
+	if (field == "name") {
+		name = input;
+	}
 }
