@@ -12,7 +12,7 @@ AudioHandler::AudioHandler()
 	}
 	//we want at least ~15 FPS fidelity on audio signal processing. to get a sample size of <size> we need a sample rate of size*30 Hz, plus a little extra to be safe
 	audio_recorder.setSize(size);
-	audio_recorder.start(48000);
+	audio_recorder.start(192000);
 }
 
 
@@ -24,12 +24,12 @@ AudioHandler::~AudioHandler()
 void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
 	sf::Vertex draw_vertices[1002];
-	sf::Vector2f base_pos(10, 600);
+	sf::Vector2f base_pos(10, 800);
 	const double * freq_vals = audio_recorder.getFrequencies();
 	draw_vertices[0] = sf::Vertex(base_pos);
 	double max = 0;
 	double freq = 0;
-	for (int i = 0; i < 1000; i++) { //freq_vals[0] is frequency at E_0, freq_vals[990] is frequency at G_8
+	for (int i = 0; i < 1000; i++) { //freq_vals[0] is frequency at E_0, freq_vals[198] is frequency at G_8
 		draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f(i + 1, 50 * -freq_vals[i]/curr_max));
 		if (freq_vals[i] > max) {
 			
@@ -40,19 +40,8 @@ void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 			freq = (freq + freqAtKey((double)i / 10.)) / 2.0;
 		}
 	}
-	//std::cout << "current max frequency: " << freq << " Hz\r";
 	draw_vertices[1001] = sf::Vertex(base_pos + sf::Vector2f(1002, 0));
 	target.draw(draw_vertices, 1002, sf::LineStrip);
-	sf::RectangleShape level_rect;
-	target.draw(level_rect);
-	double vals[] = { sub_bass_avg,bass_avg,lower_mid_avg,mid_avg,upper_mid_avg,presence_avg,brilliance_avg };
-	for (int i = 0; i < 7; i++) {
-		level_rect.setFillColor(sf::Color(255 * vals[i]*vals[i], 128 * vals[i], 0));
-		level_rect.setSize(sf::Vector2f(10, 50 * vals[i]));
-		level_rect.setPosition(base_pos + sf::Vector2f(10*i, -50 - level_rect.getSize().y));
-		target.draw(level_rect);
-	}
-	
 }
 
 void AudioHandler::resetLevels() {
@@ -65,19 +54,14 @@ void AudioHandler::resetLevels() {
 	brilliance_max = 1;
 }
 
-double levelSquare(double val) {
-	return 1.0 - (1 - val)*(1 - val);
-}
-
 void AudioHandler::update()
 {
 	int i = 0;
 	const double * freq_vals = audio_recorder.getFrequencies();
 	double curr_total = 0;
 	double ctr = 0;
-	
 	while (freqAtKey((double)i / 10.) < 60) {
-		curr_total += freq_vals[i];
+		curr_total += 1 - (1-freq_vals[i])*(1-freq_vals[i]);
 		ctr++;
 		if (freq_vals[i] > sub_bass_max) sub_bass_max = freq_vals[i];
 		i++;
@@ -86,12 +70,15 @@ void AudioHandler::update()
 	curr_total = 0;
 	ctr = 0;
 	while (freqAtKey((double)i / 10.) < 250) {
-		curr_total += freq_vals[i];
-		ctr++;
 		if (freq_vals[i] > bass_max) bass_max = freq_vals[i];
+		if (freq_vals[i] / bass_max > 0.1) {
+			curr_total += freq_vals[i];
+			ctr++;
+		}
 		i++;
 	}
-	bass_avg = curr_total / ctr / bass_max;
+	if (ctr == 0) bass_avg = 0;
+	else bass_avg = curr_total / ctr / bass_max;
 	curr_total = 0;
 	ctr = 0;
 	while (freqAtKey((double)i / 10.) < 500) {

@@ -2,9 +2,9 @@
 #include <ControlWindow.h>
 
 ControlWindow::ControlWindow(AnimationManager * animation_manager){
-	window = new sf::RenderWindow(sf::VideoMode(1280,720), "WavyBoi - " + animation_manager->getName());
+	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->getName());
 	window->setVerticalSyncEnabled(true);
-	state.window_size = window->getSize();
+	state.window_size = sf::Vector2u(1600,900);
 	font = NULL;
 	state.last_fps_draw = state.clock.getElapsedTime();
 	InitializeMenuTabs();

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Operator.h"
+#include "Comparator.h"
 
 
 void Operator::update()
