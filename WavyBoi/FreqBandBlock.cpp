@@ -23,7 +23,6 @@ void FreqBandBlock::update()
 	main_box.setOutlineThickness(-gui.outline_thickness);
 	main_box.setFillColor(gui.obj_fill_color);
 	main_box.setPosition(position);
-	out_val;
 	switch (freq_band) {
 	case 0:
 		out_val.float_val = audio_handler->getSubBass();

@@ -34,7 +34,7 @@ public:
 	virtual void processNewString(std::string field, std::string input) {}
 	OBJECT_TYPE getObjectType() { return type; }
 	virtual void setParamsToDefault() {};
-	virtual bool getMultipleInputsAllowed(int) { return true; }
+	virtual bool getMultipleInputsAllowed(int) { return false; }
 	virtual PARAM_TYPE getParamTypeForInput(int ind = 0) { return PARAM_TYPE::NONE; }
 	virtual void setParameter(Parameter * parameter, int ind){}
 	void setParameter(Parameter * parameter) {

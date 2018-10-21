@@ -20,6 +20,7 @@ rendering. */
 #include <IntObject.h>
 #include <FloatObject.h>
 #include <ClockObject.h>
+#include <MathFunction.h>
 #include <math.h>
 #include <map>
 #include <vector>

@@ -420,20 +420,28 @@ void AnimationManager::clickNewE()
 
 void AnimationManager::clickNewCos()
 {
-	//TODO: add cosine func object
+	MathFunction * new_func = new MathFunction(0);
+	new_func->setPosition(sf::Vector2f(32, 32));
+	addObject(new_func);
 }
 
 void AnimationManager::clickNewSin()
 {
-	//TODO: add cosine func object
+	MathFunction * new_func = new MathFunction(1);
+	new_func->setPosition(sf::Vector2f(32, 32));
+	addObject(new_func);
 }
 void AnimationManager::clickNewTan()
 {
-	//TODO: add cosine func object
+	MathFunction * new_func = new MathFunction(2);
+	new_func->setPosition(sf::Vector2f(32, 32));
+	addObject(new_func);
 }
 void AnimationManager::clickNewLog()
 {
-	//TODO: add cosine func object
+	MathFunction * new_func = new MathFunction(3);
+	new_func->setPosition(sf::Vector2f(32, 32));
+	addObject(new_func);
 }
 
 void AnimationManager::clickNewClock()
