@@ -27,7 +27,8 @@ void Channel::clearTexture()
 void Channel::update()
 {
 	test_scene->update();
-	render_texture = test_scene->getTexture();
+	//uncomment this to use the test scene
+	//render_texture = test_scene->getTexture();
 	if (render_texture != NULL) {
 		sf::Vector2f tex_size = sf::Vector2f(render_texture->getSize());
 		if (tex_size.y != 0) { //don't know why it would but just to be sure
@@ -90,7 +91,7 @@ const sf::Texture * Channel::getTexture()
 }
 
 Channel::Channel(int new_id) {
-	test_scene = new Scene();
+	test_scene = new WBScene();
 	id = new_id;
 	name = "Output Channel " + std::to_string(id);
 	type = OBJECT_TYPE::CHANNEL;

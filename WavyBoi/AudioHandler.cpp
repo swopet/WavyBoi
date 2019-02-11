@@ -12,7 +12,7 @@ AudioHandler::AudioHandler()
 	}
 	//we want at least ~15 FPS fidelity on audio signal processing. to get a sample size of <size> we need a sample rate of size*30 Hz, plus a little extra to be safe
 	audio_recorder.setSize(size);
-	audio_recorder.start(192000);
+	audio_recorder.start(44100);
 }
 
 

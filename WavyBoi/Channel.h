@@ -1,13 +1,13 @@
 #pragma once
 #include "Object/Object.h"
 #include "Object/Parameter.h"
-#include "Scene.h"
+#include "WBScene.h"
 
 class Channel :
 	public Object
 {
 private:
-	Scene * test_scene; //delete once i'm done testing this shiiiit
+	WBScene * test_scene; //delete once i'm done testing this shiiiit
 	sf::Vector2f size;
 	sf::RectangleShape main_box;
 	sf::RectangleShape video_box;

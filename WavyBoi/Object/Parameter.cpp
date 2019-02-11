@@ -1,5 +1,5 @@
-#include <pch.h>
-#include <Object\Parameter.h>
+#include "pch.h"
+#include "Parameter.h"
 
 PARAM_TYPE Parameter::getType()
 {

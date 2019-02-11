@@ -11,7 +11,9 @@ rendering. */
 #include <Object/Object.h>
 #include <Object/Video.h>
 #include <Object/Link.h>
+#include <SceneObject.h>
 #include <Multiplexer.h>
+#include <FallingLeaves.h>
 #include <AudioHandler.h>
 #include <FreqBandBlock.h>
 #include <Comparator.h>

@@ -52,12 +52,13 @@ void Link::update()
 	text.setFont(gui.font);
 	text.setCharacterSize(gui.input_text_height);
 	text.setFillColor(sf::Color::White);
-	text.setPosition((sf::Vector2f(in_pos.x + 10 , out_pos.y) + out_pos) / 2.0f + sf::Vector2f(-text.getGlobalBounds().width / 2, 0));
+	text.setPosition((sf::Vector2f(in_pos.x + 10 , in_pos.y) + sf::Vector2f(out_pos.x - 10,out_pos.y)) / 2.0f + sf::Vector2f(-text.getGlobalBounds().width / 2, 0));
 
 }
 
 Parameter * Link::getParameterFromLink()
 {
+	parameter->setName(name);
 	return parameter;
 }
 
@@ -77,7 +78,7 @@ void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 	sf::Vertex line[] = {
 		sf::Vertex(in_pos),
 		sf::Vertex(sf::Vector2f(in_pos.x+10,in_pos.y)),
-		sf::Vertex(sf::Vector2f(in_pos.x+10,out_pos.y)),
+		sf::Vertex(sf::Vector2f(out_pos.x-10,out_pos.y)),
 		sf::Vertex(out_pos)
 	};
 	glLineWidth(gui.outline_thickness);

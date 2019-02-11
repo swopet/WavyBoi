@@ -14,6 +14,7 @@ enum class OBJECT_TYPE {
 	IMAGE,
 	CHANNEL,
 	FREQBANDBLOCK,
+	SCENE,
 	NONE
 };
 
