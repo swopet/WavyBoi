@@ -37,7 +37,10 @@ void FloatObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 
 void FloatObject::update()
 {
-	text = sf::Text(std::to_string(out_val.float_val), gui.font, gui.input_text_height);
+	std::ostringstream out;
+	out.precision(precision);
+	out << std::fixed << out_val.float_val;
+	text = sf::Text(out.str(), gui.font, gui.input_text_height);
 	float box_width = text.findCharacterPos(text.getString().getSize()).x;
 	main_box = sf::RectangleShape(sf::Vector2f(box_width, gui.input_text_height) + sf::Vector2f(gui.outline_thickness * 4 + gui.obj_circle_radius * 2, gui.outline_thickness * 4));
 	main_box.setPosition(position);
@@ -59,6 +62,11 @@ void FloatObject::setParameter(Parameter * parameter, int ind)
 	else if (parameter->getType() == PARAM_TYPE::FLOAT) {
 		out_val.float_val = parameter->getValue().float_val;
 	}
+}
+
+void FloatObject::setPrecision(int precision_)
+{
+	precision = precision_;
 }
 
 Parameter * FloatObject::getNewParameter()
@@ -115,6 +123,22 @@ ClickResponse FloatObject::processDoubleLeftClick(sf::Vector2i mouse_pos)
 		return response;
 	}
 	return ClickResponse();
+}
+
+ClickResponse FloatObject::processMouseWheel(sf::Vector2i mouse_pos, int delta)
+{
+	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
+	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
+		precision += delta;
+		if (precision > 7) precision = 7;
+		if (precision < 0) precision = 0;
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+		return response;
+	}
+	return response;
 }
 
 FloatObject::FloatObject()
