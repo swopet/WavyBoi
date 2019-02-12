@@ -73,6 +73,10 @@ void FreqBandBlock::draw(sf::RenderTarget & target, sf::RenderStates states)
 	target.draw(right_circle);
 }
 
+bool FreqBandBlock::checkOverlap(sf::RectangleShape select_box) {
+	return checkIntersection(select_box, main_box);
+}
+
 ClickResponse FreqBandBlock::processLeftClick(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;

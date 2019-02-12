@@ -51,9 +51,11 @@ private:
 	param left_val;
 	param right_val;
 	param out_val;
+	sf::RectangleShape main_box;
 public:
 	void update();
 	Parameter getParameter();
+	bool checkOverlap(sf::RectangleShape select_box);
 	void setParameter(Parameter * parameter, int ind);
 	void draw(sf::RenderTarget &, sf::RenderStates);
 	virtual Parameter * getNewParameter();

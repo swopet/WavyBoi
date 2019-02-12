@@ -17,6 +17,7 @@ public:
 	void update();
 	void setParameter(Parameter * parameter, int ind);
 	Parameter getParameter();
+	bool checkOverlap(sf::RectangleShape select_box);
 	void setParamsToDefault() { out_val = default_val; }
 	sf::Vector2f getLeftPos(int) { return left_pos; }
 	sf::Vector2f getRightPos() { return right_pos; }

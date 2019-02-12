@@ -19,6 +19,7 @@ public:
 	void setParameter(Parameter * parameter, int ind);
 	void setParamsToDefault() { out_val = default_val; }
 	virtual Parameter * getNewParameter();
+	bool checkOverlap(sf::RectangleShape);
 	sf::Vector2f getLeftPos(int) { return left_pos; }
 	sf::Vector2f getRightPos() { return right_pos; }
 	ClickResponse processLeftClick(sf::Vector2i vec);

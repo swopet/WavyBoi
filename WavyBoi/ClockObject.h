@@ -19,6 +19,7 @@ public:
 	sf::Vector2f getRightPos();
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	void update();
+	bool checkOverlap(sf::RectangleShape select_box);
 	ClickResponse processLeftClick(sf::Vector2i vec);
 	Parameter getParameter();
 	ClockObject();

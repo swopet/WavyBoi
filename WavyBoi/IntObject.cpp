@@ -61,6 +61,11 @@ Parameter IntObject::getParameter()
 	return Parameter(PARAM_TYPE::INT, out_val, name);
 }
 
+bool IntObject::checkOverlap(sf::RectangleShape select_box)
+{
+	return checkIntersection(select_box, main_box);
+}
+
 ClickResponse IntObject::processLeftClick(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;

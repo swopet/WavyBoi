@@ -88,6 +88,11 @@ ClickResponse FloatObject::processLeftClick(sf::Vector2i mouse_pos)
 	return response;
 }
 
+bool FloatObject::checkOverlap(sf::RectangleShape select_box)
+{
+	return checkIntersection(select_box, main_box);
+}
+
 ClickResponse FloatObject::processLeftClickRelease(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;

@@ -50,6 +50,14 @@ void ClockObject::update()
 	
 }
 
+bool ClockObject::checkOverlap(sf::RectangleShape select_box)
+{
+	return (checkIntersection(select_box, clock_rect)
+		|| checkIntersection(select_box, zero_s_rect)
+		|| checkIntersection(select_box, play_pause_rect)
+		|| checkIntersection(select_box, s_ms_rect));
+}
+
 ClickResponse ClockObject::processLeftClick(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;

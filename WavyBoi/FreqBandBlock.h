@@ -24,6 +24,7 @@ public:
 		return new Parameter(PARAM_TYPE::FLOAT, new_param, name);
 	}
 	void draw(sf::RenderTarget&, sf::RenderStates);
+	bool checkOverlap(sf::RectangleShape select_box);
 	ClickResponse processLeftClick(sf::Vector2i);
 	ClickResponse processMouseWheel(sf::Vector2i mouse_pos, int delta);
 };

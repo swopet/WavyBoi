@@ -82,6 +82,11 @@ Parameter Operator::getParameter() {
 	return Parameter(left_type, out_val, name);
 }
 
+bool Operator::checkOverlap(sf::RectangleShape select_box)
+{
+	return (checkIntersection(select_box, main_box));
+}
+
 void Operator::setParameter(Parameter * parameter, int ind)
 {
 	if (ind == 0) {
@@ -96,7 +101,7 @@ void Operator::setParameter(Parameter * parameter, int ind)
 
 void Operator::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	sf::RectangleShape main_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
+	
 	main_box.setPosition(position);
 	main_box.setOutlineColor(gui.obj_outline_color);
 	main_box.setOutlineThickness(-gui.outline_thickness);
@@ -192,16 +197,19 @@ sf::Vector2f Operator::getRightPos()
 Operator::Operator(COMPARATOR new_type) {
 	op_type = OPERATOR::COMPARATOR;
 	func.comparator = new_type;
+	main_box = sf::RectangleShape(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
 }
 
 Operator::Operator(ARITHMETIC new_type)
 {
 	op_type = OPERATOR::ARITHMETIC;
 	func.arithmetic = new_type;
+	main_box = sf::RectangleShape(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
 }
 
 Operator::Operator()
 {
+	main_box = sf::RectangleShape(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
 }
 
 

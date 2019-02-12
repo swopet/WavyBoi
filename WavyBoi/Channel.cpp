@@ -48,6 +48,10 @@ void Channel::update()
 	}
 }
 
+bool Channel::checkOverlap(sf::RectangleShape select_box) {
+	return checkIntersection(select_box, main_box);
+}
+
 void Channel::draw(sf::RenderTarget& target, sf::RenderStates states) {
 	main_box.setPosition(position - size / 2.0f);
 	video_box.setPosition(position - video_box.getSize() / 2.0f);
