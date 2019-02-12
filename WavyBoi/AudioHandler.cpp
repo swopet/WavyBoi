@@ -21,6 +21,44 @@ AudioHandler::~AudioHandler()
 	audio_recorder.stop();
 }
 
+double AudioHandler::getMaxAtRange(std::pair<int, int> range)
+{
+	long unsigned int key = ((long unsigned int)range.first << 16 + (long unsigned int)range.second);
+	std::unordered_map<long unsigned int, double>::iterator pos = range_maxes.find(key);
+	if (pos != range_maxes.end()) {
+		return range_maxes[key];
+	}
+	else {
+		return 0.0;
+	}
+}
+
+double AudioHandler::getAvgAtRange(std::pair<int, int> range)
+{
+	long unsigned int key = ((long unsigned int)range.first << 16 + (long unsigned int)range.second);
+	std::unordered_map<long unsigned int, double>::iterator pos = range_avgs.find(key);
+	if (pos != range_avgs.end()) {
+		return range_avgs[key];
+	}
+	else {
+		return 0.0;
+	}
+}
+
+void AudioHandler::addRange(std::pair<int, int> new_range)
+{
+	int i = 0;
+	while (i < ranges.size()) {
+		if (ranges[i].first > new_range.first) {
+			i++;
+		}
+		else {
+			break;
+		}
+	}
+	ranges.insert(ranges.begin() + i, new_range);
+}
+
 void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
 	sf::Vertex draw_vertices[1002];
@@ -40,103 +78,101 @@ void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 			freq = (freq + freqAtKey((double)i / 10.)) / 2.0;
 		}
 	}
+	audio_recorder.unlockLastF();
 	draw_vertices[1001] = sf::Vertex(base_pos + sf::Vector2f(100, 0));
 	target.draw(draw_vertices, 1002, sf::LineStrip);
 }
 
 void AudioHandler::resetLevels() {
-	sub_bass_max = 1;
-	bass_max = 1;
-	lower_mid_max = 1;
-	mid_max = 1;
-	upper_mid_max = 1;
-	presence_max = 1;
-	brilliance_max = 1;
+	curr_max = 1;
 }
 
 void AudioHandler::update()
 {
-	int i = 0;
+	range_maxes.clear();
+	range_avgs.clear();
+	std::vector<std::pair<int, int>> active_ranges;
+	std::vector<double> maxes;
+	std::vector<double> sums;
+	std::vector<int> counts;
 	const double * freq_vals = audio_recorder.getFrequencies();
-	double curr_total = 0;
-	double ctr = 0;
-	while (freqAtKey((double)i / 10.) < 60) {
-		if (freq_vals[i] > sub_bass_max) sub_bass_max = freq_vals[i];
-		if (freq_vals[i] / sub_bass_max > 0.1) {
-			curr_total += freq_vals[i];
-			ctr++;
+	if (normalize_request) {
+		resetLevels();
+	}
+	for (int i = 0; i < 1000; i++) {
+		double freq = freqAtKey((double)i / 10.);
+		while (ranges.size() > 0) {
+			//check if the queued range should be activated
+			if ((double)ranges.back().first < freq) {
+				std::pair<int, int> curr_range = ranges.back();
+				ranges.pop_back();
+				//find the index such that the lowest high val ends up on the back of the active ranges vector
+				int ind = 0;
+				while (ind < active_ranges.size()) {
+					if (active_ranges[ind].second > curr_range.second) {
+						ind++;
+					}
+					else {
+						break;
+					}
+				}
+				active_ranges.insert(active_ranges.begin() + ind, curr_range);
+				maxes.insert(maxes.begin() + ind, 0);
+				sums.insert(sums.begin() + ind, 0);
+				counts.insert(counts.begin() + ind, 0);
+			}
+			else {
+				break;
+			}
 		}
-		i++;
-	}
-	if (ctr == 0) sub_bass_avg = 0;
-	else sub_bass_avg = curr_total / ctr / sub_bass_max;
-	curr_total = 0;
-	ctr = 0;
-	while (freqAtKey((double)i / 10.) < 250) {
-		if (freq_vals[i] > bass_max) bass_max = freq_vals[i];
-		if (freq_vals[i] / bass_max > 0.1) {
-			curr_total += freq_vals[i];
-			ctr++;
+		double val = freq_vals[i];
+		for (int i = 0; i < active_ranges.size(); i++) {
+			if (val > maxes[i]) maxes[i] = val;
+			sums[i] += val;
+			counts[i]++;
 		}
-		i++;
+		while (active_ranges.size() > 0) {
+			if ((double)active_ranges.back().second < freq) {
+				//remove the range from the active range
+				unsigned long int key = ((unsigned long int)active_ranges.back().first << 16 + (unsigned long int)active_ranges.back().second);
+				range_maxes[key] = maxes.back();
+				range_avgs[key] = sums.back() / (double)(counts.back());
+				active_ranges.pop_back();
+				maxes.pop_back();
+				sums.pop_back();
+				counts.pop_back();
+			}
+			else {
+				break;
+			}
+		}
+		if (val > curr_max) curr_max = val;
 	}
-	if (ctr == 0) bass_avg = 0;
-	else bass_avg = curr_total / ctr / bass_max;
-	curr_total = 0;
-	ctr = 0;
-	while (freqAtKey((double)i / 10.) < 500) {
-		curr_total += freq_vals[i];
-		ctr++;
-		if (freq_vals[i] > lower_mid_max) lower_mid_max = freq_vals[i];
-		i++;
+	audio_recorder.unlockLastF();
+	//clear any non-calculated ranges
+	while (active_ranges.size() > 0) {
+		//remove the range from the active range
+		unsigned long int key = ((unsigned long int)active_ranges.back().first << 16 + (unsigned long int)active_ranges.back().second);
+		range_maxes[key] = maxes.back();
+		range_avgs[key] = sums.back() / (double)(counts.back());
+		active_ranges.pop_back();
+		maxes.pop_back();
+		sums.pop_back();
+		counts.pop_back();
 	}
-	lower_mid_avg = curr_total / ctr / lower_mid_max;
-	curr_total = 0;
-	ctr = 0;
-	while (freqAtKey((double)i / 10.) < 2000) {
-		curr_total += freq_vals[i];
-		ctr++;
-		if (freq_vals[i] > mid_max) mid_max = freq_vals[i];
-		i++;
+	//normalize calculated values
+	for (std::unordered_map<long unsigned int, double>::iterator iter = range_maxes.begin(); iter != range_maxes.end(); ++iter) {
+		range_maxes[iter->first] = iter->second / curr_max;
 	}
-	mid_avg = curr_total / ctr / mid_max;
-	curr_total = 0;
-	ctr = 0;
-	while (freqAtKey((double)i / 10.) < 4000) {
-		curr_total += freq_vals[i];
-		ctr++;
-		if (freq_vals[i] > upper_mid_max) upper_mid_max = freq_vals[i];
-		i++;
+	for (std::unordered_map<long unsigned int, double>::iterator iter = range_avgs.begin(); iter != range_avgs.end(); ++iter) {
+		range_avgs[iter->first] = iter->second / curr_max;
 	}
-	upper_mid_avg = curr_total / ctr / upper_mid_max;
-	curr_total = 0;
-	ctr = 0;
-	while (freqAtKey((double)i / 10.) < 6000) {
-		curr_total += freq_vals[i];
-		ctr++;
-		if (freq_vals[i] > presence_max) presence_max = freq_vals[i];
-		i++;
-	}
-	presence_avg = curr_total / ctr / presence_max;
-	curr_total = 0;
-	ctr = 0;
-	while (i < 1000) {
-		curr_total += freq_vals[i];
-		ctr++;
-		if (freq_vals[i] > brilliance_max) brilliance_max = freq_vals[i];
-		i++;
-	}
-	brilliance_avg = curr_total / ctr / brilliance_max;
-	if (sub_bass_max > curr_max) curr_max = sub_bass_max;
-	if (bass_max > curr_max) curr_max = bass_max;
-	if (lower_mid_max > curr_max) curr_max = lower_mid_max;
-	if (mid_max > curr_max) curr_max = mid_max;
-	if (upper_mid_max > curr_max) curr_max = upper_mid_max;
-	if (presence_max > curr_max) curr_max = presence_max;
-	if (brilliance_max > curr_max) curr_max = brilliance_max;
 }
 
-AudioHandler * audio_handler;
+void AudioHandler::normalize()
+{
+	normalize_request = true;
+}
 
 double freqAtKey(double key)
 { //A440Hz is considered to be Key 53 (note that this isn't quite accurate for MIDI, A is 49 there)

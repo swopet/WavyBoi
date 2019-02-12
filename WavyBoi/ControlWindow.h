@@ -9,8 +9,6 @@
 #include <vector>
 #define TIME_PER_FPS_UPDATE_MS 500
 
-extern AudioHandler * audio_handler;
-
 struct ControlWindowState {
 	sf::Vector2u window_size;
 	bool left_mouse_held = false;

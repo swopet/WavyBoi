@@ -4,6 +4,7 @@
 
 FreqBandBlock::FreqBandBlock()
 {
+	type = OBJECT_TYPE::FREQBANDBLOCK;
 }
 
 
@@ -23,37 +24,26 @@ void FreqBandBlock::update()
 	main_box.setOutlineThickness(-gui.outline_thickness);
 	main_box.setFillColor(gui.obj_fill_color);
 	main_box.setPosition(position);
-	switch (freq_band) {
-	case 0:
-		out_val.float_val = audio_handler->getSubBass();
-		break;
-	case 1:
-		out_val.float_val = audio_handler->getBass();
-		break;
-	case 2:
-		out_val.float_val = audio_handler->getLowerMid();
-		break;
-	case 3:
-		out_val.float_val = audio_handler->getMid();
-		break;
-	case 4:
-		out_val.float_val = audio_handler->getUpperMid();
-		break;
-	case 5:
-		out_val.float_val = audio_handler->getPresence();
-		break;
-	case 6:
-		out_val.float_val = audio_handler->getBrilliance();
-		break;
-	default:
-		out_val.float_val = 0.0;
-		break;
-	}
-	text.setString(freq_band_strings[freq_band]);
+	out_val.float_val = max;
+	std::ostringstream range_str;
+	range_str << low_val << " - " << high_val << " Hz";
+	text.setString(range_str.str());
 	text.setCharacterSize(gui.input_text_height);
 	text.setFont(gui.font);
 	text.setFillColor(sf::Color::White);
 	text.setPosition(position + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
+	changed = false;
+}
+
+void FreqBandBlock::updateValsFromHandler(AudioHandler * audio_handler)
+{
+	max = audio_handler->getMaxAtRange(std::pair<int,int>(low_val, high_val));
+	avg = audio_handler->getAvgAtRange(std::pair<int, int>(low_val, high_val));
+}
+
+void FreqBandBlock::sendRangeToHandler(AudioHandler * audio_handler)
+{
+	audio_handler->addRange(std::pair<int, int>(low_val, high_val));
 }
 
 sf::Vector2f FreqBandBlock::getRightPos()
@@ -64,6 +54,13 @@ sf::Vector2f FreqBandBlock::getRightPos()
 void FreqBandBlock::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
 	target.draw(main_box);
+	sf::RectangleShape level_box(main_box.getSize() - sf::Vector2f(gui.outline_thickness * 2, gui.outline_thickness * 2));
+	
+	level_box.setFillColor(sf::Color(0, 255 * max, 0));
+	float max_height = level_box.getSize().y;
+	level_box.setSize(sf::Vector2f(level_box.getSize().x, max_height * max));
+	level_box.setPosition(main_box.getPosition() + sf::Vector2f(gui.outline_thickness, gui.outline_thickness + (1.0 - max) * max_height));
+	target.draw(level_box);
 	target.draw(text);
 	sf::CircleShape right_circle(gui.obj_circle_radius + gui.outline_thickness);
 	right_circle.setOutlineColor(gui.obj_outline_color);
@@ -100,14 +97,17 @@ ClickResponse FreqBandBlock::processMouseWheel(sf::Vector2i mouse_pos, int delta
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	sf::RectangleShape switch_box(sf::Vector2f(12, 12));
-	sf::RectangleShape move_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
-	move_box.setPosition(position);
-	switch_box.setPosition(position + move_box.getSize() / 2.0f - switch_box.getSize() / 2.0f);
 	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
-		freq_band += delta;
-		while (freq_band >= 7) freq_band = freq_band - 7;
-		while (freq_band < 0) freq_band = 6 + freq_band;
+		if (mouse_pos.x <= position.x + main_box.getSize().x/2.0f) {
+			low_val += delta;
+			if (low_val > high_val) low_val = high_val;
+			if (low_val < 0) low_val = 0;
+		}
+		else {
+			high_val += delta;
+			if (high_val > 24000) high_val = 24000;
+			if (high_val < low_val) high_val = low_val;
+		}
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::PROCESSED;
 		return response;

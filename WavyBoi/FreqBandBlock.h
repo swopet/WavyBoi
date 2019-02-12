@@ -1,22 +1,27 @@
 #pragma once
 #include "Object/Object.h"
 #include <AudioHandler.h>
-extern AudioHandler * audio_handler;
+#include <sstream>
 
 class FreqBandBlock :
 	public Object
 {
 private:
-	int freq_band = 0;
+	int low_val = 0;
+	int high_val = 60;
+	float max = 0.0;
+	float avg = 0.0;
 	param out_val;
 	sf::RectangleShape main_box;
 	sf::Text text;
-	const std::string freq_band_strings[7] = { "Sub Bass", "Bass", "Low Mids", "Mids", "Upper Mids", "Presence", "Brilliance" };
+	bool changed = false;
 public:
 	FreqBandBlock();
 	~FreqBandBlock();
 	Parameter getParameter();
 	void update();
+	void updateValsFromHandler(AudioHandler *);
+	void sendRangeToHandler(AudioHandler *);
 	sf::Vector2f getRightPos();
 	Parameter * getNewParameter() {
 		param new_param;

@@ -2,6 +2,8 @@
 #include <AnimationManager.h>
 
 AnimationManager::AnimationManager(){
+
+	audio_handler = new AudioHandler();
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
@@ -13,7 +15,7 @@ AnimationManager::AnimationManager(){
 	Video * new_video_3 = new Video();
 	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
 	new_video_3->setSpeed(4.0f);
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 2; i++) {
 		FreqBandBlock * new_freq_band = new FreqBandBlock();
 		new_freq_band->setPosition(sf::Vector2f(10, 200 + i*60));
 		addObject(new_freq_band);
@@ -31,6 +33,16 @@ AnimationManager::AnimationManager(){
 	addObject(new_scene_obj);*/
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
+}
+
+AnimationManager::~AnimationManager()
+{
+	delete audio_handler;
+}
+
+AudioHandler * AnimationManager::getAudioHandler()
+{
+	return audio_handler;
 }
 
 std::string AnimationManager::getName(){
@@ -76,6 +88,14 @@ void AnimationManager::deleteObject(Object * object_to_delete) {
 		deleteLink(*obj_graph[object_to_delete].outputs.begin());
 	}
 	obj_graph.erase(object_to_delete);
+	if (object_to_delete->getObjectType() == OBJECT_TYPE::FREQBANDBLOCK) {
+		std::vector<FreqBandBlock *>::iterator position = freq_band_objects.begin();
+		while ((Object *)(*position) != object_to_delete) {
+			++position;
+		}
+		freq_band_objects.erase(position);
+		std::cout << "special deleted freq band block" << std::endl;
+	}
 	std::vector<Object *>::iterator position = objects.begin();
 	while ((*position) != object_to_delete) {
 		++position;
@@ -151,6 +171,9 @@ void AnimationManager::addLink(Link * new_link)
 
 void AnimationManager::addObject(Object * new_obj)
 {
+	if (new_obj->getObjectType() == OBJECT_TYPE::FREQBANDBLOCK) {
+		freq_band_objects.push_back((FreqBandBlock *)new_obj);
+	}
 	objects.push_back(new_obj);
 	ObjectNode new_node;
 	new_node.obj = new_obj;
@@ -211,6 +234,13 @@ void AnimationManager::updateFPS(sf::Time frame_time)
 
 
 void AnimationManager::update() {
+	for (std::vector<FreqBandBlock *>::iterator it = freq_band_objects.begin(); it != freq_band_objects.end(); ++it) {
+		(*it)->sendRangeToHandler(audio_handler);
+	}
+	audio_handler->update();
+	for (std::vector<FreqBandBlock *>::iterator it = freq_band_objects.begin(); it != freq_band_objects.end(); ++it) {
+		(*it)->updateValsFromHandler(audio_handler);
+	}
 	state.delete_selected = false;
 	for (std::map<Link *, bool>::iterator it = updated_links.begin(); it != updated_links.end(); ++it) {
 		it->second = false;

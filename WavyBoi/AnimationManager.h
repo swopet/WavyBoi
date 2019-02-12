@@ -28,8 +28,6 @@ rendering. */
 #include <vector>
 #include <unordered_set>
 
-extern AudioHandler * audio_handler;
-
 struct AnimationManagerState {
 	bool edited = false;
 	bool display_open = false;
@@ -56,8 +54,12 @@ private:
 	std::map<Link *,bool> updated_links;
 	std::map<Object *, ObjectNode> obj_graph;
 	std::vector<Object *> root_objects;
+	std::vector<FreqBandBlock *> freq_band_objects;
+	AudioHandler * audio_handler;
 public:
 	AnimationManager();
+	~AnimationManager();
+	AudioHandler * getAudioHandler();
 	std::string getName();
 	std::vector<Channel *> getChannels();
 	std::vector<Object *> getObjects();

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
 #include <string>
 #include <iostream>
 #include <math.h>
@@ -19,6 +20,7 @@ class WavyBoiRecorder : public sf::SoundRecorder
 	double * x;
 	double * f;
 	double * last_f;
+	sf::Mutex last_f_mutex;
 	
 	virtual bool onStart() // optional
 	{
@@ -42,6 +44,7 @@ class WavyBoiRecorder : public sf::SoundRecorder
 		}
 		fft_object->do_fft(f, x);
 		double total = 0;
+		last_f_mutex.lock();
 		for (int i = 0; i < 1000; i++) {
 			double freq = freqAtKey(((double)i) / 10.);
 			int ind = (int)(freq * size / 44100.);
@@ -51,6 +54,7 @@ class WavyBoiRecorder : public sf::SoundRecorder
 				last_f[i] = 0;
 			total += last_f[i];
 		}
+		last_f_mutex.unlock();
 		double avg = total / 1000.;
 		last_time = clock.getElapsedTime();
 		return true;
@@ -66,7 +70,11 @@ class WavyBoiRecorder : public sf::SoundRecorder
 	}
 public:
 	const double * getFrequencies() {
+		last_f_mutex.lock();
 		return last_f;
+	}
+	void unlockLastF() {
+		last_f_mutex.unlock();
 	}
 	void setSize(long newSize) {
 		//stop and reset if it's playing
@@ -80,50 +88,20 @@ private:
 	long size = 1024;
 	WavyBoiRecorder audio_recorder;
 	double curr_max = 0;
-	double sub_bass_max; //20 to 60 Hz
-	double sub_bass_avg;
-	
-	double bass_max; //60 to 250 Hz
-	double bass_avg;
-	
-	double lower_mid_max; //250 to 500 Hz
-	
-	double lower_mid_avg;
-	double mid_max; //500 Hz to 2 kHz
-	double mid_avg;
-	double upper_mid_max; //2 to 4 kHz
-	double upper_mid_avg;
-	double presence_max; //4 to 6 kHz
-	double presence_avg;
-	double brilliance_max; //>6 kHz
-	double brilliance_avg;
+	bool normalize_request = false;
+	std::vector<std::pair<int, int>> ranges;
+	std::unordered_map<long unsigned int, double> range_maxes;
+	std::unordered_map<long unsigned int, double> range_avgs;
 public:
 	AudioHandler();
 	~AudioHandler();
+	double getMaxAtRange(std::pair<int, int>);
+	double getAvgAtRange(std::pair<int, int>);
+	void addRange(std::pair<int, int>);
 	void resetLevels();
 	void draw(sf::RenderTarget &, sf::RenderStates);
 	void update();
-	double getSubBass() {
-		return sub_bass_avg;
-	}
-	double getBass() {
-		return bass_avg;
-	}
-	double getLowerMid() {
-		return lower_mid_avg;
-	}
-	double getMid() {
-		return mid_avg;
-	}
-	double getUpperMid() {
-		return upper_mid_avg;
-	}
-	double getPresence() {
-		return presence_avg;
-	}
-	double getBrilliance () {
-		return brilliance_avg;
-	}
+	void normalize();
 };
 
 extern AudioHandler * audio_handler;

@@ -125,7 +125,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	}
 	drawTopMenu(animation_manager);
 	drawFPS(animation_manager);
-	audio_handler->draw(*window, sf::RenderStates());
+	animation_manager->getAudioHandler()->draw(*window, sf::RenderStates());
 	if (state.entering_text) {
 		drawTextEntered();
 	}
