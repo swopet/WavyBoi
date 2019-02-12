@@ -12,6 +12,9 @@ private:
 	sf::Vector2f size;
 	sf::RectangleShape main_box;
 	sf::RectangleShape video_box;
+	sf::RectangleShape play_pause_rect;
+	sf::RectangleShape stop_rect;
+	sf::RectangleShape loop_rect;
 	sf::CircleShape left_circle;
 	sf::Vector2f left_pos;
 	sf::CircleShape right_circle;
@@ -19,8 +22,11 @@ private:
 	sf::Time last_offset;
 	float speed = 1.0;
 	void init();
+	void togglePlay();
+	void stopAndReset();
 	sfe::Movie * movie;
 	bool playing = false;
+	bool loop = false;
 public:
 	Video();
 	Parameter * getNewParameter();

@@ -16,8 +16,13 @@ void Video::update() {
 		sfe::Status status = movie->getStatus();
 		if (playing) {
 			if (status == sfe::Stopped) {
-				std::cout << "Movie stopped, continuing" << std::endl;
-				movie->play();
+				if (loop) {
+					std::cout << "Movie stopped, continuing" << std::endl;
+					movie->play();
+				}
+				else {
+					playing = false;
+				}
 			}
 		}
 		movie->update();
@@ -44,6 +49,27 @@ void Video::init(){
 	movie = NULL;
 }
 
+void Video::togglePlay()
+{
+	if (playing) {
+		movie->pause();
+		playing = false;
+	}
+	else {
+		movie->play();
+		playing = true;
+	}
+}
+
+void Video::stopAndReset()
+{
+	if (playing) {
+		movie->stop();
+	}
+	playing = false;
+	movie->update();
+}
+
 void Video::draw(sf::RenderTarget& target, sf::RenderStates states){
 	main_box.setPosition(position - size/2.0f);
 	video_box.setPosition(position - video_box.getSize()/2.0f);
@@ -51,10 +77,22 @@ void Video::draw(sf::RenderTarget& target, sf::RenderStates states){
 	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
 	right_pos = position + sf::Vector2f((size.x - gui.outline_thickness) / 2.0f, 0);
 	right_circle.setPosition(right_pos - sf::Vector2f(right_circle.getRadius(), right_circle.getRadius()));
+	play_pause_rect.setSize(sf::Vector2f(24, 24));
+	play_pause_rect.setPosition(main_box.getPosition() + sf::Vector2f(0,main_box.getSize().y));
+	play_pause_rect.setTexture((playing) ? &gui.pause_24x24_tex : &gui.play_24x24_tex);
+	stop_rect.setSize(sf::Vector2f(24, 24));
+	stop_rect.setPosition(main_box.getPosition() + sf::Vector2f(24, main_box.getSize().y));
+	stop_rect.setTexture(&gui.stop_24x24_tex);
+	loop_rect.setSize(sf::Vector2f(24, 24));
+	loop_rect.setPosition(main_box.getPosition() + sf::Vector2f(48, main_box.getSize().y));
+	loop_rect.setTexture((loop) ? &gui.loop_true_24x24_tex : &gui.loop_false_24x24_tex);
 	target.draw(main_box);
 	target.draw(video_box);
 	target.draw(left_circle);
 	target.draw(right_circle);
+	target.draw(play_pause_rect);
+	target.draw(stop_rect);
+	target.draw(loop_rect);
 }
 
 void Video::loadFromFile(std::string file_name){ //load from full path
@@ -142,8 +180,20 @@ ClickResponse Video::processLeftClick(sf::Vector2i mouse_pos){
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}
-	else {
-		
+	else if (checkIntersection(play_pause_rect, sf::Vector2f(mouse_pos))){
+		togglePlay();
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+	}
+	else if (checkIntersection(stop_rect, sf::Vector2f(mouse_pos))) {
+		stopAndReset();
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+	}
+	else if (checkIntersection(loop_rect, sf::Vector2f(mouse_pos))) {
+		loop = !loop;
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
 	}
 	return response;
 }

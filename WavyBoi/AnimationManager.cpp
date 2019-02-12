@@ -9,10 +9,10 @@ AnimationManager::AnimationManager(){
 	/*Video * new_video = new Video();
 	new_video->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/flecks.mp4");
 	Video * new_video_2 = new Video();
-	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/dogs.mp4");
+	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/dogs.mp4");*/
 	Video * new_video_3 = new Video();
 	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
-	new_video_3->setSpeed(4.0f);*/
+	new_video_3->setSpeed(4.0f);
 	for (int i = 0; i < 4; i++) {
 		FreqBandBlock * new_freq_band = new FreqBandBlock();
 		new_freq_band->setPosition(sf::Vector2f(10, 200 + i*60));
@@ -23,11 +23,12 @@ AnimationManager::AnimationManager(){
 	addObject(new_multiplexer);
 	addObject(new_video);
 	addObject(new_video_2);
-	addObject(new_video_3);*/
-	WBScene * new_scene = new FallingLeaves();
+	*/
+	addObject(new_video_3);
+	/*WBScene * new_scene = new FallingLeaves();
 	SceneObject * new_scene_obj = new SceneObject("C:/Users/Trevor/Stuff/VS/WavyBoi/Examples/WBSceneExample.dll");
 	new_scene_obj->setPosition(sf::Vector2f(120, 120));
-	addObject(new_scene_obj);
+	addObject(new_scene_obj);*/
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 }
