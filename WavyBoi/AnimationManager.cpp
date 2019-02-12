@@ -68,21 +68,17 @@ void AnimationManager::pushToTop(Object * obj)
 }
 
 void AnimationManager::deleteObject(Object * object_to_delete) {
-	std::cout << "deleting an object" << std::endl;
 	while (obj_graph[object_to_delete].inputs.size() > 0) {
 		deleteLink(*obj_graph[object_to_delete].inputs.begin());
 	}
 	while (obj_graph[object_to_delete].outputs.size() > 0) {
 		deleteLink(*obj_graph[object_to_delete].outputs.begin());
 	}
-	std::cout << "deleted links" << std::endl;
 	obj_graph.erase(object_to_delete);
-	std::cout << "deleted object from object graph" << std::endl;
 	std::vector<Object *>::iterator position = objects.begin();
 	while ((*position) != object_to_delete) {
 		++position;
 	}
-	std::cout << "found the position" << std::endl;
 	objects.erase(position);
 	position = root_objects.begin();
 	while ((*position) != object_to_delete) {
@@ -91,14 +87,11 @@ void AnimationManager::deleteObject(Object * object_to_delete) {
 	if (position != root_objects.end()) {
 		root_objects.erase(position);
 	}
-	std::cout << "deleted the object" << std::endl;
 	delete object_to_delete;
-	std::cout << "profit???" << std::endl;
 }
 
 void AnimationManager::deleteLink(Link * link_to_delete) {
 	//remove link from all objects
-	std::cout << "deleting a link" << std::endl;
 	for (std::map<Object *, ObjectNode>::iterator it = obj_graph.begin(); it != obj_graph.end(); ++it) {
 		if (it->second.inputs.count(link_to_delete) == 1) {
 			it->second.inputs.erase(link_to_delete);
@@ -120,7 +113,6 @@ void AnimationManager::deleteLink(Link * link_to_delete) {
 
 void AnimationManager::addLink(Link * new_link)
 {
-	std::cout << "added new link: " << new_link->getName() << std::endl;
 	//TODO: check for loops!!
 	//We expect new_link->getOutObj() to not be null, otherwise we should have never entered this routine
 	if (new_link->getOutObj()->getMultipleInputsAllowed(new_link->getOutInd()) == false) {
@@ -455,5 +447,4 @@ void AnimationManager::clickNewClock()
 	ClockObject * new_clock = new ClockObject();
 	new_clock->setPosition(sf::Vector2f(32, 32));
 	addObject(new_clock);
-	//TODO: add clock object
 }

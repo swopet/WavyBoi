@@ -332,7 +332,6 @@ void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
 			if ((*it)->checkOverlap(select_box)) {
 				state.selected_objects.push_back(*it);
-				std::cout << "selected an object" << std::endl;
 			}
 		}
 		for (std::vector<Link *>::iterator it = links.begin(); it != links.end(); ++it) {

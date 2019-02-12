@@ -4,10 +4,8 @@
 
 void SceneObject::init()
 {
-	if (scene == NULL) {
-		size = sf::Vector2f(60 + gui.outline_thickness * 2, 60 + gui.outline_thickness * 2);
-	}
-	else {
+	ready_mutex.lock();
+	if (ready && scene != NULL) {
 		sf::Vector2f scene_size = sf::Vector2f(scene->getTexture()->getSize());
 		if (scene_size.y != 0) {
 			float ratio = scene_size.x / scene_size.y;
@@ -17,6 +15,7 @@ void SceneObject::init()
 			size = sf::Vector2f(60 + gui.outline_thickness * 2, 60 + gui.outline_thickness * 2);
 		}
 	}
+	ready_mutex.unlock();
 	main_box = sf::RectangleShape(size);
 	main_box.setOutlineThickness(-gui.outline_thickness);
 	main_box.setOutlineColor(gui.obj_outline_color);
@@ -33,46 +32,68 @@ void SceneObject::init()
 SceneObject::SceneObject()
 {
 	scene = NULL;
+	ready = true;
 	init();
 }
 
 SceneObject::SceneObject(WBScene * new_scene)
 {
 	scene = new_scene;
+	ready = true;
 	init();
 }
 
-SceneObject::SceneObject(std::string filename)
+void SceneObject::loadScene()
 {
+	sf::Clock clock;
+	sf::Time start_time = clock.getElapsedTime();
 	std::wstring stemp = std::wstring(filename.begin(), filename.end());
 	LPCWSTR sw = stemp.c_str();
 	hinst = LoadLibrary(sw);
 	auto ptr = reinterpret_cast<WBScene* (*)()>(GetProcAddress(hinst, "GetWBScene"));
 	scene = ptr();
+	ready_mutex.lock();
+	ready = true;
+	ready_mutex.unlock();
+	sf::Time elapsed_time = clock.getElapsedTime() - start_time;
+	std::cout << "loaded " << filename << " in " << elapsed_time.asSeconds() << "s, ready!" << std::endl;
+	init();
+}
+
+SceneObject::SceneObject(std::string scene_name)
+{
+	ready = false;
+	filename = scene_name;
+	sf::Thread loadThread(&SceneObject::loadScene, this);
+	loadThread.launch();
 	init();
 }
 
 Parameter * SceneObject::getNewParameter()
 {
 	param return_param;
-	if (scene != NULL) {
+	ready_mutex.lock();
+	if (ready && scene != NULL) {
 		return_param.texture = scene->getTexture();
 	}
 	else {
 		return_param.texture = NULL;
 	}
+	ready_mutex.unlock();
 	return new Parameter(PARAM_TYPE::TEXTURE, return_param, name);
 }
 
 Parameter SceneObject::getParameter()
 {
 	param return_param;
-	if (scene != NULL) {
+	ready_mutex.lock();
+	if (ready && scene != NULL) {
 		return_param.texture = scene->getTexture();
 	}
 	else {
 		return_param.texture = NULL;
 	}
+	ready_mutex.unlock();
 	return Parameter(PARAM_TYPE::TEXTURE, return_param, name);
 }
 
@@ -117,7 +138,8 @@ void SceneObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 
 void SceneObject::update()
 {
-	if (scene != NULL) {
+	ready_mutex.lock();
+	if (ready && scene != NULL) {
 		scene->update();
 		scene_box.setTexture(scene->getTexture());
 		sf::Vector2f scene_size = sf::Vector2f(scene->getTexture()->getSize());
@@ -134,14 +156,23 @@ void SceneObject::update()
 	else {
 		scene_box.setTexture(NULL);
 	}
+	ready_mutex.unlock();
 }
 
 
 SceneObject::~SceneObject()
 {
-	if (scene != NULL) {
+	ready_mutex.lock();
+	if (ready && scene != NULL) {
 		delete scene;
 		scene = NULL;
+	}
+	ready_mutex.unlock();
+	if (FreeLibrary(hinst)) {
+		std::cout << "freed library at " << filename << std::endl;
+	}
+	else {
+		std::cout << "no library to free for deleted scene" << std::endl;
 	}
 }
 

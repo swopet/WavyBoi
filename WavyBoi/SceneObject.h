@@ -6,6 +6,9 @@ class SceneObject :
 	public Object
 {
 private:
+	bool ready;
+	std::string filename;
+	sf::Mutex ready_mutex;
 	WBScene * scene;
 	sf::Vector2f size;
 	sf::RectangleShape main_box;
@@ -19,6 +22,7 @@ private:
 public:
 	SceneObject();
 	SceneObject(WBScene *);
+	void loadScene();
 	SceneObject(std::string);
 	Parameter * getNewParameter();
 	Parameter getParameter();
