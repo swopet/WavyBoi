@@ -25,7 +25,7 @@ AnimationManager::AnimationManager(){
 	addObject(new_video_2);
 	addObject(new_video_3);*/
 	WBScene * new_scene = new FallingLeaves();
-	SceneObject * new_scene_obj = new SceneObject("C:/Users/Trevor/source/repos/WBSceneExample/Debug/WBSceneExample.dll");
+	SceneObject * new_scene_obj = new SceneObject(new_scene);
 	new_scene_obj->setPosition(sf::Vector2f(120, 120));
 	addObject(new_scene_obj);
 	Channel * new_channel = new Channel(0);
