@@ -23,16 +23,16 @@ Parameter FloatObject::getParameter()
 
 void FloatObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	target.draw(main_box);
-	target.draw(text);
+	target.draw(main_box, states);
+	target.draw(text, states);
 	sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setOutlineColor(gui.obj_outline_color);
 	circle.setOutlineThickness(-gui.outline_thickness);
 	circle.setPosition(left_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 	circle.setPosition(right_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 }
 
 void FloatObject::update()

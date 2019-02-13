@@ -83,8 +83,8 @@ void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 	};
 	glLineWidth(gui.outline_thickness);
 	glColor3f(gui.obj_outline_color.r, gui.obj_outline_color.g, gui.obj_outline_color.b);
-	target.draw(line, 4, sf::LineStrip);
-	target.draw(text);
+	target.draw(line, 4, sf::LineStrip, states);
+	target.draw(text, states);
 }
 
 void Link::setOutInd(int new_ind)

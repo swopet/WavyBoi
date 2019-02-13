@@ -8,10 +8,10 @@ sf::Vector2f ClockObject::getRightPos()
 
 void ClockObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	target.draw(clock_rect);
-	target.draw(s_ms_rect);
-	target.draw(play_pause_rect);
-	target.draw(zero_s_rect);
+	target.draw(clock_rect, states);
+	target.draw(s_ms_rect, states);
+	target.draw(play_pause_rect, states);
+	target.draw(zero_s_rect, states);
 	float time = curr_time.asSeconds();
 	sf::Vector2f second_hand(16.f*cos(time*PI / 30.f - PI/2.f), 16.f*sin(time*PI / 30.f - PI / 2.f));
 	sf::Vertex line[] = {
@@ -20,13 +20,13 @@ void ClockObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 	};
 	glLineWidth(gui.outline_thickness);
 	glColor3f(0,0,0);
-	target.draw(line, 2, sf::LineStrip);
+	target.draw(line, 2, sf::LineStrip, states);
 	sf::CircleShape circle(gui.obj_circle_radius + gui.outline_thickness);
 	circle.setOutlineThickness(-gui.outline_thickness);
 	circle.setOutlineColor(gui.obj_outline_color);
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 }
 
 void ClockObject::update()

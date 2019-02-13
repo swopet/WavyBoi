@@ -53,21 +53,21 @@ sf::Vector2f FreqBandBlock::getRightPos()
 
 void FreqBandBlock::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	target.draw(main_box);
+	target.draw(main_box, states);
 	sf::RectangleShape level_box(main_box.getSize() - sf::Vector2f(gui.outline_thickness * 2, gui.outline_thickness * 2));
 	
 	level_box.setFillColor(sf::Color(0, 255 * max, 0));
 	float max_height = level_box.getSize().y;
 	level_box.setSize(sf::Vector2f(level_box.getSize().x, max_height * max));
 	level_box.setPosition(main_box.getPosition() + sf::Vector2f(gui.outline_thickness, gui.outline_thickness + (1.0 - max) * max_height));
-	target.draw(level_box);
-	target.draw(text);
+	target.draw(level_box, states);
+	target.draw(text, states);
 	sf::CircleShape right_circle(gui.obj_circle_radius + gui.outline_thickness);
 	right_circle.setOutlineColor(gui.obj_outline_color);
 	right_circle.setOutlineThickness(-gui.outline_thickness);
 	right_circle.setFillColor(gui.obj_fill_color);
 	right_circle.setPosition(getRightPos() - sf::Vector2f(right_circle.getRadius(),right_circle.getRadius()));
-	target.draw(right_circle);
+	target.draw(right_circle, states);
 }
 
 bool FreqBandBlock::checkOverlap(sf::RectangleShape select_box) {

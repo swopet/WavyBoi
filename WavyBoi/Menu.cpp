@@ -140,8 +140,8 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 
 void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 	if (name.length() > 0) {
-		target.draw(rect);
-		target.draw(text);
+		target.draw(rect, states);
+		target.draw(text, states);
 	}
 	sf::Vector2i temp_pos = sf::Vector2i(pos.x,pos.y+height+gui.outline_thickness*4);
 	if (is_open){
@@ -154,8 +154,8 @@ void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 			(*it).enabled ? temp_rect.setFillColor(sf::Color(127,127,127)) : temp_rect.setFillColor(sf::Color(95,95,95));
 			temp_rect.setOutlineThickness(-gui.outline_thickness);
 			temp_rect.setOutlineColor(sf::Color(63,63,63));
-			target.draw(temp_rect);
-			target.draw(temp_text);
+			target.draw(temp_rect, states);
+			target.draw(temp_text, states);
 			temp_pos = sf::Vector2i(temp_pos.x,temp_pos.y+height+gui.outline_thickness*4);
 		}
 	}

@@ -69,16 +69,16 @@ void MathFunction::update()
 
 void MathFunction::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	target.draw(main_box);
-	target.draw(text);
+	target.draw(main_box, states);
+	target.draw(text, states);
 	sf::CircleShape circle(gui.obj_circle_radius + gui.outline_thickness);
 	circle.setOutlineColor(gui.obj_outline_color);
 	circle.setOutlineThickness(-gui.outline_thickness);
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 	circle.setPosition(getLeftPos(0) - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 }
 
 ClickResponse MathFunction::processLeftClick(sf::Vector2i mouse_pos)

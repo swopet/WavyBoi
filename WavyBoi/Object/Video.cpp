@@ -86,13 +86,13 @@ void Video::draw(sf::RenderTarget& target, sf::RenderStates states){
 	loop_rect.setSize(sf::Vector2f(24, 24));
 	loop_rect.setPosition(main_box.getPosition() + sf::Vector2f(48, main_box.getSize().y));
 	loop_rect.setTexture((loop) ? &gui.loop_true_24x24_tex : &gui.loop_false_24x24_tex);
-	target.draw(main_box);
-	target.draw(video_box);
-	target.draw(left_circle);
-	target.draw(right_circle);
-	target.draw(play_pause_rect);
-	target.draw(stop_rect);
-	target.draw(loop_rect);
+	target.draw(main_box, states);
+	target.draw(video_box, states);
+	target.draw(left_circle, states);
+	target.draw(right_circle, states);
+	target.draw(play_pause_rect, states);
+	target.draw(stop_rect, states);
+	target.draw(loop_rect, states);
 }
 
 void Video::loadFromFile(std::string file_name){ //load from full path

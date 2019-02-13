@@ -57,9 +57,9 @@ void Channel::draw(sf::RenderTarget& target, sf::RenderStates states) {
 	video_box.setPosition(position - video_box.getSize() / 2.0f);
 	left_pos = position - sf::Vector2f((size.x - gui.outline_thickness) / 2.0f, 0);
 	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
-	target.draw(main_box);
-	target.draw(video_box);
-	target.draw(left_circle);
+	target.draw(main_box,states);
+	target.draw(video_box,states);
+	target.draw(left_circle,states);
 }
 
 bool Channel::getMultipleInputsAllowed(int ind)

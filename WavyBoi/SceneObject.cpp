@@ -130,10 +130,10 @@ void SceneObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
 	right_pos = position + sf::Vector2f((size.x - gui.outline_thickness) / 2.0f, 0);
 	right_circle.setPosition(right_pos - sf::Vector2f(right_circle.getRadius(), right_circle.getRadius()));
-	target.draw(main_box);
-	target.draw(scene_box);
-	target.draw(left_circle);
-	target.draw(right_circle);
+	target.draw(main_box, states);
+	target.draw(scene_box, states);
+	target.draw(left_circle, states);
+	target.draw(right_circle, states);
 }
 
 void SceneObject::update()

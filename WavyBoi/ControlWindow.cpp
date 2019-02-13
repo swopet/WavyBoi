@@ -7,6 +7,7 @@ ControlWindow::ControlWindow(AnimationManager * animation_manager){
 	state.window_size = sf::Vector2u(1600,900);
 	font = NULL;
 	state.last_fps_draw = state.clock.getElapsedTime();
+	state.workspace_pos = sf::Vector2i(0, 0);
 	InitializeMenuTabs();
 }
 
@@ -36,6 +37,7 @@ ControlWindow::ControlWindow(){
 bool ControlWindow::update(AnimationManager * animation_manager){
 	sf::Event event;
 	processLeftClickHeld(animation_manager);
+	processRightClickHeld(animation_manager);
 	while (window->pollEvent(event))
 	{
 		if (event.type == sf::Event::Closed){
@@ -46,7 +48,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 				processLeftClick(sf::Vector2i(event.mouseButton.x,event.mouseButton.y),animation_manager);
 			}
 			if (event.mouseButton.button == sf::Mouse::Right){
-				
+				processRightClick(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), animation_manager);
 			}
 			if (event.mouseButton.button == sf::Mouse::Middle){
 			}
@@ -59,7 +61,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 				processLeftClickRelease(sf::Vector2i(event.mouseButton.x,event.mouseButton.y),animation_manager);
 			}
 			if (event.mouseButton.button == sf::Mouse::Right){
-				
+				processRightClickRelease(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), animation_manager);
 			}
 			if (event.mouseButton.button == sf::Mouse::Middle){
 				
@@ -157,21 +159,33 @@ void ControlWindow::drawTopMenu(AnimationManager * animation_manager){
 }
 
 void ControlWindow::drawObjects(AnimationManager * animation_manager){
+	sf::Transform transform;
+	transform.translate(-sf::Vector2f(state.workspace_pos));
+	transform.translate(sf::Vector2f(0.0, gui.menu_text_height));
+	sf::RenderStates render_states(transform);
 	std::vector<Object *> objects = animation_manager->getObjects();
 	for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it){
-		(*it)->draw(*window,sf::RenderStates());
+		(*it)->draw(*window,render_states);
 	}
 }
 
 void ControlWindow::drawChannels(AnimationManager * animation_manager)
 {
+	sf::Transform transform;
+	transform.translate(-sf::Vector2f(state.workspace_pos));
+	transform.translate(sf::Vector2f(0.0, gui.menu_text_height));
+	sf::RenderStates render_states(transform);
 	std::vector<Channel *> channels = animation_manager->getChannels();
 	for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
-		(*it)->draw(*window, sf::RenderStates());
+		(*it)->draw(*window, render_states);
 	}
 }
 
 void ControlWindow::drawSelectBox() {
+	sf::Transform transform;
+	transform.translate(-sf::Vector2f(state.workspace_pos));
+	transform.translate(sf::Vector2f(0.0, gui.menu_text_height));
+	sf::RenderStates render_states(transform);
 	sf::RectangleShape box(sf::Vector2f(state.select_end_pos - state.select_start_pos));
 	box.setPosition(sf::Vector2f(state.select_start_pos));
 	box.setOutlineColor(state.selecting ? sf::Color(0, 0, 64, 192) : sf::Color(0, 0, 64, 128) );
@@ -209,18 +223,32 @@ void ControlWindow::drawFPS(AnimationManager * animation_manager) {
 }
 
 void ControlWindow::drawLinks(AnimationManager * animation_manager) {
+	sf::Transform transform;
+	transform.translate(-sf::Vector2f(state.workspace_pos));
+	transform.translate(sf::Vector2f(0.0, gui.menu_text_height));
+	sf::RenderStates render_states(transform);
 	std::vector<Link *> links = animation_manager->getLinks();
 	for (std::vector<Link *>::iterator it = links.begin(); it != links.end(); ++it) {
-		(*it)->draw(*window, sf::RenderStates());
+		(*it)->draw(*window, render_states);
 	}
 }
 
 void ControlWindow::drawNewLink() {
-	state.new_link->draw(*window, sf::RenderStates());
+	sf::Transform transform;
+	transform.translate(-sf::Vector2f(state.workspace_pos));
+	transform.translate(sf::Vector2f(0.0, gui.menu_text_height));
+	sf::RenderStates render_states(transform);
+	state.new_link->draw(*window, render_states);
 }
 
 void ControlWindow::close(){
 	window->close();
+}
+
+void ControlWindow::processRightClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {
+	state.last_mouse_pos = mouse_pos;
+	state.dragging_window = true;
+	state.right_mouse_held = true;
 }
 
 void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
@@ -264,9 +292,10 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * 
 	}
 	//check if clicked on an object
 	if (!processed){
+		sf::Vector2i offset = -sf::Vector2i(0, gui.menu_text_height) + sf::Vector2i(state.workspace_pos);
 		std::vector<Object *> objects = animation_manager->getObjects();
 		for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it){
-			ClickResponse response = (*it)->processLeftClick(mouse_pos);
+			ClickResponse response = (*it)->processLeftClick(mouse_pos+offset);
 			processed = response.clicked;
 			if (processed){
 				switch(response.type){
@@ -304,6 +333,17 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * 
 	state.last_mouse_pos = mouse_pos;
 	state.last_left_click = state.clock.getElapsedTime();
 }
+
+void ControlWindow::processRightClickHeld(AnimationManager * animation_manager) {
+	if (!state.right_mouse_held) return;
+	else if (state.dragging_window){
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*window);
+		sf::Vector2i diff = mouse_pos - state.last_mouse_pos;
+		state.last_mouse_pos = mouse_pos;
+		state.workspace_pos = state.workspace_pos - diff;
+	}
+}
+
 void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 	if (!state.left_mouse_held) return;
 	sf::Vector2i mouse_pos = sf::Mouse::getPosition(*window);
@@ -319,16 +359,18 @@ void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 		}
 	}
 	else if (state.linking) {
-		state.new_link->setOutPos(sf::Vector2f(mouse_pos));
+		sf::Vector2i offset = -sf::Vector2i(0, gui.menu_text_height) + sf::Vector2i(state.workspace_pos);
+		state.new_link->setOutPos(sf::Vector2f(mouse_pos + offset));
 	}
 	else if (state.selecting) {
+		sf::Vector2i offset = -sf::Vector2i(0, gui.menu_text_height) + sf::Vector2i(state.workspace_pos);
 		std::vector<Object *> objects = animation_manager->getObjects();
 		std::vector<Link *> links = animation_manager->getLinks();
 		state.selected_objects.clear();
 		state.selected_links.clear();
 		sf::RectangleShape select_box(sf::Vector2f(state.select_end_pos - state.select_start_pos));
 		select_box.setSize(sf::Vector2f(state.select_end_pos - state.select_start_pos));
-		select_box.setPosition(sf::Vector2f(state.select_start_pos));
+		select_box.setPosition(sf::Vector2f(state.select_start_pos) + sf::Vector2f(offset));
 		for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
 			if ((*it)->checkOverlap(select_box)) {
 				state.selected_objects.push_back(*it);
@@ -340,6 +382,12 @@ void ControlWindow::processLeftClickHeld(AnimationManager * animation_manager){
 		state.select_end_pos = mouse_pos;
 	}
 }
+
+void ControlWindow::processRightClickRelease(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {
+	state.right_mouse_held = false;
+	if (state.dragging_window) state.dragging_window = false;
+}
+
 void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {
 	if (!(state.selecting || state.selected)){
 		state.selected_objects.clear();
@@ -347,9 +395,10 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 	}
 	state.left_mouse_held = false;
 	if (state.linking) {
+		sf::Vector2i offset = -sf::Vector2i(0, gui.menu_text_height) + sf::Vector2i(state.workspace_pos);
 		std::vector<Object *> objects = animation_manager->getObjects();
 		for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
-			ClickResponse response = (*it)->processLeftClickRelease(mouse_pos);
+			ClickResponse response = (*it)->processLeftClickRelease(mouse_pos+offset);
 			if (response.clicked) {
 				if (response.type == CLICK_RESPONSE::GOT_LEFT) {
 					if (state.new_link->setOutObject((*it))) {
@@ -365,7 +414,7 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 		if (state.new_link != NULL) {
 			std::vector<Channel *> channels = animation_manager->getChannels();
 			for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
-				ClickResponse response = (*it)->processLeftClickRelease(mouse_pos);
+				ClickResponse response = (*it)->processLeftClickRelease(mouse_pos+offset);
 				if (response.clicked){ 
 					if (response.type == CLICK_RESPONSE::GOT_LEFT) {
 						if (state.new_link->setOutObject((*it))) {
@@ -393,12 +442,13 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 }
 
 void ControlWindow::processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {
+	sf::Vector2i offset = -sf::Vector2i(0, gui.menu_text_height) + sf::Vector2i(state.workspace_pos);
 	bool processed = false;
 	std::cout << "double clicked" << std::endl;
 	std::vector<Object *> objects = animation_manager->getObjects();
 	std::vector<Link *> links = animation_manager->getLinks();
 	for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
-		ClickResponse response = (*it)->processDoubleLeftClick(mouse_pos);
+		ClickResponse response = (*it)->processDoubleLeftClick(mouse_pos+offset);
 		if (response.clicked) {
 			if (response.type == CLICK_RESPONSE::GOT_TEXT_FIELD) {
 				state.entering_text = true;
@@ -413,7 +463,7 @@ void ControlWindow::processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationMana
 	}
 	if (!processed) {
 		for (std::vector<Link *>::reverse_iterator it = links.rbegin(); it != links.rend(); ++it) {
-			ClickResponse response = (*it)->processDoubleLeftClick(mouse_pos);
+			ClickResponse response = (*it)->processDoubleLeftClick(mouse_pos+offset);
 			if (response.clicked) {
 				if (response.type == CLICK_RESPONSE::GOT_TEXT_FIELD) {
 					state.entering_text = true;
@@ -431,10 +481,11 @@ void ControlWindow::processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationMana
 }
 
 void ControlWindow::processMouseWheel(sf::Vector2i mouse_pos, int delta, AnimationManager * animation_manager) {
+	sf::Vector2i offset = -sf::Vector2i(0, gui.menu_text_height) + sf::Vector2i(state.workspace_pos);
 	bool processed = false;
 	std::vector<Object *>objects = animation_manager->getObjects();
 	for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
-		ClickResponse response = (*it)->processMouseWheel(mouse_pos,delta);
+		ClickResponse response = (*it)->processMouseWheel(mouse_pos+offset,delta);
 		if (response.clicked) {
 			processed = true;
 			break;

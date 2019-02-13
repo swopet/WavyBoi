@@ -108,7 +108,7 @@ void Operator::draw(sf::RenderTarget & target, sf::RenderStates states)
 	main_box.setFillColor(gui.obj_fill_color);
 	sf::RectangleShape tex_box(sf::Vector2f(32, 32));
 	tex_box.setPosition(position + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
-	target.draw(main_box);
+	target.draw(main_box, states);
 	switch (op_type) {
 	case OPERATOR::COMPARATOR:
 		switch (func.comparator) {
@@ -155,17 +155,17 @@ void Operator::draw(sf::RenderTarget & target, sf::RenderStates states)
 		}
 		break; //OPERATOR::ARITHMETIC
 	}
-	target.draw(tex_box);
+	target.draw(tex_box, states);
 	sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
 	circle.setOutlineColor(gui.obj_outline_color);
 	circle.setOutlineThickness(-gui.outline_thickness);
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setPosition(getLeftPos(0) - sf::Vector2f(circle.getRadius(),circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 	circle.setPosition(getLeftPos(1) - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 	circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle);
+	target.draw(circle, states);
 }
 
 Parameter * Operator::getNewParameter()
