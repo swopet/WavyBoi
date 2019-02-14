@@ -20,15 +20,23 @@ private:
 	sf::Vector2f left_pos;
 	sf::CircleShape right_circle;
 	sf::Vector2f right_pos;
-	sf::Time last_offset;
+	sf::Time offset;
+	sf::Time last_time;
+	sf::Clock clock;
 	float speed = 1.0;
+	float desired_FPS = 6;
 	void init();
 	void togglePlay();
 	void stopAndReset();
 	std::string path;
 	std::vector<std::string> files;
 	int current_file = 0;
-	sf::Texture * loaded_texture;
+	sf::Vector2u tex_size;
+	sf::Vector2u num_tiles;
+	sf::Mutex buffer_mutex;
+	sf::RenderTexture * loaded_texture_tiles;
+	sf::RenderTexture * loaded_texture_tiles_buffer;
+	sf::RenderTexture * out_texture;
 	bool playing = false;
 	bool loop = false;
 public:
@@ -37,6 +45,7 @@ public:
 	Parameter getParameter();
 	sf::Vector2f getLeftPos(int);
 	sf::Vector2f getRightPos();
+	void loadCurrentTiles();
 	bool checkOverlap(sf::RectangleShape);
 	void update();
 	void setSpeed(float new_speed);

@@ -15,30 +15,49 @@ ImageSequence::ImageSequence() {
 void ImageSequence::update() {
 	if (files.size() != 0) {
 		if (playing) {
+			/*sf::Time elapsed_time = clock.getElapsedTime() - last_time;
+			offset = offset + elapsed_time;
+			last_time = clock.getElapsedTime();
+			std::cout << offset.asSeconds() << std::endl;
+			int desired_frame = (int)(offset.asSeconds() * desired_FPS);
+			std::cout << "desired frame: " << desired_frame << std::endl;*/
 			current_file++;
 			if (current_file == files.size()) {
 				if (loop) {
 					current_file = 0;
+					offset = sf::seconds(0);
 				}
 				else {
 					current_file = 0;
+					offset = sf::seconds(0);
 					playing = false;
 				}
 			}
-			delete loaded_texture;
-			loaded_texture = new sf::Texture();
-			loaded_texture->loadFromFile(files[current_file]);
+			if (current_file % (num_tiles.x * num_tiles.y) == 0) {
+				buffer_mutex.lock();
+				std::swap(loaded_texture_tiles, loaded_texture_tiles_buffer);
+				buffer_mutex.unlock();
+				sf::Thread load_thread(&ImageSequence::loadCurrentTiles, this);
+				load_thread.launch();
+			}
+			out_texture->setActive();
+			int i = current_file % (num_tiles.x * num_tiles.y);
+			int x = i % num_tiles.x;
+			int y = i / num_tiles.x;
+			out_texture->draw(sf::Sprite(loaded_texture_tiles->getTexture(), sf::IntRect(x*tex_size.x, y*tex_size.y, tex_size.x, tex_size.y)));
+			out_texture->display();
 		}
-		if (loaded_texture != NULL) {
+		if (out_texture != NULL) {
 			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(gui.outline_thickness, gui.outline_thickness);
 			//fit the preview video to the inside of the video object
-			float movie_ratio = (float)loaded_texture->getSize().x / (float)loaded_texture->getSize().y;
+			
+			float movie_ratio = (float)tex_size.x / (float)tex_size.y;
 			float main_box_ratio = main_box_size.x / main_box_size.y;
 			sf::Vector2f video_box_size;
 			if (movie_ratio > main_box_ratio) video_box_size = sf::Vector2f(main_box_size.x, main_box_size.x / movie_ratio);
 			else video_box_size = sf::Vector2f(main_box_size.y * movie_ratio, main_box_size.y);
 			video_box = sf::RectangleShape(video_box_size);
-			video_box.setTexture(loaded_texture);
+			video_box.setTexture(&out_texture->getTexture());
 		}
 	}
 }
@@ -60,7 +79,8 @@ void ImageSequence::init() {
 	video_box = sf::RectangleShape(sf::Vector2f(0, 0));
 	video_box.setFillColor(gui.obj_fill_color);
 	path = "";
-	loaded_texture = NULL;
+	out_texture = NULL;
+	loaded_texture_tiles = NULL;
 }
 
 void ImageSequence::togglePlay()
@@ -70,6 +90,9 @@ void ImageSequence::togglePlay()
 	}
 	else {
 		playing = true;
+		clock = sf::Clock();
+		offset = sf::seconds(0);
+		last_time = sf::seconds(0);
 	}
 }
 
@@ -114,17 +137,51 @@ void ImageSequence::loadFromPath(std::string path) { //load from path
 	}
 	current_file = 0;
 	if (files.size() != 0) {
-		if (loaded_texture != NULL) delete loaded_texture;
-		loaded_texture = NULL;
-		loaded_texture = new sf::Texture();
-		loaded_texture->loadFromFile(files[current_file]);
+		sf::Texture temp_tex;
+		temp_tex.loadFromFile(files[0]);
+		tex_size = temp_tex.getSize();
+		int max_size = sf::Texture::getMaximumSize();
+		if (max_size > 4096) max_size = 4096;
+		num_tiles = sf::Vector2u(max_size / tex_size.x, max_size / tex_size.y);
+		
+		loaded_texture_tiles = new sf::RenderTexture();
+		while (!loaded_texture_tiles->create(tex_size.x * num_tiles.x, tex_size.y * num_tiles.y)) {
+			std::cout << num_tiles.x << ", " << num_tiles.y << std::endl;
+			num_tiles = sf::Vector2u(num_tiles.x/2, num_tiles.y/2);
+		}
+		loaded_texture_tiles_buffer = new sf::RenderTexture();
+		if (!loaded_texture_tiles_buffer->create(loaded_texture_tiles->getSize().x, loaded_texture_tiles->getSize().y)) {
+			std::cout << "not enough memory to hold an image sequence efficiently... terminating sadly " << std::endl;
+		}
+		std::cout << num_tiles.x << ", " << num_tiles.y << std::endl;
+		current_file = -(int)(num_tiles.x * num_tiles.y);
+		loadCurrentTiles();
+		buffer_mutex.lock();
+		std::swap(loaded_texture_tiles, loaded_texture_tiles_buffer);
+		buffer_mutex.unlock();
+		current_file = 0;
+		sf::Thread load_thread(&ImageSequence::loadCurrentTiles, this);
+		load_thread.launch();
+		out_texture = new sf::RenderTexture();
+		out_texture->create(tex_size.x, tex_size.y);
+		out_texture->setActive();
+		int i = current_file % (num_tiles.x * num_tiles.y);
+		int x = i % num_tiles.x;
+		int y = i / num_tiles.x;
+		out_texture->draw(sf::Sprite(loaded_texture_tiles->getTexture(),sf::IntRect(x*tex_size.x,y*tex_size.y,tex_size.x,tex_size.y)));
+		out_texture->display();
 	}
 }
 
 Parameter * ImageSequence::getNewParameter()
 {
 	param return_param;
-	return_param.texture = loaded_texture;
+	if (out_texture != NULL) {
+		return_param.texture = &out_texture->getTexture();
+	}
+	else {
+		return_param.texture = NULL;
+	}
 	return new Parameter(PARAM_TYPE::TEXTURE, return_param, name);
 }
 
@@ -132,7 +189,12 @@ Parameter ImageSequence::getParameter()
 {
 
 	param return_param;
-	return_param.texture = loaded_texture;
+	if (out_texture != NULL) {
+		return_param.texture = &out_texture->getTexture();
+	}
+	else {
+		return_param.texture = NULL;
+	}
 	return Parameter(PARAM_TYPE::TEXTURE, return_param, name);
 }
 
@@ -144,6 +206,29 @@ sf::Vector2f ImageSequence::getLeftPos(int id = 0)
 sf::Vector2f ImageSequence::getRightPos()
 {
 	return right_pos;
+}
+
+void ImageSequence::loadCurrentTiles()
+{
+	buffer_mutex.lock();
+	loaded_texture_tiles_buffer->setActive();
+	int max_file = 0;
+	int next_current_file = current_file + (int)(num_tiles.x * num_tiles.y);
+	if (next_current_file > files.size()) next_current_file = 0;
+	for (int i = next_current_file; i < next_current_file + (int)(num_tiles.x * num_tiles.y) && i < files.size(); i++) {
+		int x = (i - next_current_file) % num_tiles.x;
+		int y = (i - next_current_file) / num_tiles.x;
+		sf::Transform transform;
+		sf::Texture temp_tex;
+		temp_tex.loadFromFile(files[i]);
+		transform.translate(sf::Vector2f(x*tex_size.x, y*tex_size.y));
+		sf::RenderStates states(transform);
+		loaded_texture_tiles_buffer->draw(sf::Sprite(temp_tex), states);
+		max_file = i;
+	}
+	loaded_texture_tiles_buffer->display();
+	std::cout << "loaded tiles " << next_current_file << "-" << max_file << std::endl;
+	buffer_mutex.unlock();
 }
 
 bool ImageSequence::checkOverlap(sf::RectangleShape select_box)

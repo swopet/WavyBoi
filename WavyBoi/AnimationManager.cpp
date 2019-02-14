@@ -8,6 +8,7 @@ AnimationManager::AnimationManager(){
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
+	processCommand(std::vector<std::string>({ "loadImageSequence","C:/Users/Trevor/Stuff/Rearranger_Videos/cape_lookout_1" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 }
