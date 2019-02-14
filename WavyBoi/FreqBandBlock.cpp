@@ -35,6 +35,12 @@ void FreqBandBlock::update()
 	changed = false;
 }
 
+void FreqBandBlock::setRange(std::pair<int, int> range)
+{
+	low_val = range.first;
+	high_val = range.second;
+}
+
 void FreqBandBlock::updateValsFromHandler(AudioHandler * audio_handler)
 {
 	max = audio_handler->getMaxAtRange(std::pair<int,int>(low_val, high_val));

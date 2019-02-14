@@ -20,6 +20,7 @@ public:
 	~FreqBandBlock();
 	Parameter getParameter();
 	void update();
+	void setRange(std::pair<int, int>);
 	void updateValsFromHandler(AudioHandler *);
 	void sendRangeToHandler(AudioHandler *);
 	sf::Vector2f getRightPos();

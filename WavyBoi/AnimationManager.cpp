@@ -9,29 +9,6 @@ AnimationManager::AnimationManager(){
 	state.project_name = "untitled";
 	state.project_path = "";
 	state.out_res = sf::Vector2u(600,400);
-	/*Video * new_video = new Video();
-	new_video->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/flecks.mp4");
-	Video * new_video_2 = new Video();
-	new_video_2->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/dogs.mp4");*/
-	Video * new_video_3 = new Video();
-	new_video_3->loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4");
-	new_video_3->setSpeed(4.0f);
-	for (int i = 0; i < 2; i++) {
-		FreqBandBlock * new_freq_band = new FreqBandBlock();
-		new_freq_band->setPosition(sf::Vector2f(10, 200 + i*60));
-		addObject(new_freq_band);
-	}
-	/*Multiplexer * new_multiplexer = new Multiplexer();
-	new_multiplexer->setPosition(sf::Vector2f(100, 100));
-	addObject(new_multiplexer);
-	addObject(new_video);
-	addObject(new_video_2);
-	*/
-	addObject(new_video_3);
-	/*WBScene * new_scene = new FallingLeaves();
-	SceneObject * new_scene_obj = new SceneObject("C:/Users/Trevor/Stuff/VS/WavyBoi/Examples/WBSceneExample.dll");
-	new_scene_obj->setPosition(sf::Vector2f(120, 120));
-	addObject(new_scene_obj);*/
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 }
@@ -59,17 +36,63 @@ std::vector<Link*> AnimationManager::getLinks()
 	return links;
 }
 
-void AnimationManager::processCommand(std::vector<std::string> args) {
-	if (args.size() == 0) return;
+bool AnimationManager::processCommand(std::vector<std::string> args) {
+	if (args.size() == 0) return false;
 	std::cout << args[0].length() << std::endl;
 	if (args[0].compare("loadScene") == 0) {
 		if (args.size() != 2) {
 			std::cout << "usage: loadScene <PATH_TO_SCENE>" << std::endl;
+			return false;
 		}
 		else {
 			SceneObject * new_scene = new SceneObject(args[1]);
 			new_scene->setPosition(sf::Vector2f(50, 50));
 			addObject(new_scene);
+			return true;
+		}
+	}
+	else if (args[0].compare("loadVideo") == 0) {
+		if (args.size() != 2) {
+			std::cout << "usage: loadVideo <PATH_TO_VIDEO>" << std::endl;
+			return false;
+		}
+		else {
+			Video * new_video = new Video();
+			new_video->loadFromFile(args[1]);
+			addObject(new_video);
+			return true;
+		}
+	}
+	else if (args[0].compare("addRange") == 0) {
+		if (args.size() != 3) {
+			std::cout << "usage: addRange <low_val> <high_val>" << std::endl;
+			return false;
+		}
+		else {
+			int low_val;
+			int high_val;
+			try {
+				low_val = std::stoi(args[1]);
+			}
+			catch (std::invalid_argument ex) {
+				std::cout << "Invalid argument: " << args[1] << std::endl;
+				return false;
+			}
+			try {
+				high_val = std::stoi(args[2]);
+			}
+			catch (std::invalid_argument ex) {
+				std::cout << "Invalid argument: " << args[2] << std::endl;
+				return false;
+			}
+			if (low_val > high_val || low_val < 0) {
+				std::cout << "Low val must be less than high val and greater than 0" << std::endl;
+				return false;
+			}
+			FreqBandBlock * new_band = new FreqBandBlock();
+			new_band->setRange(std::pair<int, int>(low_val, high_val));
+			addObject(new_band);
+			return true;
 		}
 	}
 	else {
