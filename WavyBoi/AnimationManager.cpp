@@ -95,6 +95,49 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 			return true;
 		}
 	}
+	else if (args[0].compare("addFloat") == 0) {
+		if (args.size() > 2) {
+			std::cout << "usage: addFloat <val>" << std::endl;
+			return false;
+		}
+			float val = 0.0;
+
+			if (args.size() == 2) {
+				if (args[1].compare("pi") == 0) {
+					val = PI;
+				}
+				else {
+					try {
+						val = std::stof(args[1]);
+					}
+					catch (std::invalid_argument ex) {
+						std::cout << "Invalid float: " << args[1] << std::endl;
+						return false;
+					}
+			}
+			FloatObject * new_float = new FloatObject(val);
+			addObject(new_float);
+		}
+	}
+	else if (args[0].compare("addInt") == 0) {
+		if (args.size() > 2) {
+			std::cout << "usage: addInt <val>" << std::endl;
+			return false;
+		}
+		int val = 0;
+
+		if (args.size() == 2) {
+			try {
+				val = std::stoi(args[1]);
+			}
+			catch (std::invalid_argument ex) {
+				std::cout << "Invalid int: " << args[1] << std::endl;
+				return false;
+			}
+		}
+		IntObject * new_int = new IntObject(val);
+		addObject(new_int);
+	}
 	else {
 		std::cout << "unrecognized command" << std::endl;
 	}
