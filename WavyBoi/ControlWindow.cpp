@@ -127,7 +127,9 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	}
 	drawTopMenu(animation_manager);
 	drawFPS(animation_manager);
-	animation_manager->getAudioHandler()->draw(*window, sf::RenderStates());
+	AudioHandler * audio_handler = animation_manager->getAudioHandler();
+	audio_handler->setPosition(sf::Vector2f(0, state.window_size.y - gui.outline_thickness * 4 - gui.audio_display_height - gui.audio_device_text_height - gui.play_24x24_tex.getSize().y));
+	audio_handler->draw(*window, sf::RenderStates());
 	if (state.entering_text) {
 		drawTextEntered();
 	}
@@ -269,6 +271,11 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * 
 			processed = (*it)->processLeftClick(mouse_pos,animation_manager);
 			if (processed) break;
 		}
+	}
+	//then check if clicked on audio handler
+	if (!processed) {
+		ClickResponse response = animation_manager->getAudioHandler()->processLeftClick(mouse_pos);
+		processed = response.clicked;
 	}
 	//check if clicked on selected box
 	if (!processed && state.selected) {
@@ -483,12 +490,18 @@ void ControlWindow::processDoubleLeftClick(sf::Vector2i mouse_pos, AnimationMana
 void ControlWindow::processMouseWheel(sf::Vector2i mouse_pos, int delta, AnimationManager * animation_manager) {
 	sf::Vector2i offset = -sf::Vector2i(0, gui.menu_text_height) + sf::Vector2i(state.workspace_pos);
 	bool processed = false;
-	std::vector<Object *>objects = animation_manager->getObjects();
-	for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
-		ClickResponse response = (*it)->processMouseWheel(mouse_pos+offset,delta);
-		if (response.clicked) {
-			processed = true;
-			break;
+	if (!processed) {
+		ClickResponse response = animation_manager->getAudioHandler()->processMouseWheel(mouse_pos, delta);
+		processed = response.clicked;
+	}
+	if (!processed) {
+		std::vector<Object *>objects = animation_manager->getObjects();
+		for (std::vector<Object *>::reverse_iterator it = objects.rbegin(); it != objects.rend(); ++it) {
+			ClickResponse response = (*it)->processMouseWheel(mouse_pos + offset, delta);
+			if (response.clicked) {
+				processed = true;
+				break;
+			}
 		}
 	}
 }

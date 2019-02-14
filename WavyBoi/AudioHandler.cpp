@@ -3,26 +3,35 @@
 
 AudioHandler::AudioHandler()
 {
-	std::cout << "Initializing audio handler" << std::endl;
-	std::vector<std::string> availableDevices = sf::SoundRecorder::getAvailableDevices();
-	int ctr = 0;
-	for (std::vector<std::string>::iterator it = availableDevices.begin(); it != availableDevices.end(); ++it) {
-		std::cout << "Audio Device " << ctr << ": " << *it << std::endl;
-		ctr++;
+	refreshDevices();
+	main_box.setSize(sf::Vector2f(gui.audio_recorder_width + gui.outline_thickness * 2, gui.audio_display_height + gui.play_24x24_tex.getSize().y + gui.outline_thickness * 2));
+	main_box.setFillColor(sf::Color::Black);
+	main_box.setOutlineColor(gui.obj_outline_color);
+	main_box.setOutlineThickness(-gui.outline_thickness);
+	text_box.setFillColor(sf::Color::Black);
+	text_box.setOutlineColor(gui.obj_outline_color);
+	text_box.setOutlineThickness(-gui.outline_thickness);
+	mode = AUDIO_DEVICE;
+	curr_device = 0;
+	if (available_devices.size() != 0) {
+		name = available_devices[0];
 	}
-	//we want at least ~15 FPS fidelity on audio signal processing. to get a sample size of <size> we need a sample rate of size*30 Hz, plus a little extra to be safe
-	audio_recorder.setSize(size);
-	audio_recorder.start(44100);
+	else {
+		name = "<no device>";
+	}
 }
 
 
 AudioHandler::~AudioHandler()
 {
-	audio_recorder.stop();
+	stop();
 }
 
 double AudioHandler::getMaxAtRange(std::pair<int, int> range)
 {
+	if (!running) {
+		return 0.0;
+	}
 	long unsigned int key = ((long unsigned int)range.first << 16 + (long unsigned int)range.second);
 	std::unordered_map<long unsigned int, double>::iterator pos = range_maxes.find(key);
 	if (pos != range_maxes.end()) {
@@ -35,6 +44,9 @@ double AudioHandler::getMaxAtRange(std::pair<int, int> range)
 
 double AudioHandler::getAvgAtRange(std::pair<int, int> range)
 {
+	if (!running) {
+		return 0.0;
+	}
 	long unsigned int key = ((long unsigned int)range.first << 16 + (long unsigned int)range.second);
 	std::unordered_map<long unsigned int, double>::iterator pos = range_avgs.find(key);
 	if (pos != range_avgs.end()) {
@@ -42,6 +54,69 @@ double AudioHandler::getAvgAtRange(std::pair<int, int> range)
 	}
 	else {
 		return 0.0;
+	}
+}
+
+void AudioHandler::setPosition(sf::Vector2f new_position)
+{
+	position = new_position;
+}
+
+void AudioHandler::refreshDevices()
+{
+	available_devices = sf::SoundRecorder::getAvailableDevices();
+}
+
+void AudioHandler::start(AUDIO_MODE new_mode, std::string file_or_device_name)
+{
+	name = file_or_device_name;
+	mode = new_mode;
+	switch (mode) {
+	case AUDIO_DEVICE:
+		audio_recorder = new WavyBoiRecorder();
+		audio_recorder->setSize(size);
+		audio_recorder->setDevice(name);
+		audio_recorder->start(44100);
+		running = true;
+		normalize_request = true;
+		break;
+	case AUDIO_FILE:
+		if (sound_buffer.loadFromFile(name)) {
+			std::cout << "loaded " << name << std::endl;
+		}
+		else {
+			std::cout << "could not load " << name << std::endl;
+		}
+		sound.setBuffer(sound_buffer);
+		sound.play();
+		running = false;
+		break;
+	case AUDIO_FILE_RECORD:
+		sound_buffer.loadFromFile(name);
+		running = false;
+		break;
+	}
+}
+
+void AudioHandler::stop()
+{
+	if (running) {
+		switch (mode) {
+		case AUDIO_DEVICE:
+			if (audio_recorder != NULL) {
+				audio_recorder->stop();
+				delete audio_recorder;
+				audio_recorder = NULL;
+			}
+			running = false;
+			break;
+		case AUDIO_FILE:
+			running = false;
+			break;
+		case AUDIO_FILE_RECORD:
+			running = false;
+			break;
+		}
 	}
 }
 
@@ -61,43 +136,130 @@ void AudioHandler::addRange(std::pair<int, int> new_range)
 
 void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	sf::Vertex draw_vertices[1002];
-	sf::Vector2f base_pos(10, 800);
-	const double * freq_vals = audio_recorder.getFrequencies();
-	draw_vertices[0] = sf::Vertex(base_pos);
-	double max = 0;
-	double freq = 0;
-	for (int i = 0; i < 1000; i++) { //freq_vals[0] is frequency at E_0, freq_vals[198] is frequency at G_8
-		draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f((i)/10., 50 * -freq_vals[i]/curr_max));
-		if (freq_vals[i] > max) {
-			
-			max = freq_vals[i];
-			freq = freqAtKey((double)i / 10.);
+	main_box.setPosition(position);
+	text_box.setPosition(position + sf::Vector2f(0,main_box.getSize().y));
+	
+	sf::Text text;
+	text.setString(name);
+	text.setFont(gui.font);
+	text.setCharacterSize(gui.input_text_height);
+	text.setFillColor(sf::Color::White);
+	text_box.setSize(sf::Vector2f(text.getLocalBounds().width + gui.outline_thickness * 2, gui.audio_device_text_height + gui.outline_thickness * 2));
+	text.setPosition(text_box.getPosition() + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
+	target.draw(main_box, states);
+	pause_play_box.setTexture((running) ? &gui.pause_24x24_tex : &gui.play_24x24_tex);
+	pause_play_box.setSize(sf::Vector2f(pause_play_box.getTexture()->getSize()));
+	pause_play_box.setPosition(position + sf::Vector2f(gui.outline_thickness, gui.outline_thickness + gui.audio_display_height));
+	stop_box.setTexture(&gui.stop_24x24_tex);
+	stop_box.setSize(sf::Vector2f(stop_box.getTexture()->getSize()));
+	stop_box.setPosition(position + sf::Vector2f(gui.outline_thickness + gui.play_24x24_tex.getSize().x, gui.outline_thickness + gui.audio_display_height));
+	target.draw(pause_play_box, states);
+	target.draw(stop_box, states);
+	target.draw(text_box, states);
+	target.draw(text, states);
+	if (running) {
+		sf::Vertex draw_vertices[1002];
+		sf::Vector2f base_pos = position + sf::Vector2f(gui.outline_thickness,gui.outline_thickness + gui.audio_display_height);
+		const double * freq_vals = audio_recorder->getFrequencies();
+		draw_vertices[0] = sf::Vertex(base_pos);
+		double max = 0;
+		double freq = 0;
+		for (int i = 0; i < 1000; i++) { //freq_vals[0] is frequency at E_0, freq_vals[198] is frequency at G_8
+			draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f(((i) / 1000.) * gui.audio_recorder_width, gui.audio_display_height * -freq_vals[i] / curr_max));
+			if (freq_vals[i] > max) {
+
+				max = freq_vals[i];
+				freq = freqAtKey((double)i / 10.);
+			}
+			else if (freq_vals[i] == max) {
+				freq = (freq + freqAtKey((double)i / 10.)) / 2.0;
+			}
 		}
-		else if (freq_vals[i] == max) {
-			freq = (freq + freqAtKey((double)i / 10.)) / 2.0;
-		}
+		audio_recorder->unlockLastF();
+		draw_vertices[1001] = sf::Vertex(base_pos + sf::Vector2f(gui.audio_recorder_width, 0));
+		target.draw(draw_vertices, 1002, sf::LineStrip);
 	}
-	audio_recorder.unlockLastF();
-	draw_vertices[1001] = sf::Vertex(base_pos + sf::Vector2f(100, 0));
-	target.draw(draw_vertices, 1002, sf::LineStrip);
+	else {
+		sf::Vertex draw_vertices[2];
+		sf::Vector2f base_pos = position + sf::Vector2f(gui.outline_thickness, gui.outline_thickness + gui.audio_display_height);
+		draw_vertices[0] = sf::Vertex(base_pos);
+		draw_vertices[1] = sf::Vertex(base_pos + sf::Vector2f(gui.audio_recorder_width, 0));
+		target.draw(draw_vertices, 2, sf::LineStrip);
+	}
+
+}
+
+void AudioHandler::setFPS(double new_fps)
+{
+	fps = new_fps;
+}
+
+ClickResponse AudioHandler::processLeftClick(sf::Vector2i mouse_pos)
+{
+	ClickResponse response;
+	response.clicked = false;
+	if (checkIntersection(pause_play_box, sf::Vector2f(mouse_pos))) {
+		if (running) {
+			stop();
+		}
+		else {
+			start(mode, name);
+		}
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+	}
+	else if (checkIntersection(stop_box, sf::Vector2f(mouse_pos))) {
+		stop();
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+	}
+	return response;
+}
+
+ClickResponse AudioHandler::processMouseWheel(sf::Vector2i mouse_pos, int delta)
+{
+	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
+	if (checkIntersection(text_box, sf::Vector2f(mouse_pos))) {
+		curr_device = curr_device + delta;
+		curr_device = curr_device % available_devices.size();
+		if (mode == AUDIO_DEVICE) {
+			if (available_devices.size() > 0) {
+				name = available_devices[curr_device];
+				if (running) {
+					stop();
+				}
+				start(mode, name);
+			}
+		}
+		response.clicked = true;
+		response.type = CLICK_RESPONSE::PROCESSED;
+		return response;
+	}
+	return response;
 }
 
 void AudioHandler::resetLevels() {
 	curr_max = 1;
 }
 
-void AudioHandler::update()
+bool AudioHandler::update()
 {
+	if (!running) {
+		ranges.clear();
+		return false;
+	}
 	range_maxes.clear();
 	range_avgs.clear();
 	std::vector<std::pair<int, int>> active_ranges;
 	std::vector<double> maxes;
 	std::vector<double> sums;
 	std::vector<int> counts;
-	const double * freq_vals = audio_recorder.getFrequencies();
+	const double * freq_vals = audio_recorder->getFrequencies();
 	if (normalize_request) {
 		resetLevels();
+		normalize_request = false;
 	}
 	for (int i = 0; i < 1000; i++) {
 		double freq = freqAtKey((double)i / 10.);
@@ -146,9 +308,12 @@ void AudioHandler::update()
 				break;
 			}
 		}
-		if (val > curr_max) curr_max = val;
+		if (val > curr_max) {
+			std::cout << "new max detected: " << val << "at freq" << freq << " at ind " << i << std::endl;
+			curr_max = val;
+		}
 	}
-	audio_recorder.unlockLastF();
+	audio_recorder->unlockLastF();
 	//clear any non-calculated ranges
 	while (active_ranges.size() > 0) {
 		//remove the range from the active range
@@ -167,6 +332,7 @@ void AudioHandler::update()
 	for (std::unordered_map<long unsigned int, double>::iterator iter = range_avgs.begin(); iter != range_avgs.end(); ++iter) {
 		range_avgs[iter->first] = iter->second / curr_max;
 	}
+	return true;
 }
 
 void AudioHandler::normalize()

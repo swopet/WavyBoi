@@ -8,7 +8,10 @@ void loadGUISettings() {
 	gui.font.loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/resources/fonts/Montserrat-Medium.otf");
 	gui.menu_text_height = 20;
 	gui.input_text_height = 16;
+	gui.audio_device_text_height = 16;
 	gui.outline_thickness = 2;
+	gui.audio_recorder_width = 200;
+	gui.audio_display_height = 50;
 	gui.menu_outline_color = sf::Color(192, 192, 192);
 	gui.menu_fill_color = sf::Color(128, 128, 128);
 	gui.menu_selected_fill_color = sf::Color(64, 64, 64);

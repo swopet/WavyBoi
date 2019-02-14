@@ -6,7 +6,10 @@ struct GUISettings {
 	sf::Font font;
 	int menu_text_height;
 	int input_text_height;
+	int audio_device_text_height;
 	int outline_thickness;
+	int audio_recorder_width;
+	int audio_display_height;
 	sf::Color menu_outline_color;
 	sf::Color menu_fill_color;
 	sf::Color menu_selected_fill_color;

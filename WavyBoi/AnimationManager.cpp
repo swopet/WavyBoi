@@ -4,6 +4,7 @@
 AnimationManager::AnimationManager(){
 
 	audio_handler = new AudioHandler();
+	//audio_handler->start(AudioHandler::AUDIO_FILE, std::string("C:/Users/Trevor/Stuff/piano thing 1.wav"));
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
