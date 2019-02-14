@@ -22,8 +22,10 @@ struct ControlWindowState {
 	sf::RectangleShape text_box;
 	sf::Text text_text;
 	bool entering_text = false;
+	bool entering_cmd = false;
 	std::string text_entered;
 	std::string text_field;
+	std::string command_entered;
 	Object * new_text_obj;
 	//Linking
 	Link * new_link = NULL;
@@ -55,15 +57,18 @@ public:
 	void InitializeMenuTabs();
 	bool update(AnimationManager *);
 	void deleteSelected(AnimationManager *);
+	
 	void drawTopMenu(AnimationManager *);
 	void drawObjects(AnimationManager *);
 	void drawChannels(AnimationManager *);
 	void drawSelectBox();
+	void drawCommandBox();
 	void drawTextEntered();
 	void drawFPS(AnimationManager * animation_manager);
 	void drawLinks(AnimationManager * animation_manager);
 	void drawNewLink();
 	void close();
+	void processCommand(std::string, AnimationManager * animation_manager);
 	void processRightClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager);
 	void processLeftClick(sf::Vector2i,AnimationManager *);
 	void processRightClickHeld(AnimationManager * animation_manager);

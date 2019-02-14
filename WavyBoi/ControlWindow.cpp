@@ -79,6 +79,15 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 					state.new_text_obj = NULL;
 					state.entering_text = false;
 				}
+				else if (state.entering_cmd) {
+					processCommand(state.command_entered, animation_manager);
+					state.entering_cmd = false;
+					state.command_entered = "";
+				}
+				else {
+					state.command_entered = "";
+					state.entering_cmd = true;
+				}
 			}
 		}
 		if (event.type == sf::Event::TextEntered) {
@@ -89,6 +98,15 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 				}
 				else {
 					state.text_entered += static_cast<char>(event.text.unicode);
+				}
+			}
+			else if (state.entering_cmd) {
+				if (event.text.unicode == 8) { //BACKSPACE
+					if (state.command_entered.length() > 0)
+						state.command_entered.pop_back();
+				}
+				else {
+					state.command_entered += static_cast<char>(event.text.unicode);
 				}
 			}
 		}
@@ -127,6 +145,9 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	}
 	drawTopMenu(animation_manager);
 	drawFPS(animation_manager);
+	if (state.entering_cmd) {
+		drawCommandBox();
+	}
 	AudioHandler * audio_handler = animation_manager->getAudioHandler();
 	audio_handler->setPosition(sf::Vector2f(0, state.window_size.y - gui.outline_thickness * 4 - gui.audio_display_height - gui.audio_device_text_height - gui.play_24x24_tex.getSize().y));
 	audio_handler->draw(*window, sf::RenderStates());
@@ -152,6 +173,18 @@ void ControlWindow::deleteSelected(AnimationManager * animation_manager)
 		}
 	}
 	state.selected = false;
+}
+
+void ControlWindow::drawCommandBox()
+{
+	sf::Text command_text;
+	command_text.setString(state.command_entered);
+	command_text.setFillColor(sf::Color::White);
+	command_text.setCharacterSize(gui.input_text_height);
+	command_text.setFont(gui.font);
+	float y = state.window_size.y - gui.audio_device_text_height - gui.audio_display_height - gui.outline_thickness * 4 - gui.input_text_height * 2 - 24;
+	command_text.setPosition(sf::Vector2f(gui.outline_thickness, y));
+	window->draw(command_text);
 }
 
 void ControlWindow::drawTopMenu(AnimationManager * animation_manager){
@@ -245,6 +278,22 @@ void ControlWindow::drawNewLink() {
 
 void ControlWindow::close(){
 	window->close();
+}
+
+void ControlWindow::processCommand(std::string command, AnimationManager * animation_manager)
+{
+	std::vector<std::string> elts;
+	int last_ind = 1;
+	for (int i = 0; i <= command.length(); i++) {
+		if (i == command.length() || command[i] == ' ') {
+			if (i != 0 && command[i - 1] != '\\' || i == command.length()) {
+				int size = i - last_ind;
+				if (size > 0) elts.push_back(command.substr(last_ind, size));
+				last_ind = i + 1;
+			}
+		}
+	}
+	animation_manager->processCommand(elts);
 }
 
 void ControlWindow::processRightClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {

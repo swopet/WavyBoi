@@ -5,14 +5,12 @@
 void SceneObject::init()
 {
 	ready_mutex.lock();
+	size = sf::Vector2f(60 + gui.outline_thickness * 2, 60 + gui.outline_thickness * 2);
 	if (ready && scene != NULL) {
 		sf::Vector2f scene_size = sf::Vector2f(scene->getTexture()->getSize());
 		if (scene_size.y != 0) {
 			float ratio = scene_size.x / scene_size.y;
 			size = sf::Vector2f(60 * ratio + gui.outline_thickness * 2, 60 + gui.outline_thickness * 2);
-		}
-		else {
-			size = sf::Vector2f(60 + gui.outline_thickness * 2, 60 + gui.outline_thickness * 2);
 		}
 	}
 	ready_mutex.unlock();
@@ -50,6 +48,17 @@ void SceneObject::loadScene()
 	std::wstring stemp = std::wstring(filename.begin(), filename.end());
 	LPCWSTR sw = stemp.c_str();
 	hinst = LoadLibrary(sw);
+	if (hinst != NULL) {
+		std::cout << "loaded " << filename << "successfully!" << std::endl;
+	}
+	else {
+		scene = NULL;
+		ready_mutex.lock();
+		ready = true;
+		ready_mutex.unlock();
+		std::cout << "load failed on " << filename << std::endl;
+		return;
+	}
 	auto ptr = reinterpret_cast<WBScene* (*)()>(GetProcAddress(hinst, "GetWBScene"));
 	scene = ptr();
 	ready_mutex.lock();
@@ -114,12 +123,14 @@ bool SceneObject::checkOverlap(sf::RectangleShape select_box)
 
 void SceneObject::setParameter(Parameter * parameter, int ind)
 {
-	scene->setParameter(parameter);
+	if (ready && scene != NULL)
+		scene->setParameter(parameter);
 }
 
 void SceneObject::setParamsToDefault()
 {
-	scene->setParamsToDefault();
+	if (ready && scene != NULL)
+		scene->setParamsToDefault();
 }
 
 void SceneObject::draw(sf::RenderTarget & target, sf::RenderStates states)
@@ -168,11 +179,13 @@ SceneObject::~SceneObject()
 		scene = NULL;
 	}
 	ready_mutex.unlock();
-	if (FreeLibrary(hinst)) {
-		std::cout << "freed library at " << filename << std::endl;
-	}
-	else {
-		std::cout << "no library to free for deleted scene" << std::endl;
+	if (hinst != NULL) {
+		if (FreeLibrary(hinst)) {
+			std::cout << "freed library at " << filename << std::endl;
+		}
+		else {
+			std::cout << "no library to free for deleted scene" << std::endl;
+		}
 	}
 }
 

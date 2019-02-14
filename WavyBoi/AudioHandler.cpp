@@ -165,7 +165,9 @@ void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 		double max = 0;
 		double freq = 0;
 		for (int i = 0; i < 1000; i++) { //freq_vals[0] is frequency at E_0, freq_vals[198] is frequency at G_8
-			draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f(((i) / 1000.) * gui.audio_recorder_width, gui.audio_display_height * -freq_vals[i] / curr_max));
+			double ratio = (i) / 1000.;
+			ratio = ratio * ratio;
+			draw_vertices[i + 1] = sf::Vertex(base_pos + sf::Vector2f(ratio * gui.audio_recorder_width, gui.audio_display_height * -freq_vals[i] / curr_max));
 			if (freq_vals[i] > max) {
 
 				max = freq_vals[i];

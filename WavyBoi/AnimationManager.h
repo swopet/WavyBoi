@@ -64,6 +64,7 @@ public:
 	std::vector<Channel *> getChannels();
 	std::vector<Object *> getObjects();
 	std::vector<Link *> getLinks();
+	void processCommand(std::vector<std::string> args);
 	void decrementLinkOutIndsGreaterThan(int, Object *);
 	void pushToTop(Object *);
 	void deleteObject(Object *);

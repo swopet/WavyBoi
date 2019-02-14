@@ -59,6 +59,24 @@ std::vector<Link*> AnimationManager::getLinks()
 	return links;
 }
 
+void AnimationManager::processCommand(std::vector<std::string> args) {
+	if (args.size() == 0) return;
+	std::cout << args[0].length() << std::endl;
+	if (args[0].compare("loadScene") == 0) {
+		if (args.size() != 2) {
+			std::cout << "usage: loadScene <PATH_TO_SCENE>" << std::endl;
+		}
+		else {
+			SceneObject * new_scene = new SceneObject(args[1]);
+			new_scene->setPosition(sf::Vector2f(50, 50));
+			addObject(new_scene);
+		}
+	}
+	else {
+		std::cout << "unrecognized command" << std::endl;
+	}
+}
+
 void AnimationManager::decrementLinkOutIndsGreaterThan(int ind, Object * obj)
 {
 	std::vector<Link *> links_to_remove;
