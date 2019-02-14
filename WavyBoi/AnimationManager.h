@@ -11,6 +11,7 @@ rendering. */
 #include <Object/Object.h>
 #include <Object/Video.h>
 #include <Object/Link.h>
+#include <ImageSequence.h>
 #include <SceneObject.h>
 #include <Multiplexer.h>
 #include <FallingLeaves.h>
@@ -34,7 +35,6 @@ struct AnimationManagerState {
 	bool delete_selected = false;
 	std::string project_name;
 	std::string project_path;
-	sf::Vector2u out_res;
 	double fps;
 };
 

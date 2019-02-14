@@ -4,11 +4,10 @@
 AnimationManager::AnimationManager(){
 
 	audio_handler = new AudioHandler();
-	//audio_handler->start(AudioHandler::AUDIO_FILE, std::string("C:/Users/Trevor/Stuff/piano thing 1.wav"));
+	//audio_handler->start(AudioHandler::AUDIO_FILE, std::string("C:/Users/Trevor/Stuff/Rearranger_Videos/Rearranger.wav"));
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
-	state.out_res = sf::Vector2u(600,400);
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 }
@@ -62,6 +61,16 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 			addObject(new_video);
 			return true;
 		}
+	}
+	else if (args[0].compare("loadImageSequence") == 0) {
+		if (args.size() != 2) {
+			std::cout << "usage: loadImageSequence <PATH_TO_DIR>" << std::endl;
+			return false;
+		}
+		ImageSequence * new_image_seq = new ImageSequence();
+		new_image_seq->loadFromPath(args[1]);
+		addObject(new_image_seq);
+		return true;
 	}
 	else if (args[0].compare("addRange") == 0) {
 		if (args.size() != 3) {
@@ -140,6 +149,7 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 	}
 	else {
 		std::cout << "unrecognized command" << std::endl;
+		return false;
 	}
 }
 

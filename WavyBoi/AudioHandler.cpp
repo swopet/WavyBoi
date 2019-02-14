@@ -83,6 +83,8 @@ void AudioHandler::start(AUDIO_MODE new_mode, std::string file_or_device_name)
 	case AUDIO_FILE:
 		if (sound_buffer.loadFromFile(name)) {
 			std::cout << "loaded " << name << std::endl;
+			std::cout << "channels: " << sound_buffer.getChannelCount() << std::endl;
+			std::cout << "sample rate: " << sound_buffer.getSampleRate() << std::endl;
 		}
 		else {
 			std::cout << "could not load " << name << std::endl;
