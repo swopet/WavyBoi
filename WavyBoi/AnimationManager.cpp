@@ -4,13 +4,15 @@
 AnimationManager::AnimationManager(){
 
 	audio_handler = new AudioHandler();
+	//audio_handler = NULL;
 	//audio_handler->start(AudioHandler::AUDIO_FILE, std::string("C:/Users/Trevor/Stuff/Rearranger_Videos/Rearranger.wav"));
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
-	processCommand(std::vector<std::string>({ "loadImageSequence","C:/Users/Trevor/Stuff/Rearranger_Videos/cape_lookout_1" }));
+	//processCommand(std::vector<std::string>({ "loadImageSequence","C:/Users/Trevor/Stuff/Rearranger_Videos/cape_lookout_1" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
+	std::cout << "Added new Channel" << std::endl; //debug7.9
 }
 
 AnimationManager::~AnimationManager()

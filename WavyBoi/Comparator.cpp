@@ -175,6 +175,14 @@ Parameter * Operator::getNewParameter()
 		new_param.int_val = 0;
 	else if (left_type == PARAM_TYPE::FLOAT)
 		new_param.float_val = 0;
+	else if (left_type == PARAM_TYPE::NONE) {
+		if (right_type == PARAM_TYPE::INT)
+			new_param.int_val = 0;
+		else if (right_type == PARAM_TYPE::FLOAT)
+			new_param.float_val = 0;
+		else
+			return NULL;
+	}
 	return new Parameter(left_type, new_param, name);
 }
 

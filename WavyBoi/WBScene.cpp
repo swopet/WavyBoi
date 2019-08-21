@@ -55,9 +55,7 @@ void WBScene::setParameter(Parameter * param)
 
 WBScene::WBScene()
 {
-	context_settings.depthBits = 32;
-	render_target = new sf::RenderTexture();
-	render_target->create(1080, 720, context_settings);
+	
 }
 
 

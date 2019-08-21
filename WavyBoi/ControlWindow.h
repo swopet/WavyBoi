@@ -26,6 +26,8 @@ struct ControlWindowState {
 	std::string text_entered;
 	std::string text_field;
 	std::string command_entered;
+	std::vector<std::string> previous_commands;
+	int curr_command;
 	Object * new_text_obj;
 	//Linking
 	Link * new_link = NULL;

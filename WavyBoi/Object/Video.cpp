@@ -104,6 +104,7 @@ void Video::loadFromFile(std::string file_name){ //load from full path
 	}
 	else {
 		std::cout << "Loaded" << file_name << std::endl;
+		movie->setVolume(0.0);
 		movie->play();
 		movie->update();
 		playing = true;

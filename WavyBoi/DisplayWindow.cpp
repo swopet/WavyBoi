@@ -61,8 +61,8 @@ void DisplayWindow::open(AnimationManager * animation_manager){
 	window = new sf::RenderWindow(sf::VideoMode(1920,1080), "WavyBoi - " + animation_manager->getName(), sf::Style::None);
 	window->setPosition(sf::Vector2i(1680,-30));
 	*/
-	window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "WavyBoi - " + animation_manager->getName(), sf::Style::None);
-	window->setPosition(sf::Vector2i(1680, -30));
+	window = new sf::RenderWindow(sf::VideoMode(720, 405), "WavyBoi - " + animation_manager->getName(), sf::Style::None);
+	window->setPosition(sf::Vector2i(4, 4));
 }
 
 void DisplayWindow::close(){

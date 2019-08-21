@@ -1,11 +1,14 @@
 #pragma once
 #include "WBScene.h"
+#include "SimplexNoise.h"
 
 class WBSceneExample : public WBScene
 {
-public:
-
-	
+private:
+	sf::Clock clock;
+	double time;
+	double last_bass = 0.0;
+public:	
 	void draw();
 	void update();
 	void setParamsToDefault();

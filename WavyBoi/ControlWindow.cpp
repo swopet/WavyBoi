@@ -89,6 +89,14 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 					state.entering_cmd = true;
 				}
 			}
+			if (event.key.code == sf::Keyboard::Up) {
+				if (state.entering_cmd) {
+					if (state.previous_commands.size() > 0) {
+						state.command_entered = state.previous_commands[state.curr_command];
+						state.curr_command = (state.curr_command + 1) % state.previous_commands.size();
+					}
+				}
+			}
 		}
 		if (event.type == sf::Event::TextEntered) {
 			if (state.entering_text) {
@@ -101,6 +109,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 				}
 			}
 			else if (state.entering_cmd) {
+				state.curr_command = 0;
 				if (event.text.unicode == 8) { //BACKSPACE
 					if (state.command_entered.length() > 0)
 						state.command_entered.pop_back();
@@ -282,6 +291,7 @@ void ControlWindow::close(){
 
 void ControlWindow::processCommand(std::string command, AnimationManager * animation_manager)
 {
+	state.curr_command = 0;
 	std::vector<std::string> elts;
 	int last_ind = 1;
 	for (int i = 0; i <= command.length(); i++) {
@@ -293,7 +303,10 @@ void ControlWindow::processCommand(std::string command, AnimationManager * anima
 			}
 		}
 	}
-	animation_manager->processCommand(elts);
+	if (elts.size() > 0) {
+		animation_manager->processCommand(elts);
+		state.previous_commands.insert(state.previous_commands.begin(), command);
+	}
 }
 
 void ControlWindow::processRightClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager) {

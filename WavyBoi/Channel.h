@@ -7,7 +7,6 @@ class Channel :
 	public Object
 {
 private:
-	WBScene * test_scene; //delete once i'm done testing this shiiiit
 	sf::Vector2f size;
 	sf::RectangleShape main_box;
 	sf::RectangleShape video_box;
