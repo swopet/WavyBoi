@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-constexpr auto TEXTURE_PATH = "C:/Users/Trevor/Stuff/VS/WavyBoi/resources/textures/";
+#include <experimental/filesystem>
+#include <algorithm>
+constexpr auto TEXTURE_PATH_EXT = "/resources/textures/";
 
 struct GUISettings {
 	sf::Font font;

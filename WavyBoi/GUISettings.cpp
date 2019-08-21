@@ -4,8 +4,10 @@
 GUISettings gui;
 
 void loadGUISettings() {
-	
-	gui.font.loadFromFile("C:/Users/Trevor/Stuff/VS/WavyBoi/resources/fonts/Montserrat-Medium.otf");
+	std::string cwd = std::experimental::filesystem::current_path().u8string();
+	std::replace(cwd.begin(), cwd.end(), '\\', '/'); //WHYYYY does it return it in a format it doesn't like
+	std::string TEXTURE_PATH = cwd + std::string(TEXTURE_PATH_EXT);
+	gui.font.loadFromFile(cwd + std::string("/resources/fonts/Montserrat-Medium.otf"));
 	gui.menu_text_height = 20;
 	gui.input_text_height = 16;
 	gui.audio_device_text_height = 16;
