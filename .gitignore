@@ -13,3 +13,5 @@ Debug/*
 *db
 *.xml
 *.pch*
+*WBConfig.txt
+*.lastbuildstate

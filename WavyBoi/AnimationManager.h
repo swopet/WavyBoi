@@ -28,6 +28,7 @@ rendering. */
 #include <map>
 #include <vector>
 #include <unordered_set>
+#include <Preferences.h>
 
 struct AnimationManagerState {
 	bool edited = false;
@@ -47,6 +48,7 @@ struct ObjectNode {
 
 class AnimationManager {
 private:
+	Preferences preferences;
 	AnimationManagerState state;
 	std::vector<Object *> objects;
 	std::vector<Link *> links;
@@ -59,6 +61,7 @@ private:
 public:
 	AnimationManager();
 	~AnimationManager();
+	Preferences getPreferences();
 	AudioHandler * getAudioHandler();
 	std::string getName();
 	std::vector<Channel *> getChannels();

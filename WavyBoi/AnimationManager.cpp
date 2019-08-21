@@ -2,7 +2,8 @@
 #include <AnimationManager.h>
 
 AnimationManager::AnimationManager(){
-
+	preferences = Preferences();
+	preferences.loadConfigFromFile();
 	audio_handler = new AudioHandler();
 	//audio_handler = NULL;
 	//audio_handler->start(AudioHandler::AUDIO_FILE, std::string("C:/Users/Trevor/Stuff/Rearranger_Videos/Rearranger.wav"));
@@ -18,6 +19,11 @@ AnimationManager::AnimationManager(){
 AnimationManager::~AnimationManager()
 {
 	delete audio_handler;
+}
+
+Preferences AnimationManager::getPreferences()
+{
+	return preferences;
 }
 
 AudioHandler * AnimationManager::getAudioHandler()

@@ -2,9 +2,11 @@
 #include <ControlWindow.h>
 
 ControlWindow::ControlWindow(AnimationManager * animation_manager){
-	window = new sf::RenderWindow(sf::VideoMode(1600,900), "WavyBoi - " + animation_manager->getName());
+	Preferences preferences = animation_manager->getPreferences();
+	state.window_size = preferences.control_resolution;
+	window = new sf::RenderWindow(sf::VideoMode(state.window_size.x,state.window_size.y), "WavyBoi - " + animation_manager->getName());
+	window->setPosition(preferences.control_position);
 	window->setVerticalSyncEnabled(true);
-	state.window_size = sf::Vector2u(1600,900);
 	font = NULL;
 	state.last_fps_draw = state.clock.getElapsedTime();
 	state.workspace_pos = sf::Vector2i(0, 0);
