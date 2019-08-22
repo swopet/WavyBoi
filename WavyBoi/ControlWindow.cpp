@@ -45,6 +45,15 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 		if (event.type == sf::Event::Closed){
 			return true;
 		}
+		if (event.type == sf::Event::Resized) {
+			std::cout << "Window resized!" << std::endl;
+			state.window_size = sf::Vector2u(event.size.width, event.size.height);
+			sf::View view;
+			view.setSize(event.size.width, event.size.height);
+			view.setCenter(sf::Vector2f(event.size.width / 2.0, event.size.height / 2.0));
+			view.setViewport(sf::FloatRect(0, 0, 1, 1));
+			window->setView(view);
+		}
 		if (event.type == sf::Event::MouseButtonPressed){
 			if (event.mouseButton.button == sf::Mouse::Left){
 				processLeftClick(sf::Vector2i(event.mouseButton.x,event.mouseButton.y),animation_manager);
@@ -145,6 +154,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 	animation_manager->update();
 	window->setActive(true);
 	window->clear();
+	glViewport(0, 0, state.window_size.x, state.window_size.y);
 	drawLinks(animation_manager);
 	drawObjects(animation_manager);
 	drawChannels(animation_manager);
