@@ -39,7 +39,7 @@ void IntObject::updateGUIElements()
 	text = sf::Text(std::to_string(out_val.int_val), gui.font, gui.input_text_height);
 	text.setFillColor(sf::Color::White);
 	sf::FloatRect text_rect = text.getLocalBounds();
-	elements.at(0).setSize(text_rect.width + text_rect.left + gui.text_buffer*2.0, text_rect.height + text_rect.top + gui.text_buffer*2.0);
+	elements.at(0).setSize(text_rect.width + text_rect.left + gui.obj_text_buffer*2.0, text_rect.height + text_rect.top + gui.obj_text_buffer*2.0);
 	inputs.at(0).setPosition(
 		sf::Vector2f(0, elements.at(0).getGlobalBounds().height/2.0) +
 		sf::Vector2f(-gui.outline_thickness / 2.0, 0.0) +
@@ -49,7 +49,7 @@ void IntObject::updateGUIElements()
 		sf::Vector2f(gui.outline_thickness / 2.0, 0.0) +
 		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
 	Object::updateGUIElements();
-	text.setPosition(position +sf::Vector2f(gui.text_buffer , gui.text_buffer) -
+	text.setPosition(position +sf::Vector2f(gui.obj_text_buffer , gui.obj_text_buffer) -
 		sf::Vector2f(text_rect.left/2.0, text_rect.top/2.0));
 }
 

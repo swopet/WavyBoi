@@ -81,8 +81,9 @@ void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 		sf::Vertex(sf::Vector2f(out_pos.x-10,out_pos.y)),
 		sf::Vertex(out_pos)
 	};
-	glLineWidth(gui.outline_thickness);
-	glColor3f(gui.obj_outline_color.r, gui.obj_outline_color.g, gui.obj_outline_color.b);
+	for (int i = 0; i < 4; i++) {
+		line[i].color = sf::Color::White;
+	}
 	target.draw(line, 4, sf::LineStrip, states);
 	target.draw(text, states);
 }

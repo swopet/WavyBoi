@@ -10,7 +10,8 @@ void loadGUISettings() {
 	gui.font.loadFromFile(cwd + std::string("/resources/fonts/Montserrat-Medium.otf"));
 	gui.menu_text_height = 16;
 	gui.input_text_height = 16;
-	gui.text_buffer = 8;
+	gui.menu_text_buffer = 4;
+	gui.obj_text_buffer = 8;
 	gui.audio_device_text_height = 16;
 	gui.outline_thickness = -2.0;
 	gui.audio_recorder_width = 200;
