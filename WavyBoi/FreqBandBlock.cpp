@@ -5,8 +5,33 @@
 FreqBandBlock::FreqBandBlock()
 {
 	type = OBJECT_TYPE::FREQBANDBLOCK;
+	initializeElements();
 }
 
+void FreqBandBlock::initializeElements() {
+	GUIElement main_rect(GUIElement::RECTANGLE, 1, 1);
+	main_rect.setPosition(sf::Vector2f(0, 0));
+	elements.push_back(main_rect);
+	GUIElement output_circle(GUIElement::CIRCLE, gui.obj_circle_radius);
+	outputs.push_back(output_circle);
+	updateGUIElements();
+}
+
+void FreqBandBlock::updateGUIElements() {
+	std::ostringstream range_str;
+	range_str << low_val << " - " << high_val << " Hz";
+	text.setString(range_str.str());
+	text.setCharacterSize(gui.input_text_height);
+	text.setFont(gui.font);
+	text.setFillColor(sf::Color::White);
+	sf::FloatRect text_rect = text.getLocalBounds();
+	elements.at(0).setSize(text_rect.width + text_rect.left + gui.text_buffer*2.0, text_rect.height + text_rect.top + gui.text_buffer*2.0);
+	text.setPosition(position + sf::Vector2f(gui.text_buffer, gui.text_buffer) -
+		sf::Vector2f(text_rect.left / 2.0, text_rect.top / 2.0));
+	outputs.at(0).setPosition(sf::Vector2f(elements.at(0).getGlobalBounds().width, elements.at(0).getGlobalBounds().height/2.0)+
+		sf::Vector2f(gui.outline_thickness/2.0, 0) + sf::Vector2f(-gui.obj_circle_radius,-gui.obj_circle_radius));
+	Object::updateGUIElements();
+}
 
 FreqBandBlock::~FreqBandBlock()
 {
@@ -19,19 +44,8 @@ Parameter FreqBandBlock::getParameter()
 
 void FreqBandBlock::update()
 {
-	main_box.setSize(sf::Vector2f(96 + gui.outline_thickness * 2, gui.input_text_height + gui.outline_thickness * 4));
-	main_box.setOutlineColor(gui.obj_outline_color);
-	main_box.setOutlineThickness(gui.outline_thickness);
-	main_box.setFillColor(gui.obj_fill_color);
-	main_box.setPosition(position);
 	out_val.float_val = max;
-	std::ostringstream range_str;
-	range_str << low_val << " - " << high_val << " Hz";
-	text.setString(range_str.str());
-	text.setCharacterSize(gui.input_text_height);
-	text.setFont(gui.font);
-	text.setFillColor(sf::Color::White);
-	text.setPosition(position + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
+	
 	changed = false;
 }
 
@@ -52,50 +66,22 @@ void FreqBandBlock::sendRangeToHandler(AudioHandler * audio_handler)
 	audio_handler->addRange(std::pair<int, int>(low_val, high_val));
 }
 
-sf::Vector2f FreqBandBlock::getRightPos()
-{
-	return position + sf::Vector2f(main_box.getSize().x, main_box.getSize().y/2);
-}
-
 void FreqBandBlock::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	target.draw(main_box, states);
-	sf::RectangleShape level_box(main_box.getSize() - sf::Vector2f(gui.outline_thickness * 2, gui.outline_thickness * 2));
-	
+	Object::draw(target, states);
+	sf::RectangleShape level_box(sf::Vector2f(elements.at(0).getGlobalBounds().width, elements.at(0).getGlobalBounds().height)
+		+ sf::Vector2f(gui.outline_thickness * 2, gui.outline_thickness * 2));
 	level_box.setFillColor(sf::Color(0, 255 * max, 0));
-	float max_height = level_box.getSize().y;
-	level_box.setSize(sf::Vector2f(level_box.getSize().x, max_height * max));
-	level_box.setPosition(main_box.getPosition() + sf::Vector2f(gui.outline_thickness, gui.outline_thickness + (1.0 - max) * max_height));
+	float max_height = elements.at(0).getGlobalBounds().height + gui.outline_thickness * 2;
+	level_box.setSize(sf::Vector2f(level_box.getSize().x, -max_height * max));
+	level_box.setPosition(sf::Vector2f(elements.at(0).getGlobalBounds().left, elements.at(0).getGlobalBounds().top + elements.at(0).getGlobalBounds().height) +
+		sf::Vector2f(-gui.outline_thickness, gui.outline_thickness));
 	target.draw(level_box, states);
 	target.draw(text, states);
-	sf::CircleShape right_circle(gui.obj_circle_radius + gui.outline_thickness);
-	right_circle.setOutlineColor(gui.obj_outline_color);
-	right_circle.setOutlineThickness(gui.outline_thickness);
-	right_circle.setFillColor(gui.obj_fill_color);
-	right_circle.setPosition(getRightPos() - sf::Vector2f(right_circle.getRadius(),right_circle.getRadius()));
-	target.draw(right_circle, states);
 }
 
 bool FreqBandBlock::checkOverlap(sf::RectangleShape select_box) {
-	return checkIntersection(select_box.getGlobalBounds(), main_box.getGlobalBounds());
-}
-
-ClickResponse FreqBandBlock::processLeftClick(sf::Vector2i mouse_pos)
-{
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - getRightPos()) <= gui.obj_circle_radius + gui.outline_thickness) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_RIGHT;
-		return response;
-	}
-	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::SELECTED;
-		return response;
-	}
-	return response;
+	return checkIntersection(select_box.getGlobalBounds(), elements.at(0).getGlobalBounds());
 }
 
 ClickResponse FreqBandBlock::processMouseWheel(sf::Vector2i mouse_pos, int delta)
@@ -103,8 +89,8 @@ ClickResponse FreqBandBlock::processMouseWheel(sf::Vector2i mouse_pos, int delta
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
-		if (mouse_pos.x <= position.x + main_box.getSize().x/2.0f) {
+	if (checkIntersection(elements.at(0).getGlobalBounds(), sf::Vector2f(mouse_pos))) {
+		if (mouse_pos.x <= position.x + elements.at(0).getGlobalBounds().width/2.0f) {
 			low_val += delta;
 			if (low_val > high_val) low_val = high_val;
 			if (low_val < 0) low_val = 0;
