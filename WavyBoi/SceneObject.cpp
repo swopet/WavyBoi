@@ -15,11 +15,11 @@ void SceneObject::init()
 	}
 	ready_mutex.unlock();
 	main_box = sf::RectangleShape(size);
-	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setOutlineThickness(gui.outline_thickness);
 	main_box.setOutlineColor(gui.obj_outline_color);
 	main_box.setFillColor(sf::Color(0, 0, 0));
 	left_circle = sf::CircleShape(gui.obj_circle_radius + gui.outline_thickness);
-	left_circle.setOutlineThickness(-gui.outline_thickness);
+	left_circle.setOutlineThickness(gui.outline_thickness);
 	left_circle.setOutlineColor(gui.obj_outline_color);
 	left_circle.setFillColor(gui.obj_fill_color);
 	right_circle = left_circle;
@@ -118,7 +118,7 @@ sf::Vector2f SceneObject::getRightPos()
 
 bool SceneObject::checkOverlap(sf::RectangleShape select_box)
 {
-	return checkIntersection(select_box, main_box);
+	return checkIntersection(select_box.getGlobalBounds(), main_box.getGlobalBounds());
 }
 
 void SceneObject::setParameter(Parameter * parameter, int ind)

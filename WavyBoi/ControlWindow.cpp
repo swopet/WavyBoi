@@ -329,7 +329,7 @@ void ControlWindow::processRightClick(sf::Vector2i mouse_pos, AnimationManager *
 
 void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
 	if (state.entering_text) {
-		if (!checkIntersection(state.text_box, sf::Vector2f(mouse_pos))) {
+		if (!checkIntersection(state.text_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 			state.entering_text = false;
 		}
 	}
@@ -359,7 +359,7 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * 
 		sf::RectangleShape mouse_box(sf::Vector2f(0, 0));
 		mouse_box.setPosition(sf::Vector2f(mouse_pos));
 		//if the click is within the boundaries, start moving, otherwise turn off the selection
-		if (checkIntersection(mouse_box, select_box)) {
+		if (checkIntersection(mouse_box.getGlobalBounds(), select_box.getGlobalBounds())) {
 			state.moving = true;
 			std::cout << "clicked on selected box" << std::endl;
 			processed = true;

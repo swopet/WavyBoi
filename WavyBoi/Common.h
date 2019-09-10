@@ -24,11 +24,12 @@ struct ClickResponse {
 	std::string field = "";
 };
 
-bool checkIntersection(sf::RectangleShape rec1, sf::RectangleShape rec2);
+bool checkIntersection(sf::FloatRect rec1, sf::FloatRect rec2);
 
-bool checkIntersection(sf::RectangleShape rec1, sf::Vector2f);
+bool checkIntersection(sf::FloatRect rec1, sf::Vector2f);
+bool checkIntersection(sf::FloatRect rec1, sf::Vector2i);
 
-bool checkIntersection(sf::RectangleShape rect, sf::Vector2f point1, sf::Vector2f point2);
+bool checkIntersection(sf::FloatRect rect, sf::Vector2f point1, sf::Vector2f point2);
 
 bool checkIntersection(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vector2f);
 

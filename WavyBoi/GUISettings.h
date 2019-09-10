@@ -8,6 +8,7 @@ struct GUISettings {
 	sf::Font font;
 	int menu_text_height;
 	int input_text_height;
+	int text_buffer;
 	int audio_device_text_height;
 	int outline_thickness;
 	int audio_recorder_width;

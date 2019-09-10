@@ -68,11 +68,11 @@ void ImageSequence::setSpeed(float new_speed) {
 
 void ImageSequence::init() {
 	main_box = sf::RectangleShape(size);
-	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setOutlineThickness(gui.outline_thickness);
 	main_box.setOutlineColor(gui.obj_outline_color);
 	main_box.setFillColor(sf::Color(0, 0, 0));
 	left_circle = sf::CircleShape(gui.obj_circle_radius + gui.outline_thickness);
-	left_circle.setOutlineThickness(-gui.outline_thickness);
+	left_circle.setOutlineThickness(gui.outline_thickness);
 	left_circle.setOutlineColor(gui.obj_outline_color);
 	left_circle.setFillColor(gui.obj_fill_color);
 	right_circle = left_circle;
@@ -233,7 +233,7 @@ void ImageSequence::loadCurrentTiles()
 
 bool ImageSequence::checkOverlap(sf::RectangleShape select_box)
 {
-	return checkIntersection(select_box, main_box);
+	return checkIntersection(select_box.getGlobalBounds(), main_box.getGlobalBounds());
 }
 
 ClickResponse ImageSequence::processLeftClick(sf::Vector2i mouse_pos) {
@@ -255,17 +255,17 @@ ClickResponse ImageSequence::processLeftClick(sf::Vector2i mouse_pos) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}
-	else if (checkIntersection(play_pause_rect, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(play_pause_rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		togglePlay();
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::PROCESSED;
 	}
-	else if (checkIntersection(stop_rect, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(stop_rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		stopAndReset();
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::PROCESSED;
 	}
-	else if (checkIntersection(loop_rect, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(loop_rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		loop = !loop;
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::PROCESSED;

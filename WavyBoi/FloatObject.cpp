@@ -28,7 +28,7 @@ void FloatObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 	sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setOutlineColor(gui.obj_outline_color);
-	circle.setOutlineThickness(-gui.outline_thickness);
+	circle.setOutlineThickness(gui.outline_thickness);
 	circle.setPosition(left_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
 	target.draw(circle, states);
 	circle.setPosition(right_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
@@ -46,7 +46,7 @@ void FloatObject::update()
 	main_box.setPosition(position);
 	main_box.setFillColor(gui.obj_fill_color);
 	main_box.setOutlineColor(gui.obj_outline_color);
-	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setOutlineThickness(gui.outline_thickness);
 
 	text.setPosition(position + sf::Vector2f(gui.obj_circle_radius, 0) + sf::Vector2f(gui.outline_thickness * 2, gui.outline_thickness * 2));
 	text.setFillColor(sf::Color::White);
@@ -89,7 +89,7 @@ ClickResponse FloatObject::processLeftClick(sf::Vector2i mouse_pos)
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
 	}
-	else if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 	}
@@ -98,7 +98,7 @@ ClickResponse FloatObject::processLeftClick(sf::Vector2i mouse_pos)
 
 bool FloatObject::checkOverlap(sf::RectangleShape select_box)
 {
-	return checkIntersection(select_box, main_box);
+	return checkIntersection(select_box.getGlobalBounds(), main_box.getGlobalBounds());
 }
 
 ClickResponse FloatObject::processLeftClickRelease(sf::Vector2i mouse_pos)
@@ -115,7 +115,7 @@ ClickResponse FloatObject::processLeftClickRelease(sf::Vector2i mouse_pos)
 
 ClickResponse FloatObject::processDoubleLeftClick(sf::Vector2i mouse_pos)
 {
-	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		ClickResponse response;
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_TEXT_FIELD;
@@ -130,7 +130,7 @@ ClickResponse FloatObject::processMouseWheel(sf::Vector2i mouse_pos, int delta)
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		precision += delta;
 		if (precision > 7) precision = 7;
 		if (precision < 0) precision = 0;

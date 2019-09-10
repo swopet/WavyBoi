@@ -64,13 +64,13 @@ Parameter * Link::getParameterFromLink()
 
 bool Link::checkOverlap(sf::RectangleShape select_rect)
 {
-	bool return_value = (checkIntersection(select_rect, in_pos, sf::Vector2f(in_pos.x + 10, in_pos.y))
-		|| checkIntersection(select_rect, sf::Vector2f(in_pos.x + 10, in_pos.y), sf::Vector2f(out_pos.x - 10, out_pos.y))
-		|| checkIntersection(select_rect, sf::Vector2f(out_pos.x - 10, out_pos.y), out_pos)
-		|| checkIntersection(select_rect, in_pos)
-		|| checkIntersection(select_rect, sf::Vector2f(in_pos.x + 10, in_pos.y))
-		|| checkIntersection(select_rect, sf::Vector2f(out_pos.x - 10, out_pos.y))
-		|| checkIntersection(select_rect, out_pos));
+	bool return_value = (checkIntersection(select_rect.getGlobalBounds(), in_pos, sf::Vector2f(in_pos.x + 10, in_pos.y))
+		|| checkIntersection(select_rect.getGlobalBounds(), sf::Vector2f(in_pos.x + 10, in_pos.y), sf::Vector2f(out_pos.x - 10, out_pos.y))
+		|| checkIntersection(select_rect.getGlobalBounds(), sf::Vector2f(out_pos.x - 10, out_pos.y), out_pos)
+		|| checkIntersection(select_rect.getGlobalBounds(), in_pos)
+		|| checkIntersection(select_rect.getGlobalBounds(), sf::Vector2f(in_pos.x + 10, in_pos.y))
+		|| checkIntersection(select_rect.getGlobalBounds(), sf::Vector2f(out_pos.x - 10, out_pos.y))
+		|| checkIntersection(select_rect.getGlobalBounds(), out_pos));
 	return return_value;
 }
 
@@ -109,7 +109,7 @@ ClickResponse Link::processDoubleLeftClick(sf::Vector2i mouse_pos)
 	sf::FloatRect text_rect(text.getGlobalBounds());
 	sf::RectangleShape rect(sf::Vector2f(text_rect.width, text_rect.height));
 	rect.setPosition(text_rect.left, text_rect.top);
-	if (checkIntersection(rect, sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		ClickResponse response;
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_TEXT_FIELD;

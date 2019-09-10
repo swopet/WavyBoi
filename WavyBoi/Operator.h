@@ -51,23 +51,19 @@ private:
 	param left_val;
 	param right_val;
 	param out_val;
-	sf::RectangleShape main_box;
 public:
+	void initializeElements();
+	void updateGUIElements();
 	void update();
 	Parameter getParameter();
 	bool checkOverlap(sf::RectangleShape select_box);
 	void setParameter(Parameter * parameter, int ind);
-	void draw(sf::RenderTarget &, sf::RenderStates);
 	virtual Parameter * getNewParameter();
-	sf::Vector2f getLeftPos(int);
-	sf::Vector2f getRightPos();
 	Operator();
 	Operator(COMPARATOR);
 	Operator(ARITHMETIC);
 	Operator(BOOLEAN_OP);
 	~Operator();
-	ClickResponse processLeftClick(sf::Vector2i);
-	ClickResponse processLeftClickRelease(sf::Vector2i);
 	ClickResponse processMouseWheel(sf::Vector2i, int);
 };
 

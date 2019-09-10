@@ -1,28 +1,16 @@
 #include <pch.h>
 #include <Common.h>
 
-sf::Vector2f getTopLeft(sf::RectangleShape rect) {
-	return sf::Vector2f(rect.getSize().x >= 0 ? rect.getPosition().x : (rect.getPosition().x + rect.getSize().x), rect.getSize().y >= 0 ? rect.getPosition().y : (rect.getPosition().y + rect.getSize().y));
+bool checkIntersection(sf::FloatRect rect1, sf::FloatRect rect2) {
+	return ((rect1.left < rect2.left) && 
+		(rect1.left + rect1.width > rect2.left) &&
+		(rect1.top < rect2.top+rect2.height)) && 
+		(rect1.top + rect1.height > rect2.top);
 }
 
-sf::Vector2f getBottomRight(sf::RectangleShape rect) {
-	return sf::Vector2f(rect.getSize().x < 0 ? rect.getPosition().x : (rect.getPosition().x + rect.getSize().x), rect.getSize().y < 0 ? rect.getPosition().y : (rect.getPosition().y + rect.getSize().y));
-}
-
-
-
-bool checkIntersection(sf::RectangleShape rect1, sf::RectangleShape rect2) {
-	sf::Vector2f rec1_topleft = getTopLeft(rect1);
-	sf::Vector2f rec1_bottomright = getBottomRight(rect1);
-	sf::Vector2f rec2_topleft = getTopLeft(rect2);
-	sf::Vector2f rec2_bottomright = getBottomRight(rect2);
-	return (rec1_topleft.x < rec2_bottomright.x && rec1_bottomright.x > rec2_topleft.x &&
-		rec1_topleft.y < rec2_bottomright.y && rec1_bottomright.y > rec2_topleft.y);
-}
-
-bool checkIntersection(sf::RectangleShape rect, sf::Vector2f point1, sf::Vector2f point2) {
-	sf::Vector2f p1 = getTopLeft(rect);
-	sf::Vector2f p3 = getBottomRight(rect);
+bool checkIntersection(sf::FloatRect rect, sf::Vector2f point1, sf::Vector2f point2) {
+	sf::Vector2f p1(rect.left,rect.top);
+	sf::Vector2f p3(rect.left+rect.width,rect.top+rect.height);
 	sf::Vector2f p2 = sf::Vector2f(p3.x, p1.y);
 	sf::Vector2f p4 = sf::Vector2f(p1.x, p3.y);
 	return (checkIntersection(point1, point2, p1, p2) ||
@@ -48,13 +36,15 @@ bool checkIntersection(sf::Vector2f line1_point1, sf::Vector2f line1_point2, sf:
 	return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);
 }
 
-bool checkIntersection(sf::RectangleShape rect, sf::Vector2f pos) {
-	sf::Vector2f top_left = getTopLeft(rect);
-	sf::Vector2f bottom_right = getBottomRight(rect);
-	return (pos.x >= top_left.x
-		&& pos.y >= top_left.y
-		&& pos.x < bottom_right.x
-		&& pos.y < bottom_right.y);
+bool checkIntersection(sf::FloatRect rect, sf::Vector2f pos) {
+	return (pos.x >= rect.left
+		&& pos.y >= rect.top
+		&& pos.x < rect.left + rect.width
+		&& pos.y < rect.top + rect.height);
+}
+
+bool checkIntersection(sf::FloatRect rect, sf::Vector2i pos) {
+	return checkIntersection(rect, sf::Vector2f(pos));
 }
 
 float length(sf::Vector2f vec) {

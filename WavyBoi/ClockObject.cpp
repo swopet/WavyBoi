@@ -22,7 +22,7 @@ void ClockObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 	glColor3f(0,0,0);
 	target.draw(line, 2, sf::LineStrip, states);
 	sf::CircleShape circle(gui.obj_circle_radius + gui.outline_thickness);
-	circle.setOutlineThickness(-gui.outline_thickness);
+	circle.setOutlineThickness(gui.outline_thickness);
 	circle.setOutlineColor(gui.obj_outline_color);
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
@@ -52,10 +52,10 @@ void ClockObject::update()
 
 bool ClockObject::checkOverlap(sf::RectangleShape select_box)
 {
-	return (checkIntersection(select_box, clock_rect)
-		|| checkIntersection(select_box, zero_s_rect)
-		|| checkIntersection(select_box, play_pause_rect)
-		|| checkIntersection(select_box, s_ms_rect));
+	return (checkIntersection(select_box.getGlobalBounds(), clock_rect.getGlobalBounds())
+		|| checkIntersection(select_box.getGlobalBounds(), zero_s_rect.getGlobalBounds())
+		|| checkIntersection(select_box.getGlobalBounds(), play_pause_rect.getGlobalBounds())
+		|| checkIntersection(select_box.getGlobalBounds(), s_ms_rect.getGlobalBounds()));
 }
 
 ClickResponse ClockObject::processLeftClick(sf::Vector2i mouse_pos)
@@ -67,21 +67,21 @@ ClickResponse ClockObject::processLeftClick(sf::Vector2i mouse_pos)
 		response.type = CLICK_RESPONSE::GOT_RIGHT;
 		response.clicked = true;
 	}
-	else if (checkIntersection(clock_rect, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(clock_rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		response.type = CLICK_RESPONSE::SELECTED;
 		response.clicked = true;
 	}
-	else if (checkIntersection(zero_s_rect, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(zero_s_rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		curr_time = sf::seconds(0);
 		response.type = CLICK_RESPONSE::PROCESSED;
 		response.clicked = true;
 	}
-	else if (checkIntersection(play_pause_rect, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(play_pause_rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		playing = !playing;
 		response.type = CLICK_RESPONSE::PROCESSED;
 		response.clicked = true;
 	}
-	else if (checkIntersection(s_ms_rect, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(s_ms_rect.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		seconds = !seconds;
 		response.type = CLICK_RESPONSE::PROCESSED;
 		response.clicked = true;

@@ -7,10 +7,10 @@ AudioHandler::AudioHandler()
 	main_box.setSize(sf::Vector2f(gui.audio_recorder_width + gui.outline_thickness * 2, gui.audio_display_height + gui.play_24x24_tex.getSize().y + gui.outline_thickness * 2));
 	main_box.setFillColor(sf::Color::Black);
 	main_box.setOutlineColor(gui.obj_outline_color);
-	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setOutlineThickness(gui.outline_thickness);
 	text_box.setFillColor(sf::Color::Black);
 	text_box.setOutlineColor(gui.obj_outline_color);
-	text_box.setOutlineThickness(-gui.outline_thickness);
+	text_box.setOutlineThickness(gui.outline_thickness);
 	mode = AUDIO_DEVICE;
 	curr_device = 0;
 	if (available_devices.size() != 0) {
@@ -202,7 +202,7 @@ ClickResponse AudioHandler::processLeftClick(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;
 	response.clicked = false;
-	if (checkIntersection(pause_play_box, sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(pause_play_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		if (running) {
 			stop();
 		}
@@ -212,7 +212,7 @@ ClickResponse AudioHandler::processLeftClick(sf::Vector2i mouse_pos)
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::PROCESSED;
 	}
-	else if (checkIntersection(stop_box, sf::Vector2f(mouse_pos))) {
+	else if (checkIntersection(stop_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		stop();
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::PROCESSED;
@@ -225,7 +225,7 @@ ClickResponse AudioHandler::processMouseWheel(sf::Vector2i mouse_pos, int delta)
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	if (checkIntersection(text_box, sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(text_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		curr_device = curr_device + delta;
 		curr_device = curr_device % available_devices.size();
 		if (mode == AUDIO_DEVICE) {

@@ -67,14 +67,14 @@ void Multiplexer::draw(sf::RenderTarget & target, sf::RenderStates states)
 	for (int i = selections; i >= 0; i--) { //draw in reverse so the top circle gets drawn on top lol fight me future trevor
 		if (i > 0) {
 			sf::RectangleShape box(sf::Vector2f(SELECTOR_BOX_SIZE + gui.outline_thickness * 2, SELECTOR_BOX_SIZE + gui.outline_thickness * 2));
-			box.setOutlineThickness(-gui.outline_thickness);
+			box.setOutlineThickness(gui.outline_thickness);
 			(i == 1) ? box.setFillColor(gui.obj_fill_color) : box.setTexture(&gui.delete_20x20_tex);
 			box.setOutlineColor(gui.obj_outline_color);
 			box.setPosition(position + sf::Vector2f(0, (SELECTOR_BOX_SIZE + gui.outline_thickness * 2)*(i-1)));
 			target.draw(box, states);
 		}
 		sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
-		circle.setOutlineThickness(-gui.outline_thickness);
+		circle.setOutlineThickness(gui.outline_thickness);
 		circle.setFillColor(gui.obj_fill_color);
 		circle.setOutlineColor(gui.obj_outline_color);
 		circle.setPosition(getLeftPos(i) - sf::Vector2f(circle.getRadius(), circle.getRadius()));
@@ -85,7 +85,7 @@ void Multiplexer::draw(sf::RenderTarget & target, sf::RenderStates states)
 		}
 	}
 	sf::RectangleShape box(sf::Vector2f(SELECTOR_BOX_SIZE + gui.outline_thickness * 2, SELECTOR_BOX_SIZE + gui.outline_thickness * 2));
-	box.setOutlineThickness(-gui.outline_thickness);
+	box.setOutlineThickness(gui.outline_thickness);
 	box.setTexture(&gui.add_20x20_tex);
 	box.setOutlineColor(gui.obj_outline_color);
 	box.setPosition(position + sf::Vector2f(0, (SELECTOR_BOX_SIZE + gui.outline_thickness * 2)*selections));
@@ -127,7 +127,7 @@ ClickResponse Multiplexer::processLeftClick(sf::Vector2i mouse_pos)
 	mouse_box.setPosition(sf::Vector2f(mouse_pos));
 	for (int i = 0; i <= selections; i++) {
 		box.setPosition(position + sf::Vector2f(0, SELECTOR_BOX_SIZE + gui.outline_thickness * 2) * (float)i);
-		if (checkIntersection(box, mouse_box)) {
+		if (checkIntersection(box.getGlobalBounds(), mouse_box.getGlobalBounds())) {
 			response.clicked = true;
 			response.ind = i + 1;
 			if (i==0) response.type = CLICK_RESPONSE::SELECTED;

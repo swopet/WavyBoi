@@ -43,7 +43,7 @@ void MathFunction::update()
 {
 	main_box.setSize(sf::Vector2f(48 + gui.outline_thickness * 2, gui.input_text_height + gui.outline_thickness * 4));
 	main_box.setOutlineColor(gui.obj_outline_color);
-	main_box.setOutlineThickness(-gui.outline_thickness);
+	main_box.setOutlineThickness(gui.outline_thickness);
 	main_box.setFillColor(gui.obj_fill_color);
 	main_box.setPosition(position);
 	text.setString(func_strings[func]);
@@ -73,7 +73,7 @@ void MathFunction::draw(sf::RenderTarget & target, sf::RenderStates states)
 	target.draw(text, states);
 	sf::CircleShape circle(gui.obj_circle_radius + gui.outline_thickness);
 	circle.setOutlineColor(gui.obj_outline_color);
-	circle.setOutlineThickness(-gui.outline_thickness);
+	circle.setOutlineThickness(gui.outline_thickness);
 	circle.setFillColor(gui.obj_fill_color);
 	circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
 	target.draw(circle, states);
@@ -92,7 +92,7 @@ ClickResponse MathFunction::processLeftClick(sf::Vector2i mouse_pos)
 		return response;
 	}
 
-	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::SELECTED;
 		return response;
@@ -121,7 +121,7 @@ ClickResponse MathFunction::processMouseWheel(sf::Vector2i mouse_pos, int delta)
 	sf::RectangleShape move_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
 	move_box.setPosition(position);
 	switch_box.setPosition(position + move_box.getSize() / 2.0f - switch_box.getSize() / 2.0f);
-	if (checkIntersection(main_box, sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		func += delta;
 		while (func >= 4) func = func - 4;
 		while (func < 0) func = 3 + func;
