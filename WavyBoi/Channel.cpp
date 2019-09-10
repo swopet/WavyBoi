@@ -26,38 +26,11 @@ void Channel::clearTexture()
 
 void Channel::update()
 {
-	//uncomment this to use the test scene
-	if (render_texture != NULL) {
-		sf::Vector2f tex_size = sf::Vector2f(render_texture->getSize());
-		if (tex_size.y != 0) { //don't know why it would but just to be sure
-			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(gui.outline_thickness, gui.outline_thickness);
-			//fit the preview video to the inside of the video object
-			float movie_ratio = tex_size.x / tex_size.y;
-			float main_box_ratio = main_box_size.x / main_box_size.y;
-			sf::Vector2f video_box_size;
-			if (movie_ratio > main_box_ratio) video_box_size = sf::Vector2f(main_box_size.x, main_box_size.x / movie_ratio);
-			else video_box_size = sf::Vector2f(main_box_size.y * movie_ratio, main_box_size.y);
-			video_box = sf::RectangleShape(video_box_size);
-			video_box.setTexture(render_texture);
-		}
-	}
-	else {
-		video_box = sf::RectangleShape(sf::Vector2f(0, 0));
-	}
+
 }
 
 bool Channel::checkOverlap(sf::RectangleShape select_box) {
-	return checkIntersection(select_box.getGlobalBounds(), main_box.getGlobalBounds());
-}
-
-void Channel::draw(sf::RenderTarget& target, sf::RenderStates states) {
-	main_box.setPosition(position - size / 2.0f);
-	video_box.setPosition(position - video_box.getSize() / 2.0f);
-	left_pos = position - sf::Vector2f((size.x - gui.outline_thickness) / 2.0f, 0);
-	left_circle.setPosition(left_pos - sf::Vector2f(left_circle.getRadius(), left_circle.getRadius()));
-	target.draw(main_box,states);
-	target.draw(video_box,states);
-	target.draw(left_circle,states);
+	return checkIntersection(select_box.getGlobalBounds(), elements.at(0).getGlobalBounds());
 }
 
 bool Channel::getMultipleInputsAllowed(int ind)
@@ -83,77 +56,61 @@ PARAM_TYPE Channel::getParamTypeForInput(int ind = 0)
 	}
 }
 
-sf::Vector2f Channel::getLeftPos(int ind = 0) {
-	return left_pos;
-}
-
 const sf::Texture * Channel::getTexture()
 {
 	return render_texture;
+}
+
+void Channel::initializeElements() {
+	GUIElement main_box(GUIElement::RECTANGLE, 160 - gui.outline_thickness * 2, 90 - gui.outline_thickness * 2);
+	main_box.setPosition(sf::Vector2f(0, 0));
+	elements.push_back(main_box);
+	GUIElement video_box(GUIElement::RECTANGLE, 160, 90);
+	video_box.setPosition(sf::Vector2f(-gui.outline_thickness, -gui.outline_thickness));
+	elements.push_back(video_box);
+	GUIElement input_circle(GUIElement::CIRCLE, gui.obj_circle_radius);
+	input_circle.setPosition(sf::Vector2f(0, 45) +
+		sf::Vector2f(-gui.outline_thickness / 2.0, 0.0) +
+		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
+	inputs.push_back(input_circle);
+	updateGUIElements();
+}
+
+void Channel::updateGUIElements() {
+	int tex_box = 1;
+	if (render_texture != NULL) {
+		elements.at(tex_box).setTexture((sf::Texture *)render_texture);
+		sf::Vector2f tex_size = sf::Vector2f(render_texture->getSize());
+		sf::Vector2f main_box_size(160, 90);
+		float movie_ratio = tex_size.x / tex_size.y;
+		float main_box_ratio = main_box_size.x / main_box_size.y;
+		sf::Vector2f video_box_size;
+		if (movie_ratio > main_box_ratio) video_box_size = sf::Vector2f(main_box_size.x, main_box_size.x / movie_ratio);
+		else video_box_size = sf::Vector2f(main_box_size.y * movie_ratio, main_box_size.y);
+		elements.at(0).setSize(video_box_size.x - gui.outline_thickness * 2, video_box_size.y - gui.outline_thickness * 2);
+		elements.at(tex_box).setSize(video_box_size.x, video_box_size.y);
+		elements.at(tex_box).setPosition(sf::Vector2f(-gui.outline_thickness, -gui.outline_thickness));
+		inputs.at(0).setPosition(sf::Vector2f(0,video_box_size.y/2.0) +
+			sf::Vector2f(-gui.outline_thickness / 2.0, -gui.outline_thickness) +
+			sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
+	}
+	else {
+		elements.at(tex_box).setSize(0, 0);
+	}
+	Object::updateGUIElements();
 }
 
 Channel::Channel(int new_id) {
 	id = new_id;
 	name = "Output Channel " + std::to_string(id);
 	type = OBJECT_TYPE::CHANNEL;
-	size = sf::Vector2f(160 + gui.outline_thickness * 2, 90 + gui.outline_thickness * 2);
 	position = sf::Vector2f(1000, 100 * (id+1));
-	main_box = sf::RectangleShape(size);
-	main_box.setOutlineThickness(gui.outline_thickness);
-	main_box.setOutlineColor(gui.obj_outline_color);
-	main_box.setFillColor(sf::Color(0, 0, 0));
-	left_circle = sf::CircleShape(gui.obj_circle_radius + gui.outline_thickness);
-	left_circle.setOutlineThickness(gui.outline_thickness);
-	left_circle.setOutlineColor(gui.obj_outline_color);
-	left_circle.setFillColor(gui.obj_fill_color);
-	video_box = sf::RectangleShape(sf::Vector2f(0, 0));
-	video_box.setFillColor(gui.obj_fill_color);
-}
-
-ClickResponse Channel::processLeftClickHeld(sf::Vector2i mouse_pos) {
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - left_pos) <= left_circle.getRadius()) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_LEFT;
-	}
-	else if (mouse_pos.x >= position.x - size.x / 2.0f &&
-		mouse_pos.y >= position.y - size.y / 2.0f &&
-		mouse_pos.x < position.x + size.x / 2.0f &&
-		mouse_pos.y < position.y + size.y / 2.0f) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::SELECTED;
-	}
-	else {
-
-	}
-	return response;
-}
-
-ClickResponse Channel::processLeftClickRelease(sf::Vector2i mouse_pos) {
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - left_pos) <= left_circle.getRadius()) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_LEFT;
-	}
-	else if (mouse_pos.x >= position.x - size.x / 2.0f &&
-		mouse_pos.y >= position.y - size.y / 2.0f &&
-		mouse_pos.x < position.x + size.x / 2.0f &&
-		mouse_pos.y < position.y + size.y / 2.0f) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::SELECTED;
-	}
-	else {
-
-	}
-	return response;
+	initializeElements();
 }
 
 Channel::Channel()
 {
+
 }
 
 
