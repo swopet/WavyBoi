@@ -23,35 +23,43 @@ Parameter FloatObject::getParameter()
 
 void FloatObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	target.draw(main_box, states);
+	Object::draw(target, states);
 	target.draw(text, states);
-	sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
-	circle.setFillColor(gui.obj_fill_color);
-	circle.setOutlineColor(gui.obj_outline_color);
-	circle.setOutlineThickness(gui.outline_thickness);
-	circle.setPosition(left_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle, states);
-	circle.setPosition(right_pos - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle, states);
 }
 
-void FloatObject::update()
+void FloatObject::initializeElements()
+{
+	GUIElement main_box_element = GUIElement(GUIElement::RECTANGLE, 32 - gui.outline_thickness * 2, 32 - gui.outline_thickness * 2);
+	main_box_element.setOrigin(position);
+	main_box_element.setPosition(sf::Vector2f(0, 0));
+	elements.push_back(main_box_element);
+	GUIElement input_circle = GUIElement(GUIElement::CIRCLE, gui.obj_circle_radius);
+	inputs.push_back(input_circle);
+	GUIElement output_circle = GUIElement(GUIElement::CIRCLE, gui.obj_circle_radius);
+	outputs.push_back(output_circle);
+	updateGUIElements();
+}
+
+void FloatObject::updateGUIElements()
 {
 	std::ostringstream out;
 	out.precision(precision);
 	out << std::fixed << out_val.float_val;
 	text = sf::Text(out.str(), gui.font, gui.input_text_height);
-	float box_width = text.findCharacterPos(text.getString().getSize()).x;
-	main_box = sf::RectangleShape(sf::Vector2f(box_width, gui.input_text_height) + sf::Vector2f(gui.outline_thickness * 4 + gui.obj_circle_radius * 2, gui.outline_thickness * 4));
-	main_box.setPosition(position);
-	main_box.setFillColor(gui.obj_fill_color);
-	main_box.setOutlineColor(gui.obj_outline_color);
-	main_box.setOutlineThickness(gui.outline_thickness);
-
-	text.setPosition(position + sf::Vector2f(gui.obj_circle_radius, 0) + sf::Vector2f(gui.outline_thickness * 2, gui.outline_thickness * 2));
 	text.setFillColor(sf::Color::White);
-	left_pos = position + sf::Vector2f(gui.outline_thickness / 2.0f, main_box.getSize().y / 2.0f);
-	right_pos = position + sf::Vector2f(main_box.getSize().x - gui.outline_thickness / 2.0f, main_box.getSize().y / 2.0f);
+	sf::FloatRect text_rect = text.getLocalBounds();
+	elements.at(0).setSize(text_rect.width + text_rect.left + gui.text_buffer*2.0, text_rect.height + text_rect.top + gui.text_buffer*2.0);
+	inputs.at(0).setPosition(
+		sf::Vector2f(0, elements.at(0).getGlobalBounds().height / 2.0) +
+		sf::Vector2f(-gui.outline_thickness / 2.0, 0.0) +
+		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
+	outputs.at(0).setPosition(
+		sf::Vector2f(elements.at(0).getGlobalBounds().width, elements.at(0).getGlobalBounds().height / 2.0) +
+		sf::Vector2f(gui.outline_thickness / 2.0, 0.0) +
+		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
+	Object::updateGUIElements();
+	text.setPosition(position + sf::Vector2f(gui.text_buffer, gui.text_buffer) -
+		sf::Vector2f(text_rect.left / 2.0, text_rect.top / 2.0));
 }
 
 void FloatObject::setParameter(Parameter * parameter, int ind)
@@ -76,46 +84,9 @@ Parameter * FloatObject::getNewParameter()
 	return new Parameter(PARAM_TYPE::FLOAT, new_param, name);
 }
 
-ClickResponse FloatObject::processLeftClick(sf::Vector2i mouse_pos)
-{
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - left_pos) <= gui.outline_thickness + gui.obj_circle_radius) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_LEFT;
-	}
-	else if (length(sf::Vector2f(mouse_pos) - right_pos) <= gui.outline_thickness + gui.obj_circle_radius) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_RIGHT;
-	}
-	else if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::SELECTED;
-	}
-	return response;
-}
-
-bool FloatObject::checkOverlap(sf::RectangleShape select_box)
-{
-	return checkIntersection(select_box.getGlobalBounds(), main_box.getGlobalBounds());
-}
-
-ClickResponse FloatObject::processLeftClickRelease(sf::Vector2i mouse_pos)
-{
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - left_pos) <= gui.outline_thickness + gui.obj_circle_radius) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_LEFT;
-	}
-	return response;
-}
-
 ClickResponse FloatObject::processDoubleLeftClick(sf::Vector2i mouse_pos)
 {
-	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(elements.at(0).getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		ClickResponse response;
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::GOT_TEXT_FIELD;
@@ -130,7 +101,7 @@ ClickResponse FloatObject::processMouseWheel(sf::Vector2i mouse_pos, int delta)
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(elements.at(0).getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		precision += delta;
 		if (precision > 7) precision = 7;
 		if (precision < 0) precision = 0;
@@ -145,12 +116,14 @@ FloatObject::FloatObject()
 {
 	default_val.float_val = 0;
 	out_val.float_val = 0;
+	initializeElements();
 }
 
 FloatObject::FloatObject(float new_val)
 {
 	out_val.float_val = new_val;
 	default_val.float_val = new_val;
+	initializeElements();
 }
 
 

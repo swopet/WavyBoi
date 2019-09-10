@@ -19,7 +19,6 @@ void IntObject::processNewString(std::string field, std::string input)
 void IntObject::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
 	Object::draw(target, states);
-	//target.draw(main_box, states);
 	target.draw(text, states);
 }
 
@@ -52,10 +51,6 @@ void IntObject::updateGUIElements()
 	Object::updateGUIElements();
 	text.setPosition(position +sf::Vector2f(gui.text_buffer , gui.text_buffer) -
 		sf::Vector2f(text_rect.left/2.0, text_rect.top/2.0));
-}
-
-void IntObject::update()
-{
 }
 
 void IntObject::setParameter(Parameter * parameter, int ind)

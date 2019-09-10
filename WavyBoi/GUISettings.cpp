@@ -46,7 +46,7 @@ void loadGUISettings() {
 	gui.dividedby_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("dividedby_32x32.png"));
 	gui.modulo_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("modulo_32x32.png"));
 	gui.exponent_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("exponent_32x32.png"));
-	//BOLEAN
+	//BOOLEAN
 	gui.and_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("and_32x32.png"));
 	gui.or_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("or_32x32.png"));
 	//VIDEO
