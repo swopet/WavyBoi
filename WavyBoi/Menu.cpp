@@ -80,14 +80,15 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 			menu_options.push_back(MenuOption(std::string("Tangent"), &AnimationManager::clickNewTan, true, false));
 			break;
 	}
-	height = gui.menu_text_height;
+	height = gui.menu_text_height + gui.text_buffer * 2;
 	//get thiccest menu option
 	menu_options_width = 0;
 	for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
-		text = sf::Text((*it).name,gui.font,height);
-		unsigned int width = (unsigned int)text.findCharacterPos((*it).name.length()).x;
+		text = sf::Text((*it).name,gui.font,gui.menu_text_height);
+		unsigned int width = (unsigned int)text.getLocalBounds().width;
 		if (width > menu_options_width) menu_options_width = width;
 	}
+	menu_options_width += gui.text_buffer * 2;
 	pos = new_pos;
 	int submenu_index = 0;
 	sf::Vector2i new_menu_pos = pos + sf::Vector2i(menu_options_width, 0);
@@ -127,10 +128,10 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 			new_menu_pos = new_menu_pos + sf::Vector2i(0, height);
 		}
 	}
-	text = sf::Text(name,gui.font,gui.menu_text_height);
-	text.setPosition(new_pos.x,new_pos.y);
+	text = sf::Text(name, gui.font, gui.menu_text_height);
+	text.setPosition(new_pos.x + gui.text_buffer,new_pos.y + gui.text_buffer);
 	text.setFillColor(sf::Color::White);
-	rect = sf::RectangleShape(sf::Vector2f(text.findCharacterPos(name.length()).x-pos.x,height));
+	rect = sf::RectangleShape(sf::Vector2f(text.getLocalBounds().width + gui.text_buffer * 2,height));
 	rect.setPosition(new_pos.x,new_pos.y);
 	rect.setFillColor(sf::Color(127,127,127));
 	rect.setOutlineThickness(gui.outline_thickness);
@@ -145,8 +146,8 @@ void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 	sf::Vector2i temp_pos = sf::Vector2i(pos.x,pos.y+height);
 	if (is_open){
 		for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
-			sf::Text temp_text((*it).name,gui.font,height);
-			temp_text.setPosition(temp_pos.x,temp_pos.y);
+			sf::Text temp_text((*it).name,gui.font,gui.menu_text_height);
+			temp_text.setPosition(temp_pos.x + gui.text_buffer,temp_pos.y + gui.text_buffer);
 			temp_text.setFillColor(sf::Color::White);
 			sf::RectangleShape temp_rect(sf::Vector2f(menu_options_width,height));
 			temp_rect.setPosition(temp_pos.x,temp_pos.y);

@@ -4,24 +4,48 @@
 MathFunction::MathFunction(int new_func) {
 	func = new_func;
 	in_val.float_val = 0;
+	initializeElements();
 }
 
 MathFunction::MathFunction()
 {
 	in_val.float_val = 0;
+	initializeElements();
 }
 
+void MathFunction::initializeElements() {
+	GUIElement main_box_element = GUIElement(GUIElement::RECTANGLE, 32 - gui.outline_thickness * 2, 32 - gui.outline_thickness * 2);
+	main_box_element.setOrigin(position);
+	main_box_element.setPosition(sf::Vector2f(0, 0));
+	elements.push_back(main_box_element);
+	GUIElement input_circle = GUIElement(GUIElement::CIRCLE, gui.obj_circle_radius);
+	inputs.push_back(input_circle);
+	GUIElement output_circle = GUIElement(GUIElement::CIRCLE, gui.obj_circle_radius);
+	outputs.push_back(output_circle);
+	updateGUIElements();
+}
+
+void MathFunction::updateGUIElements()
+{
+	text = sf::Text(func_strings[func], gui.font, gui.input_text_height);
+	text.setFillColor(sf::Color::White);
+	sf::FloatRect text_rect = text.getLocalBounds();
+	elements.at(0).setSize(text_rect.width + text_rect.left + gui.text_buffer*2.0, text_rect.height + text_rect.top + gui.text_buffer*2.0);
+	inputs.at(0).setPosition(
+		sf::Vector2f(0, elements.at(0).getGlobalBounds().height / 2.0) +
+		sf::Vector2f(-gui.outline_thickness / 2.0, 0.0) +
+		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
+	outputs.at(0).setPosition(
+		sf::Vector2f(elements.at(0).getGlobalBounds().width, elements.at(0).getGlobalBounds().height / 2.0) +
+		sf::Vector2f(gui.outline_thickness / 2.0, 0.0) +
+		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
+	Object::updateGUIElements();
+	text.setPosition(position + sf::Vector2f(gui.text_buffer, gui.text_buffer) -
+		sf::Vector2f(text_rect.left / 2.0, text_rect.top / 2.0));
+}
 
 MathFunction::~MathFunction()
 {
-}
-
-sf::Vector2f MathFunction::getLeftPos(int ind) {
-	return position + sf::Vector2f(gui.outline_thickness / 2.0f, main_box.getSize().y / 2.0f);
-}
-
-sf::Vector2f MathFunction::getRightPos() {
-	return position + sf::Vector2f(main_box.getSize().x - gui.outline_thickness / 2.0f, main_box.getSize().y / 2.0f);
 }
 
 void MathFunction::setParameter(Parameter * parameter, int ind)
@@ -41,16 +65,6 @@ Parameter MathFunction::getParameter()
 
 void MathFunction::update()
 {
-	main_box.setSize(sf::Vector2f(48 + gui.outline_thickness * 2, gui.input_text_height + gui.outline_thickness * 4));
-	main_box.setOutlineColor(gui.obj_outline_color);
-	main_box.setOutlineThickness(gui.outline_thickness);
-	main_box.setFillColor(gui.obj_fill_color);
-	main_box.setPosition(position);
-	text.setString(func_strings[func]);
-	text.setCharacterSize(gui.input_text_height);
-	text.setFont(gui.font);
-	text.setFillColor(sf::Color::White);
-	text.setPosition(position + sf::Vector2f(gui.outline_thickness + gui.obj_circle_radius, gui.outline_thickness));
 	switch (func) {
 	case 0: //COS
 		out_val.float_val = cos(in_val.float_val);
@@ -69,47 +83,12 @@ void MathFunction::update()
 
 void MathFunction::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	target.draw(main_box, states);
+	Object::draw(target, states);
 	target.draw(text, states);
-	sf::CircleShape circle(gui.obj_circle_radius + gui.outline_thickness);
-	circle.setOutlineColor(gui.obj_outline_color);
-	circle.setOutlineThickness(gui.outline_thickness);
-	circle.setFillColor(gui.obj_fill_color);
-	circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle, states);
-	circle.setPosition(getLeftPos(0) - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-	target.draw(circle, states);
 }
 
-ClickResponse MathFunction::processLeftClick(sf::Vector2i mouse_pos)
-{
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - getRightPos()) <= gui.obj_circle_radius + gui.outline_thickness) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_RIGHT;
-		return response;
-	}
-
-	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::SELECTED;
-		return response;
-	}
-	return response;
-}
-
-ClickResponse MathFunction::processLeftClickRelease(sf::Vector2i mouse_pos)
-{
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	if (length(sf::Vector2f(mouse_pos) - getLeftPos(0)) <= gui.outline_thickness + gui.obj_circle_radius) {
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::GOT_LEFT;
-	}
-	return response;
+bool MathFunction::checkOverlap(sf::RectangleShape select_box) {
+	return checkIntersection(select_box.getGlobalBounds(), elements.at(0).getGlobalBounds());
 }
 
 ClickResponse MathFunction::processMouseWheel(sf::Vector2i mouse_pos, int delta)
@@ -117,11 +96,7 @@ ClickResponse MathFunction::processMouseWheel(sf::Vector2i mouse_pos, int delta)
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
-	sf::RectangleShape switch_box(sf::Vector2f(12, 12));
-	sf::RectangleShape move_box(sf::Vector2f(32 + gui.outline_thickness * 2, 32 + gui.outline_thickness * 2));
-	move_box.setPosition(position);
-	switch_box.setPosition(position + move_box.getSize() / 2.0f - switch_box.getSize() / 2.0f);
-	if (checkIntersection(main_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
+	if (checkIntersection(elements.at(0).getGlobalBounds(), sf::Vector2f(mouse_pos))) {
 		func += delta;
 		while (func >= 4) func = func - 4;
 		while (func < 0) func = 3 + func;

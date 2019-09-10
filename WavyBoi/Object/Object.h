@@ -86,7 +86,6 @@ public:
 	}
 	virtual void updateGUIElements() {
 		std::vector<GUIElement> element_vectors[3] = { elements,inputs,outputs };
-		std::cout << elements.size() << std::endl;
 		for (int i = 0; i < 3; i++) {
 			for (std::vector<GUIElement>::iterator it = element_vectors[i].begin(); it != element_vectors[i].end(); ++it) {
 				(*it).setOrigin(position);
