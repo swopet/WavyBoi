@@ -66,6 +66,7 @@ void GUIElement::updateShape()
 		}
 		else {
 			shape.rect->setOutlineThickness(0);
+			shape.rect->setTexture(texture, true);
 		}
 		break;
 	case GUIElement::CIRCLE:
