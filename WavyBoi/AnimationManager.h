@@ -14,7 +14,6 @@ rendering. */
 #include <ImageSequence.h>
 #include <SceneObject.h>
 #include <Multiplexer.h>
-#include <FallingLeaves.h>
 #include <AudioHandler.h>
 #include <FreqBandBlock.h>
 #include <Operator.h>
@@ -112,5 +111,6 @@ public:
 	void clickNewSin();
 	void clickNewTan();
 	void clickNewLog();
+	void clickNewMux();
 	void clickNewClock();
 };

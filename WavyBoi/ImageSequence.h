@@ -43,7 +43,7 @@ public:
 	ImageSequence();
 	Parameter * getNewParameter();
 	Parameter getParameter();
-	sf::Vector2f getLeftPos(int);
+	sf::Vector2f getLeftPos(unsigned int);
 	sf::Vector2f getRightPos();
 	void loadCurrentTiles();
 	bool checkOverlap(sf::RectangleShape);

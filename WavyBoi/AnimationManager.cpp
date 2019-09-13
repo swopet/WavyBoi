@@ -10,7 +10,7 @@ AnimationManager::AnimationManager(){
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
-	//processCommand(std::vector<std::string>({ "loadImageSequence","C:/Users/Trevor/Stuff/Rearranger_Videos/cape_lookout_1" }));
+	processCommand(std::vector<std::string>({ "loadScene","C:/Users/Trevor/Stuff/WavyBoi/Animations/Rings/Rings/Debug/Rings.dll" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 	std::cout << "Added new Channel" << std::endl; //debug7.9
@@ -160,6 +160,7 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 		std::cout << "unrecognized command" << std::endl;
 		return false;
 	}
+	return false;
 }
 
 void AnimationManager::decrementLinkOutIndsGreaterThan(int ind, Object * obj)
@@ -575,6 +576,13 @@ void AnimationManager::clickNewLog()
 	MathFunction * new_func = new MathFunction(3);
 	new_func->setPosition(sf::Vector2f(32, 32));
 	addObject(new_func);
+}
+
+void AnimationManager::clickNewMux()
+{
+	Multiplexer * new_mux = new Multiplexer();
+	new_mux->setPosition(sf::Vector2f(32, 32));
+	addObject(new_mux);
 }
 
 void AnimationManager::clickNewClock()

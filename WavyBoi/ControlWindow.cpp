@@ -306,9 +306,9 @@ void ControlWindow::processCommand(std::string command, AnimationManager * anima
 	state.curr_command = 0;
 	std::vector<std::string> elts;
 	int last_ind = 1;
-	for (int i = 0; i <= command.length(); i++) {
-		if (i == command.length() || command[i] == ' ') {
-			if (i != 0 && command[i - 1] != '\\' || i == command.length()) {
+	for (int i = 0; i <= (int)command.length(); i++) {
+		if (i == (int)command.length() || command[i] == ' ') {
+			if (i != 0 && command[i - 1] != '\\' || i == (int)command.length()) {
 				int size = i - last_ind;
 				if (size > 0) elts.push_back(command.substr(last_ind, size));
 				last_ind = i + 1;

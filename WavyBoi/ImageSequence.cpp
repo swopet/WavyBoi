@@ -198,7 +198,7 @@ Parameter ImageSequence::getParameter()
 	return Parameter(PARAM_TYPE::TEXTURE, return_param, name);
 }
 
-sf::Vector2f ImageSequence::getLeftPos(int id = 0)
+sf::Vector2f ImageSequence::getLeftPos(unsigned int id = 0)
 {
 	return left_pos;
 }

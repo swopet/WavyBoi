@@ -9,7 +9,7 @@ class GUIElement
 
 private:
 	
-	sf::Texture * texture = NULL;
+	const sf::Texture * texture = NULL;
 	union {
 		sf::RectangleShape * rect;
 		sf::CircleShape * circle;
@@ -28,7 +28,7 @@ public:
 	void setSize(double width, double height);
 	void setOrigin(sf::Vector2f);
 	void setPosition(sf::Vector2f);
-	void setTexture(sf::Texture *);
+	void setTexture(const sf::Texture *);
 	void updateShape();
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	sf::FloatRect getGlobalBounds();

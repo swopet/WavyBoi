@@ -110,7 +110,7 @@ void Video::loadFromFile(std::string file_name){ //load from full path
 		playing = true;
 		sf::Vector2f movie_size = movie->getSize();
 		if (movie_size.y != 0) { //don't know why it would but just to be sure
-			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f(gui.outline_thickness,gui.outline_thickness);
+			sf::Vector2f main_box_size = main_box.getSize() - 2.0f*sf::Vector2f((float)gui.outline_thickness,(float)gui.outline_thickness);
 			//fit the preview video to the inside of the video object
 			float movie_ratio = movie_size.x / movie_size.y;
 			float main_box_ratio = main_box_size.x / main_box_size.y;
@@ -147,7 +147,7 @@ Parameter Video::getParameter()
 	return Parameter(PARAM_TYPE::TEXTURE,return_param,name);
 }
 
-sf::Vector2f Video::getLeftPos(int id = 0)
+sf::Vector2f Video::getLeftPos(unsigned int id = 0)
 {
 	return left_pos;
 }

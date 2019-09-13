@@ -37,7 +37,7 @@ void GUIElement::setPosition(sf::Vector2f new_position)
 	position = new_position;
 }
 
-void GUIElement::setTexture(sf::Texture * new_texture)
+void GUIElement::setTexture(const sf::Texture * new_texture)
 {
 	texture = new_texture;
 	switch (type) {

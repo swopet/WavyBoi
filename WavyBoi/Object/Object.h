@@ -48,23 +48,23 @@ public:
 		setParameter(parameter, 0);
 	}
 	virtual bool checkOverlap(sf::RectangleShape);
-	virtual sf::Vector2f getLeftPos(int pos) {
+	virtual sf::Vector2f getLeftPos(unsigned int pos) {
 		if (pos >= inputs.size() || pos < 0) {
 			return position;
 		}
 		else {
 			sf::FloatRect rect = inputs.at(pos).getGlobalBounds();
-			return sf::Vector2f(rect.left + rect.width / 2.0, rect.top + rect.height / 2.0);
+			return sf::Vector2f(rect.left + rect.width / 2.0f, rect.top + rect.height / 2.0f);
 		}
 	}
 	sf::Vector2f getLeftPos() { return getLeftPos(0); }
-	virtual sf::Vector2f getRightPos(int pos) {
+	virtual sf::Vector2f getRightPos(unsigned int pos) {
 		if (pos >= outputs.size() || pos < 0) {
 			return position;
 		}
 		else {
 			sf::FloatRect rect = outputs.at(pos).getGlobalBounds();
-			return sf::Vector2f(rect.left + rect.width / 2.0, rect.top + rect.height / 2.0);
+			return sf::Vector2f(rect.left + rect.width / 2.0f, rect.top + rect.height / 2.0f);
 		}
 	}
 	sf::Vector2f getRightPos() { return getRightPos(0);	}

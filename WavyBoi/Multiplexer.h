@@ -20,7 +20,7 @@ public:
 		return new Parameter(out_type,curr_value,name);
 	}
 	bool getMultipleInputsAllowed(int);
-	sf::Vector2f getLeftPos(int);
+	sf::Vector2f getLeftPos(unsigned int);
 	sf::Vector2f getRightPos();
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	virtual ClickResponse processLeftClick(sf::Vector2i);

@@ -44,7 +44,7 @@ bool Multiplexer::getMultipleInputsAllowed(int ind)
 	return (false);
 }
 
-sf::Vector2f Multiplexer::getLeftPos(int ind)
+sf::Vector2f Multiplexer::getLeftPos(unsigned int ind)
 {
 	if (ind == 0) {
 		return position + sf::Vector2f(gui.outline_thickness + SELECTOR_BOX_SIZE / 2, gui.outline_thickness / 2);
