@@ -22,8 +22,9 @@ struct GUISettings {
 	int obj_circle_radius;
 	//TEXTURES
 	//MULTIPLEXER
-	sf::Texture add_20x20_tex;
-	sf::Texture delete_20x20_tex;
+	sf::Texture add_24x24_tex;
+	sf::Texture blank_24x24_tex;
+	sf::Texture delete_24x24_tex;
 	//COMPARATOR
 	sf::Texture gt_true_32x32_tex;
 	sf::Texture gt_false_32x32_tex;

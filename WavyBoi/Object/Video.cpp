@@ -10,6 +10,13 @@ Video::Video(){
 	init();
 }
 
+Video::~Video()
+{
+	if (movie != NULL) {
+		delete movie;
+	}
+}
+
 void Video::initializeElements()
 {
 	elements.clear();
@@ -171,6 +178,8 @@ ClickResponse Video::processLeftClick(sf::Vector2i mouse_pos){
 	int stop_rect = 3;
 	int loop_rect = 4;
 	ClickResponse response;
+	response.clicked = false;
+	response.type = CLICK_RESPONSE::NONE;
 	if (checkIntersection(elements.at(play_pause_rect).getGlobalBounds(), sf::Vector2f(mouse_pos))){
 		togglePlay();
 		response.clicked = true;

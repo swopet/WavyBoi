@@ -6,8 +6,54 @@ extern GUISettings gui;
 Multiplexer::Multiplexer()
 {
 	selections = 2;
+	initializeElements();
 }
 
+void Multiplexer::initializeElements()
+{
+	GUIElement end_rect(GUIElement::RECTANGLE, 24, 24);
+	end_rect.setTexture(&gui.add_24x24_tex);
+	elements.push_back(end_rect);
+	GUIElement input_circle(GUIElement::CIRCLE, gui.obj_circle_radius);
+	input_circle.setPosition(sf::Vector2f(12, -gui.outline_thickness / 2.0f) +
+		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius));
+	inputs.push_back(input_circle);
+	GUIElement output_circle(GUIElement::CIRCLE, gui.obj_circle_radius);
+	outputs.push_back(output_circle);
+	updateGUIElements();
+}
+
+void Multiplexer::updateGUIElements()
+{
+	while (elements.size() <= selections) {
+		GUIElement rect(GUIElement::RECTANGLE, 24, 24);
+		elements.push_back(rect);
+	}
+	while (elements.size() > selections + 1) {
+		elements.pop_back();
+	}
+	while (inputs.size() <= selections) {
+		GUIElement input_circle(GUIElement::CIRCLE, gui.obj_circle_radius);
+		inputs.push_back(input_circle);
+	}
+	while (inputs.size() > selections + 1) {
+		inputs.pop_back();
+	}
+	for (int i = 1; i <= selections; i++) {
+		inputs.at(i).setPosition(sf::Vector2f(0, 12.0f + 24.0f * (float)(i - 1)) +
+			sf::Vector2f(-gui.outline_thickness/2.0, 0.0) +
+			sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius)
+		);
+		elements.at(i).setTexture(i == 1 ? &gui.blank_24x24_tex : &gui.delete_24x24_tex);
+		elements.at(i).setPosition(sf::Vector2f(0.0f, 24.0f * (float)(i - 1)));
+	}
+	elements.at(0).setPosition(sf::Vector2f(0, 24 * selections));
+	outputs.at(0).setPosition(sf::Vector2f(24, 12 + 24 * (curr_selection - 1)) +
+		sf::Vector2f(gui.outline_thickness / 2.0, 0.0) +
+		sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius)
+	);
+	Object::updateGUIElements();
+}
 
 Multiplexer::~Multiplexer()
 {
@@ -24,6 +70,8 @@ void Multiplexer::setParameter(Parameter * parameter, int ind)
 	if (ind == 0) {
 		if (parameter->getType() == PARAM_TYPE::INT) {
 			curr_selection = parameter->getValue().int_val + 1;
+			if (curr_selection > selections) curr_selection = selections;
+			if (curr_selection < 1) curr_selection = 1;
 		}
 	}
 	if (ind == 1) {
@@ -44,126 +92,33 @@ bool Multiplexer::getMultipleInputsAllowed(int ind)
 	return (false);
 }
 
-sf::Vector2f Multiplexer::getLeftPos(unsigned int ind)
-{
-	if (ind == 0) {
-		return position + sf::Vector2f(gui.outline_thickness + SELECTOR_BOX_SIZE / 2, gui.outline_thickness / 2);
-	}
-	else {
-		if (ind <= selections) {
-			return position + sf::Vector2f(gui.outline_thickness / 2, SELECTOR_BOX_SIZE / 2 + gui.outline_thickness + (SELECTOR_BOX_SIZE + gui.outline_thickness * 2)*(ind - 1));
-		}
-	}
-	return sf::Vector2f();
-}
-
-sf::Vector2f Multiplexer::getRightPos()
-{
-	return position + sf::Vector2f(gui.outline_thickness * 3 / 2 + SELECTOR_BOX_SIZE, SELECTOR_BOX_SIZE / 2 + gui.outline_thickness + (SELECTOR_BOX_SIZE + gui.outline_thickness * 2)*(curr_selection - 1));
-}
-
-void Multiplexer::draw(sf::RenderTarget & target, sf::RenderStates states)
-{
-	for (int i = selections; i >= 0; i--) { //draw in reverse so the top circle gets drawn on top lol fight me future trevor
-		if (i > 0) {
-			sf::RectangleShape box(sf::Vector2f(SELECTOR_BOX_SIZE + gui.outline_thickness * 2, SELECTOR_BOX_SIZE + gui.outline_thickness * 2));
-			box.setOutlineThickness(gui.outline_thickness);
-			(i == 1) ? box.setFillColor(gui.obj_fill_color) : box.setTexture(&gui.delete_20x20_tex);
-			box.setOutlineColor(gui.obj_outline_color);
-			box.setPosition(position + sf::Vector2f(0, (SELECTOR_BOX_SIZE + gui.outline_thickness * 2)*(i-1)));
-			target.draw(box, states);
-		}
-		sf::CircleShape circle(gui.outline_thickness + gui.obj_circle_radius);
-		circle.setOutlineThickness(gui.outline_thickness);
-		circle.setFillColor(gui.obj_fill_color);
-		circle.setOutlineColor(gui.obj_outline_color);
-		circle.setPosition(getLeftPos(i) - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-		target.draw(circle, states);
-		if (i == curr_selection) {
-			circle.setPosition(getRightPos() - sf::Vector2f(circle.getRadius(), circle.getRadius()));
-			target.draw(circle, states);
-		}
-	}
-	sf::RectangleShape box(sf::Vector2f(SELECTOR_BOX_SIZE + gui.outline_thickness * 2, SELECTOR_BOX_SIZE + gui.outline_thickness * 2));
-	box.setOutlineThickness(gui.outline_thickness);
-	box.setTexture(&gui.add_20x20_tex);
-	box.setOutlineColor(gui.obj_outline_color);
-	box.setPosition(position + sf::Vector2f(0, (SELECTOR_BOX_SIZE + gui.outline_thickness * 2)*selections));
-	target.draw(box, states);
-
-}
-
 ClickResponse Multiplexer::processLeftClick(sf::Vector2i mouse_pos)
 {
 	ClickResponse response;
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
 	for (int i = 0; i <= selections; i++) {
-		sf::Vector2f pos = getLeftPos(i);
-		if (length(sf::Vector2f(mouse_pos) - pos) <= gui.outline_thickness + gui.obj_circle_radius) {
-			response.clicked = true;
-			response.ind = i;
+		if (checkIntersection(elements.at(i).getGlobalBounds(), mouse_pos)) {
 			if (i == 0) {
+				selections += 1;
+				response.type = CLICK_RESPONSE::PROCESSED;
+				response.clicked = true;
+				return response;
+			}
+			else if (i == 1) {
 				response.type = CLICK_RESPONSE::SELECTED;
+				response.clicked = true;
+				return response;
 			}
 			else {
-				curr_selection = i;
-				response.type = CLICK_RESPONSE::PROCESSED;
-			}
-			return response;
-		}
-	}
-	if (curr_selection != 0 && curr_selection <= selections) {
-		sf::Vector2f pos = getRightPos();
-		if (length(sf::Vector2f(mouse_pos) - pos) <= gui.outline_thickness + gui.obj_circle_radius) {
-			response.clicked = true;
-			response.ind = curr_selection;
-			response.type = CLICK_RESPONSE::GOT_RIGHT;
-			return response;
-		}
-	}
-	sf::RectangleShape box(sf::Vector2f(SELECTOR_BOX_SIZE + gui.outline_thickness * 2, SELECTOR_BOX_SIZE + gui.outline_thickness * 2));
-	sf::RectangleShape mouse_box(sf::Vector2f(0, 0));
-	mouse_box.setPosition(sf::Vector2f(mouse_pos));
-	for (int i = 0; i <= selections; i++) {
-		box.setPosition(position + sf::Vector2f(0, SELECTOR_BOX_SIZE + gui.outline_thickness * 2) * (float)i);
-		if (checkIntersection(box.getGlobalBounds(), mouse_box.getGlobalBounds())) {
-			response.clicked = true;
-			response.ind = i + 1;
-			if (i==0) response.type = CLICK_RESPONSE::SELECTED;
-			else if (i == selections) {
-				selections++;
-				response.type = CLICK_RESPONSE::PROCESSED;
-			}
-			else {
-				selections--;
-				if (curr_selection > selections) curr_selection--;
+				selections -= 1;
+				if (i == curr_selection) curr_selection--;
 				response.type = CLICK_RESPONSE::DELETED_MUX_INPUT;
+				response.ind = i;
+				response.clicked = true;
+				return response;
 			}
-			return response;
 		}
 	}
-	return response;
-}
-
-ClickResponse Multiplexer::processLeftClickHeld(sf::Vector2i)
-{
-	return ClickResponse();
-}
-
-ClickResponse Multiplexer::processLeftClickRelease(sf::Vector2i mouse_pos)
-{
-	ClickResponse response;
-	response.clicked = false;
-	response.type = CLICK_RESPONSE::NONE;
-	for (int i = 0; i <= selections; i++) {
-		sf::Vector2f pos = getLeftPos(i);
-		if (length(sf::Vector2f(mouse_pos) - pos) <= gui.outline_thickness + gui.obj_circle_radius) {
-			response.clicked = true;
-			response.ind = i;
-			response.type = CLICK_RESPONSE::GOT_LEFT;
-			return response;
-		}
-	}
-	return response;
+	return Object::processLeftClick(mouse_pos);
 }

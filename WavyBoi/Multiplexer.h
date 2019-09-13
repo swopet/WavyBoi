@@ -13,6 +13,8 @@ private:
 	param curr_value;
 public:
 	Multiplexer();
+	void initializeElements();
+	void updateGUIElements();
 	~Multiplexer();
 	Parameter getParameter();
 	void setParameter(Parameter *, int);
@@ -20,11 +22,6 @@ public:
 		return new Parameter(out_type,curr_value,name);
 	}
 	bool getMultipleInputsAllowed(int);
-	sf::Vector2f getLeftPos(unsigned int);
-	sf::Vector2f getRightPos();
-	void draw(sf::RenderTarget&, sf::RenderStates);
 	virtual ClickResponse processLeftClick(sf::Vector2i);
-	virtual ClickResponse processLeftClickHeld(sf::Vector2i);
-	virtual ClickResponse processLeftClickRelease(sf::Vector2i);
 };
 

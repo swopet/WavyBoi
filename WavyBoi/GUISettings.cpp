@@ -25,8 +25,9 @@ void loadGUISettings() {
 
 	//TEXTURES
 	//MULTIPLEXER
-	gui.add_20x20_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("add_20x20.png"));
-	gui.delete_20x20_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("delete_20x20.png"));
+	gui.add_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("add_24x24.png"));
+	gui.blank_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("blank_24x24.png"));
+	gui.delete_24x24_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("delete_24x24.png"));
 	//COMPARATOR
 	gui.gte_false_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("gte_false_32x32.png"));
 	gui.gte_true_32x32_tex.loadFromFile(std::string(TEXTURE_PATH) + std::string("gte_true_32x32.png"));

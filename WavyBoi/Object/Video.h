@@ -20,6 +20,7 @@ private:
 	bool loop = false;
 public:
 	Video();
+	~Video();
 	void initializeElements();
 	void updateGUIElements();
 	Parameter * getNewParameter();
