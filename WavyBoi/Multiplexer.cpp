@@ -112,7 +112,7 @@ ClickResponse Multiplexer::processLeftClick(sf::Vector2i mouse_pos)
 			}
 			else {
 				selections -= 1;
-				if (i == curr_selection) curr_selection--;
+				if (i == curr_selection)curr_selection--;
 				response.type = CLICK_RESPONSE::DELETED_MUX_INPUT;
 				response.ind = i;
 				response.clicked = true;

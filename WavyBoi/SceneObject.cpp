@@ -86,7 +86,7 @@ void SceneObject::loadScene()
 	LPCWSTR sw = stemp.c_str();
 	hinst = LoadLibrary(sw);
 	if (hinst != NULL) {
-		std::cout << "loaded " << filename << "successfully!" << std::endl;
+		std::cout << "loaded " << filename << " successfully!" << std::endl;
 	}
 	else {
 		scene = NULL;

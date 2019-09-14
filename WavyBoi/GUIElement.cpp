@@ -65,6 +65,7 @@ void GUIElement::updateShape()
 			shape.rect->setOutlineColor(gui.obj_outline_color);
 		}
 		else {
+			shape.rect->setFillColor(sf::Color::White);
 			shape.rect->setOutlineThickness(0);
 			shape.rect->setTexture(texture, true);
 		}
