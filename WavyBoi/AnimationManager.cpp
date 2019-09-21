@@ -10,8 +10,8 @@ AnimationManager::AnimationManager(){
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
-	processCommand(std::vector<std::string>({ "loadScene","C:/Users/Trevor/Stuff/WavyBoi/Animations/Rings/Rings/Debug/Rings.dll" }));
-	processCommand(std::vector<std::string>({ "loadVideo","C:/Users/Trevor/Stuff/WavyBoi/WavyBoi/test_files/fish.mp4" }));
+	//processCommand(std::vector<std::string>({ "loadScene","C:/Users/Trevor/Stuff/WavyBoi/Animations/Rings/Rings/Debug/Rings.dll" }));
+	//processCommand(std::vector<std::string>({ "loadVideo","C:/Users/Trevor/Stuff/WavyBoi/WavyBoi/test_files/fish.mp4" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 	std::cout << "Added new Channel" << std::endl; //debug7.9

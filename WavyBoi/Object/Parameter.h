@@ -7,7 +7,23 @@ enum class PARAM_TYPE {
 	TEXT,
 	FLOAT,
 	INT,
+	COLOR_RGBA,
+	COLOR_HSVA,
 	NONE
+};
+
+struct color_rgba {
+	double r;
+	double g;
+	double b;
+	double a;
+};
+
+struct color_hsva {
+	double h;
+	double s;
+	double v;
+	double a;
 };
 
 typedef union {
@@ -15,6 +31,8 @@ typedef union {
 	std::string * text;
 	float float_val;
 	int int_val;
+	color_rgba rgba_val;
+	color_hsva hsva_val;
 } param;
 
 class Parameter{
