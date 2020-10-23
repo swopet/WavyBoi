@@ -16,10 +16,15 @@ public:
 	sf::Vector2i control_position,
 		display_position;
 	void loadConfigFromFile();
+    void setControlResolution(sf::Vector2u);
+    void setControlPosition(sf::Vector2i);
+    void setDisplayResolution(sf::Vector2u);
+    void setDisplayPosition(sf::Vector2i);
 	Preferences();
 	~Preferences();
 	void writeNewDefaults();
 };
+
 
 sf::Vector2i getIntPairFromString(std::string pair);
 sf::Vector2u getUnsignedIntPairFromString(std::string pair);

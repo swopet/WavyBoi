@@ -26,11 +26,10 @@ sf::Vector2u getUnsignedIntPairFromString(std::string pair) {
 }
 
 void Preferences::loadConfigFromFile() {
-	std::string cwd = std::experimental::filesystem::current_path().u8string();
-	std::replace(cwd.begin(), cwd.end(), '\\', '/');
-	std::ifstream t("WBConfig.txt");
+	std::ifstream t("./WBConfig.txt");
 	std::stringstream buffer;
 	buffer << t.rdbuf();
+    t.close();
 	std::string config_str = buffer.str();
 	int ctr = 0;
 	size_t pos = 0;
@@ -83,6 +82,27 @@ void Preferences::loadConfigFromFile() {
 		config_str.erase(0, pos + 1);
 		ctr++;
 	}
+    writeNewDefaults();
+}
+
+void Preferences::setControlResolution(sf::Vector2u res)
+{
+  control_resolution = res;
+}
+
+void Preferences::setControlPosition(sf::Vector2i pos)
+{
+  control_position = pos;
+}
+
+void Preferences::setDisplayResolution(sf::Vector2u res)
+{
+  display_resolution = res;
+}
+
+void Preferences::setDisplayPosition(sf::Vector2i pos)
+{
+  display_position = pos;
 }
 
 Preferences::Preferences()
@@ -100,4 +120,12 @@ Preferences::~Preferences()
 
 void Preferences::writeNewDefaults()
 {
+  std::string cwd = std::experimental::filesystem::current_path().u8string();
+  std::replace(cwd.begin(), cwd.end(), '\\', '/');
+  std::ofstream t("./WBConfig.txt", std::ofstream::trunc);
+  t << "control_resolution:" << control_resolution.x << "," << control_resolution.y << std::endl;
+  t << "control_position:" << control_position.x << "," << control_position.y << std::endl;
+  t << "display_resolution:" << display_resolution.x << "," << display_resolution.y << std::endl;
+  t << "display_position:" << display_position.x << "," << display_position.y << std::endl;
+  t.close();
 }

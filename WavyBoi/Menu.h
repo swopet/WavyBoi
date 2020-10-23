@@ -8,12 +8,16 @@
 
 extern GUISettings gui;
 
-struct MenuOption {
-	MenuOption(std::string new_name, void (AnimationManager::*newFunc)(), bool new_enabled, bool new_has_submenu = false) : name(new_name), clickFunc(newFunc), enabled(new_enabled), has_submenu(new_has_submenu) {}
-	std::string name;
+class MenuOption {
+protected:
+	MenuOption(std::string new_name, void (AnimationManager::*new_func)(), bool new_enabled, bool new_has_submenu = false) : name(new_name), clickFunc(new_func), enabled(new_enabled), has_submenu(new_has_submenu) {}
+	MenuOption(std::string new_name, std::vector<std::string> new_commands, bool new_enabled, bool new_has_submenu = false) : name(new_name), clickCommands(new_commands), enabled(new_enabled), has_submenu(new_has_submenu) {}
+    std::string name;
+    std::vector<std::string> clickCommands;
 	void (AnimationManager::*clickFunc)();
 	bool enabled;
 	bool has_submenu;
+    friend class Menu;
 };
 
 enum class MENU_TYPE {
@@ -24,7 +28,11 @@ enum class MENU_TYPE {
 	COMPARATOR,
 	OPERATOR,
 	NUMBER,
-	FUNCTION
+	FUNCTION,
+    LOAD,
+    LOADVIDEO,
+    LOADPLUGIN,
+    LOADSHADER
 };
 
 class Menu{
@@ -41,12 +49,13 @@ private:
 	std::vector<Menu *> submenus;
 public:
 	Menu();
+    ~Menu();
 	MENU_TYPE getType();
 	void toggleOption(int);
 	bool getOptionEnabled(int);
 	void initialize(MENU_TYPE,sf::Vector2i);
 	void draw(sf::RenderTarget&, sf::RenderStates);
-	void update(sf::Vector2i);
+	void update(sf::Vector2i,AnimationManager *);
 	unsigned int get_width();
 	bool processLeftClick(sf::Vector2i,AnimationManager *);
 };

@@ -12,13 +12,7 @@ AudioHandler::AudioHandler()
 	text_box.setOutlineColor(gui.obj_outline_color);
 	text_box.setOutlineThickness(gui.outline_thickness);
 	mode = AUDIO_DEVICE;
-	curr_device = 0;
-	if (available_devices.size() != 0) {
-		name = available_devices[0];
-	}
-	else {
-		name = "<no device>";
-	}
+	
 }
 
 
@@ -65,6 +59,13 @@ void AudioHandler::setPosition(sf::Vector2f new_position)
 void AudioHandler::refreshDevices()
 {
 	available_devices = sf::SoundRecorder::getAvailableDevices();
+    curr_device = 0;
+    if (available_devices.size() != 0) {
+      name = available_devices[0];
+    }
+    else {
+      name = "<no device>";
+    }
 }
 
 void AudioHandler::start(AUDIO_MODE new_mode, std::string file_or_device_name)
@@ -146,7 +147,7 @@ void AudioHandler::draw(sf::RenderTarget & target, sf::RenderStates states)
 	text.setFont(gui.font);
 	text.setCharacterSize(gui.input_text_height);
 	text.setFillColor(sf::Color::White);
-	text_box.setSize(sf::Vector2f(text.getLocalBounds().width + gui.outline_thickness * 2, gui.audio_device_text_height + gui.outline_thickness * 2));
+	text_box.setSize(sf::Vector2f(text.getLocalBounds().width + abs(gui.outline_thickness * 2), gui.audio_device_text_height + gui.menu_text_buffer));
 	text.setPosition(text_box.getPosition() + sf::Vector2f(gui.outline_thickness, gui.outline_thickness));
 	target.draw(main_box, states);
 	pause_play_box.setTexture((running) ? &gui.pause_24x24_tex : &gui.play_24x24_tex);
@@ -207,7 +208,12 @@ ClickResponse AudioHandler::processLeftClick(sf::Vector2i mouse_pos)
 			stop();
 		}
 		else {
-			start(mode, name);
+            if (available_devices.size() > 0) {
+              start(mode, name);
+            }
+            else {
+              refreshDevices();
+            }
 		}
 		response.clicked = true;
 		response.type = CLICK_RESPONSE::PROCESSED;
@@ -226,20 +232,20 @@ ClickResponse AudioHandler::processMouseWheel(sf::Vector2i mouse_pos, int delta)
 	response.clicked = false;
 	response.type = CLICK_RESPONSE::NONE;
 	if (checkIntersection(text_box.getGlobalBounds(), sf::Vector2f(mouse_pos))) {
-		curr_device = curr_device + delta;
-		curr_device = curr_device % available_devices.size();
-		if (mode == AUDIO_DEVICE) {
-			if (available_devices.size() > 0) {
-				name = available_devices[curr_device];
-				if (running) {
-					stop();
-				}
-				start(mode, name);
-			}
-		}
-		response.clicked = true;
-		response.type = CLICK_RESPONSE::PROCESSED;
-		return response;
+      if (available_devices.size() > 0) {
+        curr_device = curr_device + delta;
+        curr_device = (available_devices.size() + (curr_device % available_devices.size())) % available_devices.size();
+        if (mode == AUDIO_DEVICE) {
+          name = available_devices[curr_device];
+          if (running) {
+            stop();
+            start(mode, name);
+          }
+        }
+      }
+	  response.clicked = true;
+	  response.type = CLICK_RESPONSE::PROCESSED;
+	  return response;
 	}
 	return response;
 }

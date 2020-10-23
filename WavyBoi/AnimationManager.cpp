@@ -10,11 +10,12 @@ AnimationManager::AnimationManager(){
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
-	//processCommand(std::vector<std::string>({ "loadScene","C:/Users/Trevor/Stuff/WavyBoi/Animations/Rings/Rings/Debug/Rings.dll" }));
-	//processCommand(std::vector<std::string>({ "loadVideo","C:/Users/Trevor/Stuff/WavyBoi/WavyBoi/test_files/fish.mp4" }));
+    state.resource_cache_updated = false;
+	processCommand(std::vector<std::string>({ "loadVideo","C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 	std::cout << "Added new Channel" << std::endl; //debug7.9
+    loadResourceCache();
 }
 
 AnimationManager::~AnimationManager()
@@ -55,9 +56,16 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 		}
 		else {
 			SceneObject * new_scene = new SceneObject(args[1]);
-			new_scene->setPosition(sf::Vector2f(50, 50));
-			addObject(new_scene);
-			return true;
+            if (new_scene->checkValid()) {
+              new_scene->setPosition(sf::Vector2f(50, 50));
+              addObject(new_scene);
+              updateResourceCache(args[1], PLUGIN);
+              return true;
+            }
+            else {
+              delete new_scene;
+              return false;
+            }
 		}
 	}
 	else if (args[0].compare("loadVideo") == 0) {
@@ -67,11 +75,51 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 		}
 		else {
 			Video * new_video = new Video();
-			new_video->loadFromFile(args[1]);
-			addObject(new_video);
-			return true;
+            if (new_video->loadFromFile(args[1])) {
+              addObject(new_video);
+              updateResourceCache(args[1], VIDEO);
+              return true;
+            }
+            else {
+              delete new_video;
+              return false;
+            }
 		}
 	}
+    else if (args[0].compare("setDisplayPosition") == 0) {
+      if (args.size() != 3) {
+        std::cout << "usage: setDisplayPosition <x> <y>" << std::endl;
+        return false;
+        }
+      else {
+        try {
+          int x = std::stoi(args[1]);
+          int y = std::stoi(args[2]);
+          preferences.setDisplayPosition(sf::Vector2i(x, y));
+          preferences.writeNewDefaults();
+        }
+        catch (const std::invalid_argument& ia){
+          std::cout << "invalid argument: " << ia.what() << std::endl;
+        }
+      }
+    }
+    else if (args[0].compare("setDisplaySize") == 0) {
+      if (args.size() != 3) {
+        std::cout << "usage: setDisplaySize <x> <y>" << std::endl;
+        return false;
+      }
+      else {
+        try {
+          unsigned int x = std::stoul(args[1]);
+          unsigned int y = std::stoul(args[2]);
+          preferences.setDisplayResolution(sf::Vector2u(x, y));
+          preferences.writeNewDefaults();
+        }
+        catch (const std::invalid_argument& ia) {
+          std::cout << "invalid argument: " << ia.what() << std::endl;
+        }
+      }
+    }
 	else if (args[0].compare("loadImageSequence") == 0) {
 		if (args.size() != 2) {
 			std::cout << "usage: loadImageSequence <PATH_TO_DIR>" << std::endl;
@@ -162,6 +210,52 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 		return false;
 	}
 	return false;
+}
+
+void AnimationManager::loadResourceCache()
+{
+  resource_cache.videos.empty();
+  resource_cache.plugins.empty();
+  resource_cache.shaders.empty();
+}
+
+void AnimationManager::writeResourceCache()
+{
+}
+
+void AnimationManager::updateResourceCache(std::string path, RESOURCE_TYPE type)
+{
+  std::vector<std::string> * vec = NULL;
+  switch (type) {
+  case VIDEO:
+    vec = &resource_cache.videos;
+    break;
+  case PLUGIN:
+    vec = &resource_cache.plugins;
+    break;
+  case SHADER:
+    vec = &resource_cache.shaders;
+    break;
+  }
+  if (vec == NULL) return;
+  for (auto it = vec->begin(); it != vec->end(); ++it) {
+    std::cout << "Cache entry: " << *it << std::endl;
+    if (it->compare(path) == 0) return;
+  }
+  vec->push_back(path);
+  std::cout << "added " << path << " to resource cache" << std::endl;
+  state.resource_cache_updated = true;
+}
+
+ResourceCache * AnimationManager::getResourceCache()
+{
+  if (state.resource_cache_updated) {
+    state.resource_cache_updated = false;
+    return &resource_cache;
+  }
+  else {
+    return NULL;
+  }
 }
 
 void AnimationManager::decrementLinkOutIndsGreaterThan(int ind, Object * obj)

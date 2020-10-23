@@ -87,6 +87,7 @@ void SceneObject::loadScene()
 	hinst = LoadLibrary(sw);
 	if (hinst != NULL) {
 		std::cout << "loaded " << filename << " successfully!" << std::endl;
+        valid = true;
 	}
 	else {
 		scene = NULL;
@@ -94,6 +95,7 @@ void SceneObject::loadScene()
 		ready = true;
 		ready_mutex.unlock();
 		std::cout << "load failed on " << filename << std::endl;
+        valid = false;
 		return;
 	}
 	auto ptr = reinterpret_cast<WBScene* (*)()>(GetProcAddress(hinst, "GetWBScene"));
@@ -146,6 +148,11 @@ Parameter SceneObject::getParameter()
 bool SceneObject::checkOverlap(sf::RectangleShape select_box)
 {
 	return checkIntersection(select_box.getGlobalBounds(), elements.at(0).getGlobalBounds());
+}
+
+bool SceneObject::checkValid()
+{
+  return valid;
 }
 
 void SceneObject::setParameter(Parameter * parameter, int ind)

@@ -7,6 +7,7 @@ Video::Video(){
 	type = OBJECT_TYPE::VIDEO;
 	size = sf::Vector2f(80,60);
 	position = sf::Vector2f(100,100);
+    speed = 1.0;
 	init();
 }
 
@@ -80,10 +81,21 @@ void Video::update() {
 				else {
 					playing = false;
 				}
+                last_time = clock.getElapsedTime();
 			}
+            else if (speed != 1.0) {
+              sf::Time elapsed = clock.getElapsedTime() - last_time;
+              last_time = clock.getElapsedTime();
+              sf::Time warped = elapsed * speed;
+              sf::Time diff = warped - elapsed;
+              if (!movie->setPlayingOffset(movie->getPlayingOffset() + diff)) {
+                std::cout << "failed to warp playback speed" << std::endl;
+              }
+            }
 		}
 		movie->update();
 	}
+
 }
 
 void Video::setSpeed(float new_speed) {
@@ -116,15 +128,16 @@ void Video::stopAndReset()
 	movie->update();
 }
 
-void Video::loadFromFile(std::string file_name){ //load from full path
+bool Video::loadFromFile(std::string file_name){ //load from full path
 	movie = new sfe::Movie();
 	if (!movie->openFromFile(file_name)) {
 		std::cerr << "Could not open " << file_name << std::endl;
 		delete movie;
 		movie = NULL;
+        return false;
 	}
 	else {
-		std::cout << "Loaded" << file_name << std::endl;
+		std::cout << "Loaded " << file_name << std::endl;
 		movie->setVolume(0.0);
 		movie->play();
 		movie->update();
@@ -140,6 +153,7 @@ void Video::loadFromFile(std::string file_name){ //load from full path
 			else size = sf::Vector2f(main_box_size.y * movie_ratio, main_box_size.y);
 			initializeElements();
 		}
+        return true;
 	}
 }
 

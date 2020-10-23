@@ -10,7 +10,8 @@
 class Video : public Object {
 private:
 	sf::Vector2f size;
-	sf::Time last_offset;
+    sf::Time last_time;
+    sf::Clock clock;
 	float speed = 1.0;
 	void init();
 	void togglePlay();
@@ -28,6 +29,6 @@ public:
 	bool checkOverlap(sf::RectangleShape);
 	void update();
 	void setSpeed(float new_speed);
-	void loadFromFile(std::string);
+	bool loadFromFile(std::string);
 	ClickResponse processLeftClick(sf::Vector2i);
 };

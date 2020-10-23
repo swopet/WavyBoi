@@ -5,6 +5,13 @@ Menu::Menu(){
 	
 }
 
+Menu::~Menu()
+{
+  for (auto it = submenus.begin(); it != submenus.end(); ++it) {
+    delete *it;
+  }
+}
+
 MENU_TYPE Menu::getType(){
 	return type;
 }
@@ -72,14 +79,20 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 			menu_options.push_back(MenuOption(std::string("Float"), &AnimationManager::clickNewFloat, true, false));
 			menu_options.push_back(MenuOption(std::string("PI"), &AnimationManager::clickNewPI, true, false));
 			menu_options.push_back(MenuOption(std::string("e"), &AnimationManager::clickNewE, true, false));
-			break;
+		break;
 		case MENU_TYPE::FUNCTION:
 			name = "";
 			menu_options.push_back(MenuOption(std::string("Cosine"), &AnimationManager::clickNewCos, true, false));
 			menu_options.push_back(MenuOption(std::string("Sine"), &AnimationManager::clickNewSin, true, false));
 			menu_options.push_back(MenuOption(std::string("Log"), &AnimationManager::clickNewLog, true, false));
 			menu_options.push_back(MenuOption(std::string("Tangent"), &AnimationManager::clickNewTan, true, false));
-			break;
+		break;
+        case MENU_TYPE::LOAD:
+            name = "Load";
+            menu_options.push_back(MenuOption(std::string("Video"), NULL, true, true));
+            menu_options.push_back(MenuOption(std::string("Plugin"), NULL, true, true));
+            menu_options.push_back(MenuOption(std::string("Shader"), NULL, true, true));
+        break;
 	}
 	height = gui.menu_text_height + gui.menu_text_buffer * 2;
 	//get thiccest menu option
@@ -95,10 +108,11 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 	sf::Vector2i new_menu_pos = pos + sf::Vector2i(menu_options_width, 0);
 	for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it) {
 		if ((*it).has_submenu) {
+
+          Menu * new_menu;
 			switch (type) {
 			case MENU_TYPE::NEW:
 
-				Menu * new_menu;
 				switch (submenu_index) {
 				case 0:
 					new_menu = new Menu();
@@ -124,6 +138,27 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 					break;
 				}
 				break;
+            case MENU_TYPE::LOAD:
+              switch (submenu_index) {
+              case 0: 
+                new_menu = new Menu();
+                new_menu->initialize(MENU_TYPE::LOADVIDEO, new_menu_pos);
+                submenus.push_back(new_menu);
+                break;
+              case 1:
+                new_menu = new Menu();
+                new_menu->initialize(MENU_TYPE::LOADPLUGIN, new_menu_pos);
+                submenus.push_back(new_menu);
+                break;
+              case 2:
+                new_menu = new Menu();
+                new_menu->initialize(MENU_TYPE::LOADSHADER, new_menu_pos);
+                submenus.push_back(new_menu);
+                break;
+              default: break;
+
+              }
+              break;
 			}
 			submenu_index++;
 			new_menu_pos = new_menu_pos + sf::Vector2i(0, height);
@@ -166,8 +201,8 @@ void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 	}
 }
 
-void Menu::update(sf::Vector2i mouse_pos){
-	if (is_open){
+void Menu::update(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
+	/*if (is_open){
 		if ((mouse_pos.x >= pos.x
 			&& mouse_pos.y >= pos.y
 			&& mouse_pos.x < pos.x + rect.getSize().x
@@ -186,8 +221,14 @@ void Menu::update(sf::Vector2i mouse_pos){
 				}
 			}
 		}
-	}
-	
+	}*/
+    ResourceCache * cache = animation_manager->getResourceCache();
+    if (cache == NULL) return;
+    else {
+      for (auto it = cache->videos.begin(); it != cache->videos.end(); ++it) {
+        std::cout << *it << std::endl;
+      }
+    }
 }
 
 bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
@@ -219,11 +260,15 @@ bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation
 					&& mouse_pos.x < pos.x + menu_options_width
 					&& mouse_pos.y < pos.y + (ctr+1) * (height)){
 						void (AnimationManager::*clickFunc)() = (*it).clickFunc;
+                        std::vector<std::string> clickCommands = (*it).clickCommands;
 						if (clickFunc != NULL) {
 							(animation_manager->*clickFunc)();
 							is_open = false;
 							return true;
 						}
+                        else if (clickCommands.size() != 0) {
+                          animation_manager->processCommand(clickCommands);
+                        }
 						else if ((*it).has_submenu){
 							(*submenu_it)->is_open = !(*submenu_it)->is_open;
 							for (std::vector<Menu *>::iterator submenu_it_other = submenus.begin(); submenu_it_other != submenus.end(); ++submenu_it_other) {
@@ -244,9 +289,12 @@ bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation
 			//check if the click is in an open submenu dropdown
 			for (std::vector<Menu *>::iterator submenu_it = submenus.begin(); submenu_it != submenus.end(); ++submenu_it) {
 				if ((*submenu_it)->processLeftClick(mouse_pos, animation_manager)) {
+                  if (!(*submenu_it)->is_open)
+                    is_open = false;
 					return true;
 				}
 			}
+            is_open = false;
 			return false;
 		}
 		return false;

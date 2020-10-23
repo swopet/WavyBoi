@@ -7,6 +7,7 @@ class SceneObject :
 {
 private:
 	bool ready;
+    bool valid;
 	std::string filename;
 	sf::Mutex ready_mutex;
 	WBScene * scene;
@@ -24,6 +25,7 @@ public:
 	Parameter getParameter();
 	bool getMultipleInputsAllowed(int ind) { return true; }
 	bool checkOverlap(sf::RectangleShape);
+    bool checkValid();
 	void setParameter(Parameter * parameter, int ind);
 	void setParamsToDefault();
 	void update();

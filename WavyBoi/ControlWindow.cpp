@@ -30,6 +30,10 @@ void ControlWindow::InitializeMenuTabs() {
 	Menu * display_menu = new Menu();
 	display_menu->initialize(MENU_TYPE::DISPLAY, pos);
 	menu_tabs.push_back(display_menu);
+    pos = pos + sf::Vector2i(display_menu->get_width(), 0);
+    Menu * load_menu = new Menu();
+    load_menu->initialize(MENU_TYPE::LOAD, pos);
+    menu_tabs.push_back(load_menu);
 }
 
 ControlWindow::ControlWindow(){
@@ -149,7 +153,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 				}
 			}
 		}
-		(*it)->update(sf::Mouse::getPosition(*window));
+		(*it)->update(sf::Mouse::getPosition(*window),animation_manager);
 	}
 	animation_manager->update();
 	window->setActive(true);
@@ -170,7 +174,7 @@ bool ControlWindow::update(AnimationManager * animation_manager){
 		drawCommandBox();
 	}
 	AudioHandler * audio_handler = animation_manager->getAudioHandler();
-	audio_handler->setPosition(sf::Vector2f(0, state.window_size.y - gui.outline_thickness * 4 - gui.audio_display_height - gui.audio_device_text_height - gui.play_24x24_tex.getSize().y));
+	audio_handler->setPosition(sf::Vector2f(0, state.window_size.y - gui.outline_thickness * 4 - gui.audio_display_height - gui.audio_device_text_height - gui.menu_text_buffer * 2 - gui.play_24x24_tex.getSize().y));
 	audio_handler->draw(*window, sf::RenderStates());
 	if (state.entering_text) {
 		drawTextEntered();
@@ -342,8 +346,7 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * 
 	//check if clicked on menu tabs first
 	if (!processed){
 		for (std::vector<Menu *>::iterator it = menu_tabs.begin(); it != menu_tabs.end(); ++it){
-			processed = (*it)->processLeftClick(mouse_pos,animation_manager);
-			if (processed) break;
+			processed = (processed || (*it)->processLeftClick(mouse_pos,animation_manager));
 		}
 	}
 	//then check if clicked on audio handler

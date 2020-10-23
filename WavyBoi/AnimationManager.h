@@ -33,9 +33,16 @@ struct AnimationManagerState {
 	bool edited = false;
 	bool display_open = false;
 	bool delete_selected = false;
+    bool resource_cache_updated = false;
 	std::string project_name;
 	std::string project_path;
 	double fps;
+};
+
+struct ResourceCache {
+  std::vector<std::string> videos;
+  std::vector<std::string> plugins;
+  std::vector<std::string> shaders;
 };
 
 struct ObjectNode {
@@ -46,9 +53,15 @@ struct ObjectNode {
 };
 
 class AnimationManager {
+  enum RESOURCE_TYPE {
+  VIDEO,
+  PLUGIN,
+  SHADER
+};
 private:
 	Preferences preferences;
 	AnimationManagerState state;
+    ResourceCache resource_cache;
 	std::vector<Object *> objects;
 	std::vector<Link *> links;
 	std::vector<Channel *> channels;
@@ -67,6 +80,10 @@ public:
 	std::vector<Object *> getObjects();
 	std::vector<Link *> getLinks();
 	bool processCommand(std::vector<std::string> args);
+    void loadResourceCache();
+    void writeResourceCache();
+    void updateResourceCache(std::string, RESOURCE_TYPE);
+    ResourceCache * getResourceCache();
 	void decrementLinkOutIndsGreaterThan(int, Object *);
 	void pushToTop(Object *);
 	void deleteObject(Object *);
