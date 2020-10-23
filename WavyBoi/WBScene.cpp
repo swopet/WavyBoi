@@ -55,7 +55,8 @@ void WBScene::setParameter(Parameter * param)
 
 WBScene::WBScene()
 {
-	
+  render_target = new sf::RenderTexture();
+  render_target->create(1920, 1080);
 }
 
 

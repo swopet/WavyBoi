@@ -5,13 +5,10 @@ AnimationManager::AnimationManager(){
 	preferences = Preferences();
 	preferences.loadConfigFromFile();
 	audio_handler = new AudioHandler();
-	//audio_handler = NULL;
-	//audio_handler->start(AudioHandler::AUDIO_FILE, std::string("C:/Users/Trevor/Stuff/Rearranger_Videos/Rearranger.wav"));
 	state.edited = false;
 	state.project_name = "untitled";
 	state.project_path = "";
     state.resource_cache_updated = false;
-	processCommand(std::vector<std::string>({ "loadVideo","C:/Users/Trevor/Stuff/VS/WavyBoi/test_files/fish.mp4" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 	std::cout << "Added new Channel" << std::endl; //debug7.9
@@ -217,10 +214,53 @@ void AnimationManager::loadResourceCache()
   resource_cache.videos.empty();
   resource_cache.plugins.empty();
   resource_cache.shaders.empty();
+  std::ifstream t("./WBCache.txt");
+  std::stringstream buffer;
+  buffer << t.rdbuf();
+  t.close();
+  std::string config_str = buffer.str();
+  int ctr = 0;
+  size_t pos = 0;
+  std::string line;
+  while ((pos = config_str.find("\n")) != std::string::npos) {
+    line = config_str.substr(0, pos);
+    size_t colon_pos = line.find(':');
+    if (colon_pos != std::string::npos) {
+      std::string key = line.substr(0, colon_pos);
+      line.erase(0, colon_pos + 1);
+      std::string value = line;
+      if (key.compare("video") == 0) {
+        resource_cache.videos.push_back(value);
+      }
+      if (key.compare("plugin") == 0) {
+        resource_cache.plugins.push_back(value);
+      }
+      if (key.compare("shader") == 0) {
+        resource_cache.shaders.push_back(value);
+      }
+    }
+    else {
+      std::cerr << "Invalid format on line " << ctr << " of config file!" << std::endl;
+    }
+    config_str.erase(0, pos + 1);
+    ctr++;
+  }
+  state.resource_cache_updated = true;
 }
 
 void AnimationManager::writeResourceCache()
 {
+  std::ofstream t("./WBCache.txt",std::ofstream::trunc);
+  for (auto it = resource_cache.videos.begin(); it != resource_cache.videos.end(); ++it) {
+    t << "video:" << *it << std::endl;
+  }
+  for (auto it = resource_cache.plugins.begin(); it != resource_cache.plugins.end(); ++it) {
+    t << "plugin:" << *it << std::endl;
+  }
+  for (auto it = resource_cache.shaders.begin(); it != resource_cache.shaders.end(); ++it) {
+    t << "shader:" << *it << std::endl;
+  }
+  t.close();
 }
 
 void AnimationManager::updateResourceCache(std::string path, RESOURCE_TYPE type)
@@ -244,6 +284,7 @@ void AnimationManager::updateResourceCache(std::string path, RESOURCE_TYPE type)
   }
   vec->push_back(path);
   std::cout << "added " << path << " to resource cache" << std::endl;
+  writeResourceCache();
   state.resource_cache_updated = true;
 }
 
