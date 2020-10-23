@@ -95,14 +95,7 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
         break;
 	}
 	height = gui.menu_text_height + gui.menu_text_buffer * 2;
-	//get thiccest menu option
-	menu_options_width = 0;
-	for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it){
-		text = sf::Text((*it).name,gui.font,gui.menu_text_height);
-		unsigned int width = (unsigned int)text.getLocalBounds().width;
-		if (width > menu_options_width) menu_options_width = width;
-	}
-	menu_options_width += gui.menu_text_buffer * 2;
+    updateOptionsWidth();
 	pos = new_pos;
 	int submenu_index = 0;
 	sf::Vector2i new_menu_pos = pos + sf::Vector2i(menu_options_width, 0);
@@ -174,6 +167,17 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 	rect.setOutlineColor(sf::Color(63,63,63));
 }
 
+void Menu::updateOptionsWidth() {
+  //get thiccest menu option
+  menu_options_width = 0;
+  for (std::vector<MenuOption>::iterator it = menu_options.begin(); it != menu_options.end(); ++it) {
+    text = sf::Text((*it).name, gui.font, gui.menu_text_height);
+    unsigned int width = (unsigned int)text.getLocalBounds().width;
+    if (width > menu_options_width) menu_options_width = width;
+  }
+  menu_options_width += gui.menu_text_buffer * 2;
+}
+
 void Menu::draw(sf::RenderTarget& target, sf::RenderStates states){
 	if (name.length() > 0) {
 		target.draw(rect, states);
@@ -222,11 +226,32 @@ void Menu::update(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
 			}
 		}
 	}*/
-    ResourceCache * cache = animation_manager->getResourceCache();
-    if (cache == NULL) return;
-    else {
-      for (auto it = cache->videos.begin(); it != cache->videos.end(); ++it) {
-        std::cout << *it << std::endl;
+    if (type == MENU_TYPE::LOAD) {
+      ResourceCache * cache = animation_manager->getResourceCache();
+      if (cache == NULL) return;
+      else {
+        std::vector<std::string> commands({"loadVideo","loadScene","loadShader"});
+        std::vector<std::vector<std::string> * > caches({&cache->videos,&cache->plugins,&cache->shaders});
+        for (int ind = 0; ind <= 2; ind++) {
+          std::cout << ind << std::endl;
+          submenus.at(ind)->menu_options.empty();
+          for (auto it = caches.at(ind)->begin(); it != caches.at(ind)->end(); ++it) {
+            std::cout << *it << std::endl;
+            size_t last_slash = -1;
+            size_t last_dot = -1;
+            for (size_t i = 0; i < it->length(); i++) {
+              if (it->at(i) == '/' || it->at(i) == '\\') {
+                last_slash = i + 1;
+              }
+              if (it->at(i) == '.') {
+                last_dot = i;
+              }
+            }
+            std::string shortened = it->substr(last_slash, last_dot - last_slash);
+            submenus.at(ind)->menu_options.push_back(MenuOption(shortened, std::vector<std::string>({ commands.at(ind),*it }), true, false));
+          }
+          submenus.at(ind)->updateOptionsWidth();
+        }
       }
     }
 }
@@ -267,6 +292,11 @@ bool Menu::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * animation
 							return true;
 						}
                         else if (clickCommands.size() != 0) {
+                          std::cout << "processing: ";
+                          for (auto it = clickCommands.begin(); it != clickCommands.end(); ++it) {
+                            std::cout << *it << " ";
+                          }
+                          std::cout << std::endl;
                           animation_manager->processCommand(clickCommands);
                         }
 						else if ((*it).has_submenu){

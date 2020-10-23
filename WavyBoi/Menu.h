@@ -14,7 +14,7 @@ protected:
 	MenuOption(std::string new_name, std::vector<std::string> new_commands, bool new_enabled, bool new_has_submenu = false) : name(new_name), clickCommands(new_commands), enabled(new_enabled), has_submenu(new_has_submenu) {}
     std::string name;
     std::vector<std::string> clickCommands;
-	void (AnimationManager::*clickFunc)();
+	void (AnimationManager::*clickFunc)() = NULL;
 	bool enabled;
 	bool has_submenu;
     friend class Menu;
@@ -54,6 +54,7 @@ public:
 	void toggleOption(int);
 	bool getOptionEnabled(int);
 	void initialize(MENU_TYPE,sf::Vector2i);
+    void updateOptionsWidth();
 	void draw(sf::RenderTarget&, sf::RenderStates);
 	void update(sf::Vector2i,AnimationManager *);
 	unsigned int get_width();
