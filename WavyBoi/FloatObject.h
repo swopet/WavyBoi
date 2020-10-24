@@ -17,6 +17,7 @@ public:
 	void initializeElements();
 	void updateGUIElements();
 	void setParameter(Parameter * parameter, int ind);
+    bool checkOverlap(sf::RectangleShape select_box);
 	void setParamsToDefault() { out_val = default_val; }
 	void setPrecision(int);
 	virtual Parameter * getNewParameter();

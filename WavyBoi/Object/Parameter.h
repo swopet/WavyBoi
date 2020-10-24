@@ -3,7 +3,8 @@
 #include <SFML/Graphics.hpp>
 
 enum class PARAM_TYPE {
-	TEXTURE,
+	VIDEO_TEXTURE,
+    SHADER_TEXTURE,
 	TEXT,
 	FLOAT,
 	INT,

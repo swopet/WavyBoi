@@ -10,7 +10,7 @@ void Channel::setParameter(Parameter * parameter, int ind)
 {
 	switch (ind) {
 	case 0:
-		if (parameter->getType() == PARAM_TYPE::TEXTURE) {
+		if (parameter->getType() == PARAM_TYPE::VIDEO_TEXTURE || parameter->getType() == PARAM_TYPE::SHADER_TEXTURE) {
 			render_texture = parameter->getValue().texture;
 		}
 		break;
@@ -45,14 +45,14 @@ bool Channel::getMultipleInputsAllowed(int ind)
 	}
 }
 
-PARAM_TYPE Channel::getParamTypeForInput(int ind = 0)
+std::vector<PARAM_TYPE> Channel::getParamTypesForInput(int ind = 0)
 {
 	switch (ind) {
 	case 0:
-		return PARAM_TYPE::TEXTURE;
+      return std::vector<PARAM_TYPE>({ PARAM_TYPE::VIDEO_TEXTURE,PARAM_TYPE::SHADER_TEXTURE });
 		break;
 	default:
-		return PARAM_TYPE::NONE;
+		return std::vector<PARAM_TYPE>();
 	}
 }
 

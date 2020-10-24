@@ -72,6 +72,11 @@ void FloatObject::setParameter(Parameter * parameter, int ind)
 	}
 }
 
+bool FloatObject::checkOverlap(sf::RectangleShape select_box)
+{
+  return checkIntersection(select_box.getGlobalBounds(), elements.at(0).getGlobalBounds());
+}
+
 void FloatObject::setPrecision(int precision_)
 {
 	precision = precision_;

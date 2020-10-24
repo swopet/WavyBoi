@@ -93,11 +93,12 @@ void Video::update() {
               }
             }
             if (loop_time != sf::seconds(0.0)) {
-              if (movie->getPlayingOffset() > loop_start + loop_time) {
+              if (movie->getPlayingOffset() > loop_start + loop_time || movie->getPlayingOffset() < loop_start) {
                 if (loop) {
                   if (!movie->setPlayingOffset(loop_start)) {
                     std::cout << "invalid loop start time" << std::endl;
                   }
+                  movie->play();
                 }
                 else {
                   movie->pause();
@@ -177,7 +178,7 @@ Parameter * Video::getNewParameter()
 	else {
 		return_param.texture = NULL;
 	}
-	return new Parameter(PARAM_TYPE::TEXTURE, return_param, name);
+	return new Parameter(PARAM_TYPE::VIDEO_TEXTURE, return_param, name);
 }
 
 Parameter Video::getParameter()
@@ -190,7 +191,7 @@ Parameter Video::getParameter()
 	else {
 		return_param.texture = NULL;
 	}
-	return Parameter(PARAM_TYPE::TEXTURE,return_param,name);
+	return Parameter(PARAM_TYPE::VIDEO_TEXTURE,return_param,name);
 }
 
 bool Video::getMultipleInputsAllowed(int ind)

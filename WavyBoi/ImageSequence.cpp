@@ -182,7 +182,7 @@ Parameter * ImageSequence::getNewParameter()
 	else {
 		return_param.texture = NULL;
 	}
-	return new Parameter(PARAM_TYPE::TEXTURE, return_param, name);
+	return new Parameter(PARAM_TYPE::VIDEO_TEXTURE, return_param, name);
 }
 
 Parameter ImageSequence::getParameter()
@@ -195,7 +195,7 @@ Parameter ImageSequence::getParameter()
 	else {
 		return_param.texture = NULL;
 	}
-	return Parameter(PARAM_TYPE::TEXTURE, return_param, name);
+	return Parameter(PARAM_TYPE::VIDEO_TEXTURE, return_param, name);
 }
 
 sf::Vector2f ImageSequence::getLeftPos(unsigned int id = 0)

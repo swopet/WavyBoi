@@ -43,7 +43,7 @@ public:
     virtual void clearParameter(Parameter * parameter, int ind) {}
 	virtual void setParamsToDefault() {};
 	virtual bool getMultipleInputsAllowed(int) { return false; }
-	virtual PARAM_TYPE getParamTypeForInput(int ind = 0) { return PARAM_TYPE::NONE; }
+    virtual std::vector<PARAM_TYPE> getParamTypesForInput(int ind = 0) { return std::vector<PARAM_TYPE>(); }
 	virtual void setParameter(Parameter * parameter, int ind){}
 	void setParameter(Parameter * parameter) {
 		setParameter(parameter, 0);

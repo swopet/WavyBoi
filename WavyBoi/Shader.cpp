@@ -71,9 +71,15 @@ void Shader::update() {
     shader->setUniform("iResolution", sf::Vector2f(render_texture->getSize()));
     for (auto it = params.begin(); it != params.end(); ++it) {
       switch ((*it)->getType()) {
-      case PARAM_TYPE::TEXTURE:
+      case PARAM_TYPE::VIDEO_TEXTURE:
         shader->setUniform((*it)->getName(), *(*it)->getValue().texture);
         shader->setUniform((*it)->getName() + std::string("_set"), 1);
+        shader->setUniform((*it)->getName() + std::string("_flip"), 1);
+        break;
+      case PARAM_TYPE::SHADER_TEXTURE:
+        shader->setUniform((*it)->getName(), *(*it)->getValue().texture);
+        shader->setUniform((*it)->getName() + std::string("_set"), 1);
+        shader->setUniform((*it)->getName() + std::string("_flip"), 0);
         break;
       case PARAM_TYPE::FLOAT:
         shader->setUniform((*it)->getName(), (*it)->getValue().float_val);
@@ -101,7 +107,8 @@ void Shader::clearParameter(Parameter * param, int index)
 {
   if (index != 0 || shader == NULL) return;
   switch (param->getType()) {
-  case PARAM_TYPE::TEXTURE:
+  case PARAM_TYPE::VIDEO_TEXTURE:
+  case PARAM_TYPE::SHADER_TEXTURE:
     shader->setUniform(param->getName() + std::string("_set"), 0);
     break;
   case PARAM_TYPE::FLOAT:
@@ -127,7 +134,7 @@ Parameter Shader::getParameter()
     return_param.texture = NULL;
   }
   ready_mutex.unlock();
-  return Parameter(PARAM_TYPE::TEXTURE, return_param, name);
+  return Parameter(PARAM_TYPE::SHADER_TEXTURE, return_param, name);
 }
 
 void Shader::setParameter(Parameter * parameter, int ind)

@@ -16,7 +16,7 @@ public:
 	void update();
 	bool checkOverlap(sf::RectangleShape select_box);
 	bool getMultipleInputsAllowed(int);
-	PARAM_TYPE getParamTypeForInput(int);
+	std::vector<PARAM_TYPE> getParamTypesForInput(int);
 	const sf::Texture * getTexture();
 	void initializeElements();
 	void updateGUIElements();

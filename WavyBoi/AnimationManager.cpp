@@ -9,7 +9,6 @@ AnimationManager::AnimationManager(){
 	state.project_name = "untitled";
 	state.project_path = "";
     state.resource_cache_updated = false;
-    processCommand(std::vector<std::string>({"loadShader","C:/Users/Trevor/Stuff/shaders/square_circles.frag"}));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 	std::cout << "Added new Channel" << std::endl;
@@ -546,17 +545,6 @@ void AnimationManager::update() {
 			}
 		}
 	}
-	/*for (std::vector<Object *>::iterator it = objects.begin(); it != objects.end(); ++it) {
-		(*it)->update();
-	}
-	for (std::vector<Link *>::iterator it = links.begin(); it != links.end(); ++it) {
-		(*it)->update();
-	}*/
-	/*for (int i = 0; i < 4; i++) {
-		if (channels[i] != NULL) {
-			channels[i]->update();
-		}
-	}*/
 }
 
 void AnimationManager::clickDisplayOpen(){

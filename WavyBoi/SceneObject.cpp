@@ -134,7 +134,7 @@ Parameter * SceneObject::getNewParameter()
 		return_param.texture = NULL;
 	}
 	ready_mutex.unlock();
-	return new Parameter(PARAM_TYPE::TEXTURE, return_param, name);
+	return new Parameter(PARAM_TYPE::SHADER_TEXTURE, return_param, name);
 }
 
 Parameter SceneObject::getParameter()
@@ -148,7 +148,7 @@ Parameter SceneObject::getParameter()
 		return_param.texture = NULL;
 	}
 	ready_mutex.unlock();
-	return Parameter(PARAM_TYPE::TEXTURE, return_param, name);
+	return Parameter(PARAM_TYPE::SHADER_TEXTURE, return_param, name);
 }
 
 bool SceneObject::checkOverlap(sf::RectangleShape select_box)
