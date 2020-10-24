@@ -486,7 +486,7 @@ void ControlWindow::processLeftClickRelease(sf::Vector2i mouse_pos, AnimationMan
 			if (response.clicked) {
 				if (response.type == CLICK_RESPONSE::GOT_LEFT) {
 					if (state.new_link->setOutObject((*it))) {
-						state.new_link->setOutInd(response.ind);
+						state.new_link->setOutIndex(response.ind);
 						//give control of the link to the animation manager
 						animation_manager->addLink(state.new_link);
 						state.new_link = NULL;

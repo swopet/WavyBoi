@@ -322,8 +322,8 @@ void AnimationManager::decrementLinkOutIndsGreaterThan(int ind, Object * obj)
 {
 	std::vector<Link *> links_to_remove;
 	for (std::unordered_set<Link *>::iterator it = obj_graph[obj].inputs.begin(); it != obj_graph[obj].inputs.end(); ++it) {
-		if ((*it)->getOutInd() > ind) (*it)->setOutInd((*it)->getOutInd() - 1);
-		else if ((*it)->getOutInd() == ind) links_to_remove.push_back(*it);
+		if ((*it)->getOutIndex() > ind) (*it)->setOutIndex((*it)->getOutIndex() - 1);
+		else if ((*it)->getOutIndex() == ind) links_to_remove.push_back(*it);
 	}
 	for (std::vector<Link*>::iterator it = links_to_remove.begin(); it != links_to_remove.end(); ++it){
 		deleteLink(*it);
@@ -375,10 +375,12 @@ void AnimationManager::deleteLink(Link * link_to_delete) {
 	//remove link from all objects
 	for (std::map<Object *, ObjectNode>::iterator it = obj_graph.begin(); it != obj_graph.end(); ++it) {
 		if (it->second.inputs.count(link_to_delete) == 1) {
+            it->first->clearParameter(link_to_delete->getParameterFromLink(),link_to_delete->getOutIndex());
 			it->second.inputs.erase(link_to_delete);
 			if (it->second.inputs.size() == 0) {
 				root_objects.push_back(it->first);
 			}
+            
 		}
 		if (it->second.outputs.count(link_to_delete) == 1) {
 			it->second.outputs.erase(link_to_delete);
@@ -396,10 +398,10 @@ void AnimationManager::addLink(Link * new_link)
 {
 	//TODO: check for loops!!
 	//We expect new_link->getOutObj() to not be null, otherwise we should have never entered this routine
-	if (new_link->getOutObj()->getMultipleInputsAllowed(new_link->getOutInd()) == false) {
+	if (new_link->getOutObj()->getMultipleInputsAllowed(new_link->getOutIndex()) == false) {
 		Link * link_to_delete = NULL;
 		for (std::unordered_set<Link *>::iterator it = obj_graph[new_link->getOutObj()].inputs.begin(); it != obj_graph[new_link->getOutObj()].inputs.end(); ++it) {
-			if ((*it)->getOutInd() == new_link->getOutInd()) {
+			if ((*it)->getOutIndex() == new_link->getOutIndex()) {
 				link_to_delete = *it;
 				break;
 			}
@@ -528,7 +530,7 @@ void AnimationManager::update() {
 						(*out_link_it)->update();
 						updated_links[*out_link_it] = true;
 						Object * new_obj = (*out_link_it)->getOutObj();
-						new_obj->setParameter((*out_link_it)->getParameterFromLink(),(*out_link_it)->getOutInd());
+						new_obj->setParameter((*out_link_it)->getParameterFromLink(),(*out_link_it)->getOutIndex());
 						if (new_obj != NULL) {
 							objects_to_update.push_back(new_obj);
 						}

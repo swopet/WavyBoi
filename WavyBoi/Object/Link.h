@@ -10,7 +10,7 @@ class Link : public Object {
 private:
 	Object * in;
 	Object * out; //out will only ever be NULL if the link is going into the display
-	int out_ind = 0;
+	int out_index = 0;
 	Parameter * parameter = NULL;
 	sf::Vector2f in_pos;
 	sf::Vector2f out_pos;
@@ -23,8 +23,8 @@ public:
 	Parameter * getParameterFromLink();
 	bool checkOverlap(sf::RectangleShape);
 	void draw(sf::RenderTarget&, sf::RenderStates);
-	void setOutInd(int);
-	int getOutInd();
+	void setOutIndex(int);
+	int getOutIndex();
 	ClickResponse processLeftClick(sf::Vector2i);
 	ClickResponse processDoubleLeftClick(sf::Vector2i mouse_pos);
 	Object * getInObj();

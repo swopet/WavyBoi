@@ -39,7 +39,7 @@ void Link::update()
 		in_pos = in->getRightPos();
 	}
 	if (out != NULL) {
-		out_pos = out->getLeftPos(out_ind);
+		out_pos = out->getLeftPos(out_index);
 	}
 	if (in != NULL) {
 		Parameter new_parameter = in->getParameter();
@@ -89,14 +89,14 @@ void Link::draw(sf::RenderTarget& target, sf::RenderStates states){
 	target.draw(text, states);
 }
 
-void Link::setOutInd(int new_ind)
+void Link::setOutIndex(int new_index)
 {
-	out_ind = new_ind;
+	out_index = new_index;
 }
 
-int Link::getOutInd()
+int Link::getOutIndex()
 {
-	return out_ind;
+	return out_index;
 }
 
 ClickResponse Link::processLeftClick(sf::Vector2i mouse_pos){

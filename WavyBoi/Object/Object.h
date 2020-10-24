@@ -40,6 +40,7 @@ public:
 	}
 	virtual void processNewString(std::string field, std::string input) {}
 	OBJECT_TYPE getObjectType() { return type; }
+    virtual void clearParameter(Parameter * parameter, int ind) {}
 	virtual void setParamsToDefault() {};
 	virtual bool getMultipleInputsAllowed(int) { return false; }
 	virtual PARAM_TYPE getParamTypeForInput(int ind = 0) { return PARAM_TYPE::NONE; }
