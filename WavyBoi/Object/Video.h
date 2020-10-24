@@ -13,6 +13,8 @@ private:
     sf::Time last_time;
     sf::Clock clock;
 	float speed = 1.0;
+    sf::Time loop_time;
+    sf::Time loop_start;
 	void init();
 	void togglePlay();
 	void stopAndReset();
@@ -26,6 +28,9 @@ public:
 	void updateGUIElements();
 	Parameter * getNewParameter();
 	Parameter getParameter();
+    bool getMultipleInputsAllowed(int);
+    void setParamsToDefault();
+    void setParameter(Parameter *, int);
 	bool checkOverlap(sf::RectangleShape);
 	void update();
 	void setSpeed(float new_speed);

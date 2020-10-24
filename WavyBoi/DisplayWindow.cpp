@@ -58,7 +58,7 @@ void DisplayWindow::open(AnimationManager * animation_manager){
 				  << mode.bitsPerPixel << " bpp" << std::endl;
 	}
 	Preferences preferences = animation_manager->getPreferences();
-	window = new sf::RenderWindow(sf::VideoMode(preferences.display_resolution.x, preferences.display_resolution.y), "WavyBoi - " + animation_manager->getName(), sf::Style::None);
+	window = new sf::RenderWindow(sf::VideoMode(preferences.display_resolution.x, preferences.display_resolution.y), "WavyBoi - " + animation_manager->getName() + " Display", sf::Style::None);
 	window->setPosition(preferences.display_position);
 }
 

@@ -92,10 +92,21 @@ void Video::update() {
                 std::cout << "failed to warp playback speed" << std::endl;
               }
             }
+            if (loop_time != sf::seconds(0.0)) {
+              if (movie->getPlayingOffset() > loop_start + loop_time) {
+                if (loop) {
+                  if (!movie->setPlayingOffset(loop_start)) {
+                    std::cout << "invalid loop start time" << std::endl;
+                  }
+                }
+                else {
+                  movie->pause();
+                }
+              }
+            }
 		}
 		movie->update();
 	}
-
 }
 
 void Video::setSpeed(float new_speed) {
@@ -180,6 +191,41 @@ Parameter Video::getParameter()
 		return_param.texture = NULL;
 	}
 	return Parameter(PARAM_TYPE::TEXTURE,return_param,name);
+}
+
+bool Video::getMultipleInputsAllowed(int ind)
+{
+  return (ind == 0);
+}
+
+void Video::setParamsToDefault()
+{
+  loop_time = sf::seconds(0.0);
+  loop_start = sf::seconds(0.0);
+}
+
+void Video::setParameter(Parameter * param, int ind)
+{
+  if (param->getName().compare("loop_time") == 0) {
+    switch (param->getType()) {
+    case PARAM_TYPE::FLOAT:
+      loop_time = sf::seconds(param->getValue().float_val);
+      break;
+    case PARAM_TYPE::INT:
+      loop_time = sf::seconds(param->getValue().int_val);
+      break;
+    }
+  }
+  if (param->getName().compare("loop_start") == 0) {
+    switch (param->getType()) {
+    case PARAM_TYPE::FLOAT:
+      loop_start = sf::seconds(param->getValue().float_val);
+      break;
+    case PARAM_TYPE::INT:
+      loop_start = sf::seconds(param->getValue().int_val);
+      break;
+    }
+  }
 }
 
 bool Video::checkOverlap(sf::RectangleShape select_box)

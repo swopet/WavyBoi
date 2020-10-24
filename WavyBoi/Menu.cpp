@@ -234,7 +234,7 @@ void Menu::update(sf::Vector2i mouse_pos, AnimationManager * animation_manager){
         std::vector<std::vector<std::string> * > caches({&cache->videos,&cache->plugins,&cache->shaders});
         for (int ind = 0; ind <= 2; ind++) {
           std::cout << ind << std::endl;
-          submenus.at(ind)->menu_options.empty();
+          submenus.at(ind)->menu_options.clear();
           for (auto it = caches.at(ind)->begin(); it != caches.at(ind)->end(); ++it) {
             std::cout << *it << std::endl;
             size_t last_slash = -1;
