@@ -28,8 +28,11 @@ void SceneObject::initializeElements()
 		main_box.setPosition(sf::Vector2f(0.0f, 0.0f));
 		GUIElement tex_box(GUIElement::RECTANGLE, size.x, size.y);
 		tex_box.setPosition(sf::Vector2f(-gui.outline_thickness, -gui.outline_thickness));
+        GUIElement loop_rect(GUIElement::RECTANGLE, 24, 24);
+        loop_rect.setPosition(sf::Vector2f(0, 0));
 		elements.push_back(main_box);
 		elements.push_back(tex_box);
+        elements.push_back(loop_rect);
 		GUIElement input_circle(GUIElement::CIRCLE, gui.obj_circle_radius);
 		input_circle.setPosition(sf::Vector2f(0.0f, size.y / 2.0f) +
 			sf::Vector2f(-gui.outline_thickness / 2.0f, -gui.outline_thickness / 2.0f) +
@@ -42,6 +45,7 @@ void SceneObject::initializeElements()
 			sf::Vector2f(-gui.obj_circle_radius, -gui.obj_circle_radius)
 		);
 		outputs.push_back(output_circle);
+        
 	}
 	ready_mutex.unlock();
 	updateGUIElements();
@@ -51,16 +55,18 @@ void SceneObject::updateGUIElements() {
 	ready_mutex.lock();
 	if (ready && scene != NULL)
 	{
-		if (elements.size() == 2) {
+		if (elements.size() == 3) {
 			elements.at(1).setTexture(scene->getTexture());
 		}
 	}
 	else {
-		if (elements.size() == 2) {
+		if (elements.size() == 3) {
 			elements.at(1).setTexture(NULL);
 		}
 	}
 	ready_mutex.unlock();
+    size_t loop_rect = 2;
+    if (elements.size() >= 3) elements.at(loop_rect).setTexture(&gui.loop_false_24x24_tex);
 	Object::updateGUIElements();
 }
 
@@ -71,7 +77,7 @@ SceneObject::SceneObject()
 	init();
 }
 
-SceneObject::SceneObject(WBScene * new_scene)
+SceneObject::SceneObject(Plugin * new_scene)
 {
 	scene = new_scene;
 	ready = true;
@@ -98,7 +104,7 @@ void SceneObject::loadScene()
         valid = false;
 		return;
 	}
-	auto ptr = reinterpret_cast<WBScene* (*)()>(GetProcAddress(hinst, "GetWBScene"));
+	auto ptr = reinterpret_cast<Plugin* (*)()>(GetProcAddress(hinst, "GetWBScene"));
 	scene = ptr();
 	ready_mutex.lock();
 	ready = true;
@@ -155,6 +161,27 @@ bool SceneObject::checkValid()
   return valid;
 }
 
+void SceneObject::reload()
+{
+  ready_mutex.lock();
+  if (ready && scene != NULL) {
+    delete scene;
+    scene = NULL;
+    ready = false;
+    valid = false;
+  }
+  ready_mutex.unlock();
+  if (hinst != NULL) {
+    if (FreeLibrary(hinst)) {
+      std::cout << "freed library at " << filename << std::endl;
+    }
+    else {
+      std::cout << "no library to free for deleted scene" << std::endl;
+    }
+  }
+  loadScene();
+}
+
 void SceneObject::setParameter(Parameter * parameter, int ind)
 {
 	if (ready && scene != NULL)
@@ -193,4 +220,23 @@ SceneObject::~SceneObject()
 			std::cout << "no library to free for deleted scene" << std::endl;
 		}
 	}
+}
+
+ClickResponse SceneObject::processLeftClick(sf::Vector2i mouse_pos) {
+  int loop_rect = 2;
+  ClickResponse response;
+  response.clicked = false;
+  response.type = CLICK_RESPONSE::NONE;
+  if (checkIntersection(elements.at(loop_rect).getGlobalBounds(), sf::Vector2f(mouse_pos))) {
+    reload();
+    response.clicked = true;
+    response.type = CLICK_RESPONSE::PROCESSED;
+  }
+  if (response.clicked) {
+    return response;
+  }
+  else {
+    response = Object::processLeftClick(mouse_pos);
+  }
+  return response;
 }

@@ -2,12 +2,12 @@
 #include "WBScene.h"
 
 
-void WBScene::update()
+void Plugin::update()
 {
 	draw();
 }
 
-void WBScene::draw()
+void Plugin::draw()
 {
 	//DRAW EVERYTHING
 	render_target->setActive();
@@ -39,11 +39,11 @@ void WBScene::draw()
 	render_target->display();
 }
 
-void WBScene::setParamsToDefault()
+void Plugin::setParamsToDefault()
 {
 }
 
-void WBScene::setParameter(Parameter * param)
+void Plugin::setParameter(Parameter * param)
 {
 	const std::string key = param->getName();
 	Parameter new_param;
@@ -53,14 +53,14 @@ void WBScene::setParameter(Parameter * param)
 	params[key] = new_param;
 }
 
-WBScene::WBScene()
+Plugin::Plugin()
 {
   render_target = new sf::RenderTexture();
   render_target->create(1920, 1080);
 }
 
 
-WBScene::~WBScene()
+Plugin::~Plugin()
 {
 	if (render_target != NULL) {
 		delete render_target;

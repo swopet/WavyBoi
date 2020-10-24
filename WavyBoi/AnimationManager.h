@@ -13,6 +13,7 @@ rendering. */
 #include <Object/Link.h>
 #include <ImageSequence.h>
 #include <SceneObject.h>
+#include <Shader.h>
 #include <Multiplexer.h>
 #include <AudioHandler.h>
 #include <FreqBandBlock.h>

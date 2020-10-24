@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-class WBScene
+class Plugin
 {
 protected:
 	sf::ContextSettings context_settings;
@@ -24,7 +24,7 @@ public:
 		}
 		else return NULL;
 	}
-	WBScene();
-	virtual ~WBScene();
+	Plugin();
+	virtual ~Plugin();
 };
 

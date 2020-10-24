@@ -9,9 +9,10 @@ AnimationManager::AnimationManager(){
 	state.project_name = "untitled";
 	state.project_path = "";
     state.resource_cache_updated = false;
+    processCommand(std::vector<std::string>({"loadShader","C:/Users/Trevor/Stuff/shaders/square_circles.frag"}));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
-	std::cout << "Added new Channel" << std::endl; //debug7.9
+	std::cout << "Added new Channel" << std::endl;
     loadResourceCache();
 }
 
@@ -83,6 +84,24 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
             }
 		}
 	}
+    else if (args[0].compare("loadShader") == 0) {
+      if (args.size() != 2) {
+        std::cout << "usage: loadShader <PATH_TO_SHADER>" << std::endl;
+        return false;
+      }
+      else {
+        Shader * new_shader = new Shader(args[1]);
+        if (new_shader->checkValid()) {
+          addObject(new_shader);
+          updateResourceCache(args[1], SHADER);
+          return true;
+        }
+        else {
+          delete new_shader;
+          return false;
+        }
+      }
+    }
     else if (args[0].compare("setDisplayPosition") == 0) {
       if (args.size() != 3) {
         std::cout << "usage: setDisplayPosition <x> <y>" << std::endl;
