@@ -90,7 +90,30 @@ void Shader::update() {
     render_texture->display();
     sf::Shader::bind(NULL);
   }
+}
+
+void Shader::setParamsToDefault()
+{
   params.clear();
+}
+
+void Shader::clearParameter(Parameter * param, int index)
+{
+  if (index != 0 || shader == NULL) return;
+  switch (param->getType()) {
+  case PARAM_TYPE::TEXTURE:
+    shader->setUniform(param->getName() + std::string("_set"), 0);
+    break;
+  case PARAM_TYPE::FLOAT:
+    shader->setUniform(param->getName(), 0.0f);
+    shader->setUniform(param->getName() + std::string("_set"), 0);
+    break;
+  case PARAM_TYPE::INT:
+    shader->setUniform(param->getName(), 0);
+    shader->setUniform(param->getName() + std::string("_set"), 0);
+    break;
+  }
+  std::cout << "cleared " << param->getName() << " from shader" << std::endl;
 }
 
 Parameter Shader::getParameter()

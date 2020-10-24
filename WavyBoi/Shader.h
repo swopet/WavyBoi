@@ -16,6 +16,8 @@ public:
   void loadScene();
   void init();
   void update();
+  void setParamsToDefault();
+  void clearParameter(Parameter * param, int index);
   Parameter getParameter();
   void setParameter(Parameter * parameter, int ind);
   void updateGUIElements();
