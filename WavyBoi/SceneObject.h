@@ -20,7 +20,7 @@ protected:
 public:
 	SceneObject();
 	SceneObject(Plugin *);
-	void loadScene();
+	virtual void loadScene();
 	SceneObject(std::string);
 	Parameter * getNewParameter();
 	Parameter getParameter();

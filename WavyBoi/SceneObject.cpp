@@ -164,8 +164,8 @@ bool SceneObject::checkValid()
 void SceneObject::reload()
 {
   ready_mutex.lock();
-  if (ready && scene != NULL) {
-    delete scene;
+  if (ready) {
+    if (scene != NULL) delete scene;
     scene = NULL;
     ready = false;
     valid = false;
