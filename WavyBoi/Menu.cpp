@@ -54,6 +54,7 @@ void Menu::initialize(MENU_TYPE new_type,sf::Vector2i new_pos){
 			menu_options.push_back(MenuOption(std::string("Function"), NULL, true, true));
 			menu_options.push_back(MenuOption(std::string("Mux"), &AnimationManager::clickNewMux, true, false));
 			menu_options.push_back(MenuOption(std::string("Clock"), &AnimationManager::clickNewClock, true, false));
+            menu_options.push_back(MenuOption(std::string("Register"), &AnimationManager::clickNewRegister, true, false));
 		break;
 		case MENU_TYPE::COMPARATOR:
 			name = "";

@@ -24,6 +24,7 @@ rendering. */
 #include <FloatObject.h>
 #include <ClockObject.h>
 #include <MathFunction.h>
+#include <Register.h>
 #include <math.h>
 #include <map>
 #include <vector>
@@ -69,7 +70,8 @@ private:
 	std::map<Link *,bool> updated_links;
 	std::map<Object *, ObjectNode> obj_graph;
 	std::vector<Object *> root_objects;
-	std::vector<FreqBandBlock *> freq_band_objects;
+	std::vector<Object *> freq_band_objects;
+    std::vector<Object *> register_objects;
 	AudioHandler * audio_handler;
 public:
 	AnimationManager();
@@ -131,4 +133,5 @@ public:
 	void clickNewLog();
 	void clickNewMux();
 	void clickNewClock();
+    void clickNewRegister();
 };

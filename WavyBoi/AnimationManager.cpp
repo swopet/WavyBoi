@@ -9,6 +9,7 @@ AnimationManager::AnimationManager(){
 	state.project_name = "untitled";
 	state.project_path = "";
     state.resource_cache_updated = false;
+    processCommand(std::vector<std::string>({ "addRegister" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 	std::cout << "Added new Channel" << std::endl;
@@ -220,6 +221,14 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 		IntObject * new_int = new IntObject(val);
 		addObject(new_int);
 	}
+    else if (args[0].compare("addRegister") == 0) {
+    if (args.size() > 1) {
+      std::cout << "usage: addRegister" << std::endl;
+      return false;
+    }
+    Register * new_reg = new Register();
+    addObject(new_reg);
+    }
 	else {
 		std::cout << "unrecognized command" << std::endl;
 		return false;
@@ -340,6 +349,7 @@ void AnimationManager::pushToTop(Object * obj)
 }
 
 void AnimationManager::deleteObject(Object * object_to_delete) {
+  std::cout << "Deleting " << object_to_delete->getName() << std::endl;
 	while (obj_graph[object_to_delete].inputs.size() > 0) {
 		deleteLink(*obj_graph[object_to_delete].inputs.begin());
 	}
@@ -348,20 +358,26 @@ void AnimationManager::deleteObject(Object * object_to_delete) {
 	}
 	obj_graph.erase(object_to_delete);
 	if (object_to_delete->getObjectType() == OBJECT_TYPE::FREQBANDBLOCK) {
-		std::vector<FreqBandBlock *>::iterator position = freq_band_objects.begin();
-		while ((Object *)(*position) != object_to_delete) {
+		std::vector<Object *>::iterator position = freq_band_objects.begin();
+		while ((*position) != object_to_delete) {
 			++position;
 		}
 		freq_band_objects.erase(position);
-		std::cout << "special deleted freq band block" << std::endl;
 	}
+    if (object_to_delete->getObjectType() == OBJECT_TYPE::REGISTER) {
+      std::vector<Object *>::iterator position = register_objects.begin();
+      while ((*position) != object_to_delete) {
+        ++position;
+      }
+      register_objects.erase(position);
+    }
 	std::vector<Object *>::iterator position = objects.begin();
 	while ((*position) != object_to_delete) {
 		++position;
 	}
 	objects.erase(position);
 	position = root_objects.begin();
-	while ((*position) != object_to_delete) {
+	while ((*position) != object_to_delete && position != root_objects.end()) {
 		++position;
 	}
 	if (position != root_objects.end()) {
@@ -377,7 +393,10 @@ void AnimationManager::deleteLink(Link * link_to_delete) {
             it->first->clearParameter(link_to_delete->getParameterFromLink(),link_to_delete->getOutIndex());
 			it->second.inputs.erase(link_to_delete);
 			if (it->second.inputs.size() == 0) {
-				root_objects.push_back(it->first);
+              if (it->first->getObjectType() != OBJECT_TYPE::REGISTER) {
+                std::cout << "adding " << it->first->getName() << " to roots" << std::endl;
+                root_objects.push_back(it->first);
+              }
 			}
             
 		}
@@ -419,7 +438,7 @@ void AnimationManager::addLink(Link * new_link)
 	if (out != NULL) {
 		obj_graph[out].inputs.insert(new_link);
 		//if it was a root, remove it from the root list
-		if (obj_graph[out].inputs.size() == 1) {
+		if (obj_graph[out].inputs.size() == 1 && out->getObjectType() != OBJECT_TYPE::REGISTER) {
 			std::vector<Object *>::iterator position = root_objects.begin();
 			while ((*position) != out) {
 				++position;
@@ -435,12 +454,19 @@ void AnimationManager::addObject(Object * new_obj)
 	if (new_obj->getObjectType() == OBJECT_TYPE::FREQBANDBLOCK) {
 		freq_band_objects.push_back((FreqBandBlock *)new_obj);
 	}
+    
 	objects.push_back(new_obj);
 	ObjectNode new_node;
 	new_node.obj = new_obj;
 	new_node.updated = false;
 	obj_graph.insert(std::pair<Object *, ObjectNode>(new_obj,new_node));
-	root_objects.push_back(new_obj);
+    if (new_obj->getObjectType() == OBJECT_TYPE::REGISTER) {
+      register_objects.push_back((Register *)new_obj);
+    }
+    else {
+      std::cout << "adding " << new_obj->getName() << " to roots" << std::endl;
+      root_objects.push_back(new_obj);
+    }
 }
 
 void AnimationManager::addChannel(Channel * new_channel)
@@ -495,12 +521,12 @@ void AnimationManager::updateFPS(sf::Time frame_time)
 
 
 void AnimationManager::update() {
-	for (std::vector<FreqBandBlock *>::iterator it = freq_band_objects.begin(); it != freq_band_objects.end(); ++it) {
-		(*it)->sendRangeToHandler(audio_handler);
+	for (auto it = freq_band_objects.begin(); it != freq_band_objects.end(); ++it) {
+		((FreqBandBlock *)(*it))->sendRangeToHandler(audio_handler);
 	}
 	audio_handler->update();
-	for (std::vector<FreqBandBlock *>::iterator it = freq_band_objects.begin(); it != freq_band_objects.end(); ++it) {
-		(*it)->updateValsFromHandler(audio_handler);
+	for (auto it = freq_band_objects.begin(); it != freq_band_objects.end(); ++it) {
+        ((FreqBandBlock *)(*it))->updateValsFromHandler(audio_handler);
 	}
 	state.delete_selected = false;
 	for (std::map<Link *, bool>::iterator it = updated_links.begin(); it != updated_links.end(); ++it) {
@@ -510,7 +536,12 @@ void AnimationManager::update() {
 		it->first->setParamsToDefault();
 		it->second.updated = false;
 	}
-	for (std::vector<Object *>::iterator it = root_objects.begin(); it != root_objects.end(); ++it) {
+    for (std::vector<Object *>::iterator it = register_objects.begin(); it != register_objects.end(); ++it) {
+        ((Register *)(*it))->updateRegister();
+    }
+    std::vector<Object *> registers_and_roots = register_objects;
+    registers_and_roots.insert(registers_and_roots.end(), root_objects.begin(), root_objects.end());
+	for (std::vector<Object *>::iterator it = registers_and_roots.begin(); it != registers_and_roots.end(); ++it) {
 		std::vector<Object *> objects_to_update;
 		Object * curr_obj = (*it);
 		while (curr_obj != NULL) {
@@ -522,16 +553,18 @@ void AnimationManager::update() {
 						break;
 					}
 				}
-				if (ready) {
+				if (ready || curr_obj->getObjectType() == OBJECT_TYPE::REGISTER) {
 					curr_obj->update();
 					obj_graph[curr_obj].updated = true;
 					for (std::unordered_set<Link *>::iterator out_link_it = obj_graph[curr_obj].outputs.begin(); out_link_it != obj_graph[curr_obj].outputs.end(); ++out_link_it) {
 						(*out_link_it)->update();
 						updated_links[*out_link_it] = true;
 						Object * new_obj = (*out_link_it)->getOutObj();
-						new_obj->setParameter((*out_link_it)->getParameterFromLink(),(*out_link_it)->getOutIndex());
+                        Parameter * link_param = (*out_link_it)->getParameterFromLink();
+						new_obj->setParameter(link_param,(*out_link_it)->getOutIndex());
 						if (new_obj != NULL) {
-							objects_to_update.push_back(new_obj);
+                            if (new_obj->getObjectType() != OBJECT_TYPE::REGISTER)
+							  objects_to_update.push_back(new_obj);
 						}
 					}
 				}
@@ -735,4 +768,11 @@ void AnimationManager::clickNewClock()
 	ClockObject * new_clock = new ClockObject();
 	new_clock->setPosition(sf::Vector2f(32, 32));
 	addObject(new_clock);
+}
+
+void AnimationManager::clickNewRegister()
+{
+  Register * new_register = new Register();
+  new_register->setPosition(sf::Vector2f(32, 32));
+  addObject(new_register);
 }
