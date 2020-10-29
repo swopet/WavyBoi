@@ -67,6 +67,10 @@ bool ClockObject::checkOverlap(sf::RectangleShape select_box)
 	return false;
 }
 
+void ClockObject::setPlaying(bool new_playing) {
+  playing = new_playing;
+}
+
 ClickResponse ClockObject::processLeftClick(sf::Vector2i mouse_pos)
 {
 	int zero_s_rect = 1;

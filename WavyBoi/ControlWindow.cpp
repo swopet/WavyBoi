@@ -393,9 +393,14 @@ void ControlWindow::processLeftClick(sf::Vector2i mouse_pos, AnimationManager * 
 						break;
 					case CLICK_RESPONSE::GOT_RIGHT:
 						std::cout << "got right side of " << (*it)->getName() << std::endl;
-						state.new_link = new Link((*it), NULL, (*it)->getNewParameter());
-						state.linking = true;
-						state.linking = true;
+                        {
+                          Parameter * new_param = (*it)->getNewParameter();
+                          if (new_param != NULL) {
+                            state.new_link = new Link((*it), NULL, new_param);
+                            state.linking = true;
+                          }
+                          else state.linking = false;
+                        }
 						break;
 					case CLICK_RESPONSE::DELETED_MUX_INPUT:
 						animation_manager->decrementLinkOutIndsGreaterThan(response.ind,*it);

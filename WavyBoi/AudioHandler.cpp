@@ -77,7 +77,7 @@ void AudioHandler::start(AUDIO_MODE new_mode, std::string file_or_device_name)
 		audio_recorder = new WavyBoiRecorder();
 		audio_recorder->setSize(size);
 		audio_recorder->setDevice(name);
-		audio_recorder->start(44100);
+		audio_recorder->start(48000);
 		running = true;
 		normalize_request = true;
 		break;

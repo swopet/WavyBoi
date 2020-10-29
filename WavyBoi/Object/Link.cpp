@@ -9,7 +9,7 @@ Link::Link(Object * obj_in, Object *obj_out, Parameter *new_parameter)
 		in_pos = in->getRightPos();
 	}
 	if (out != NULL) {
-		out_pos = in->getLeftPos();
+		out_pos = out->getLeftPos();
 	}
 	else {
 		out_pos = in_pos;

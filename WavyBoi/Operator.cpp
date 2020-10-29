@@ -133,22 +133,22 @@ void Operator::update()
 	case OPERATOR::COMPARATOR:
 		switch (func.comparator) {
 		case COMPARATOR::EQ:
-			out_val.int_val = (l_val == r_val);
+			out_val.int_val = (l_val == r_val) ? 1 : 0;
 			break;
 		case COMPARATOR::NEQ:
-			out_val.int_val = (l_val != r_val);
+			out_val.int_val = (l_val != r_val) ? 1 : 0;
 			break;
 		case COMPARATOR::LT:
-			out_val.int_val = (l_val < r_val);
+			out_val.int_val = (l_val < r_val) ? 1 : 0;
 			break;
 		case COMPARATOR::LTE:
-			out_val.int_val = (l_val <= r_val);
+			out_val.int_val = (l_val <= r_val) ? 1 : 0;
 			break;
 		case COMPARATOR::GT:
-			out_val.int_val = (l_val > r_val);
+			out_val.int_val = (l_val > r_val) ? 1 : 0;
 			break;
 		case COMPARATOR::GTE:
-			out_val.int_val = (l_val >= r_val);
+			out_val.int_val = (l_val >= r_val) ? 1 : 0;
 			break;
 		}
 		break;

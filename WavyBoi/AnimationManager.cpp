@@ -9,7 +9,6 @@ AnimationManager::AnimationManager(){
 	state.project_name = "untitled";
 	state.project_path = "";
     state.resource_cache_updated = false;
-    processCommand(std::vector<std::string>({ "addRegister" }));
 	Channel * new_channel = new Channel(0);
 	addChannel(new_channel);
 	std::cout << "Added new Channel" << std::endl;
@@ -84,6 +83,50 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
             }
 		}
 	}
+    else if (args[0].compare("addBPM") == 0) {
+      if (args.size() != 2) {
+        std::cout << "usage: loadBPM <BPM>" << std::endl;
+        return false;
+      }
+      float val;
+      try {
+        val = std::stof(args[1]);
+      }
+      catch (std::invalid_argument ex) {
+        std::cout << "Invalid float: " << args[1] << std::endl;
+        return false;
+      }
+      if (val <= 0.0) return false;
+      FloatObject * float_bpm = new FloatObject(val);
+      FloatObject * float_60 = new FloatObject(60.0f);
+      ClockObject * new_clock = new ClockObject();
+      Operator * op1 = new Operator(ARITHMETIC::DIVIDEDBY);
+      Operator * op2 = new Operator(ARITHMETIC::DIVIDEDBY);
+      std::cout << "creating links" << std::endl;
+      Link * link1 = new Link(float_60, op1, float_60->getNewParameter());
+      link1->setOutIndex(0);
+      op1->setParameter(link1->getParameterFromLink(),0);
+      Link * link2 = new Link(float_bpm, op1, float_bpm->getNewParameter());
+      link2->setOutIndex(1);
+      op1->setParameter(link2->getParameterFromLink(), 1);
+      Link * link3 = new Link(new_clock, op2, new_clock->getNewParameter());
+      link3->setOutIndex(0);
+      Link * link4 = new Link(op1, op2, op1->getNewParameter());
+      link4->setOutIndex(1);
+
+      std::cout << "created all links" << std::endl;
+
+      new_clock->setPlaying(true);
+      addObject(float_60);
+      addObject(new_clock);
+      addObject(float_bpm);
+      addObject(op1);
+      addObject(op2);
+      addLink(link1);
+      addLink(link2);
+      addLink(link3);
+      addLink(link4);
+    }
     else if (args[0].compare("loadShader") == 0) {
       if (args.size() != 2) {
         std::cout << "usage: loadShader <PATH_TO_SHADER>" << std::endl;
@@ -183,23 +226,23 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
 			std::cout << "usage: addFloat <val>" << std::endl;
 			return false;
 		}
-			float val = 0.0;
+		float val = 0.0;
 
-			if (args.size() == 2) {
-				if (args[1].compare("pi") == 0) {
-					val = PI;
-				}
-				else {
-					try {
-						val = std::stof(args[1]);
-					}
-					catch (std::invalid_argument ex) {
-						std::cout << "Invalid float: " << args[1] << std::endl;
-						return false;
-					}
+		if (args.size() == 2) {
+			if (args[1].compare("pi") == 0) {
+				val = PI;
 			}
-			FloatObject * new_float = new FloatObject(val);
-			addObject(new_float);
+			else {
+				try {
+					val = std::stof(args[1]);
+				}
+				catch (std::invalid_argument ex) {
+					std::cout << "Invalid float: " << args[1] << std::endl;
+					return false;
+				}
+		    }
+		    FloatObject * new_float = new FloatObject(val);
+		    addObject(new_float);
 		}
 	}
 	else if (args[0].compare("addInt") == 0) {
@@ -428,10 +471,36 @@ void AnimationManager::addLink(Link * new_link)
 			deleteLink(link_to_delete);
 		}
 	}
+    Object * in, *out;
+    in = new_link->getInObj();
+    out = new_link->getOutObj();
+    std::unordered_set<Link *> forward_links = obj_graph[out].outputs;
+    Link * link_to_check = new_link;
+    while (link_to_check != NULL) {
+      forward_links.erase(link_to_check);
+      if (link_to_check->getOutObj()->getObjectType() == OBJECT_TYPE::REGISTER) {
+        link_to_check = forward_links.empty() ? NULL : *forward_links.begin();
+        continue;
+      }
+      if (link_to_check->getOutObj() == in) {
+        std::cout << "found a loop, will replace with register" << std::endl;
+        Register * new_register = new Register();
+        new_register->setPosition((in->getRightPos() + out->getLeftPos(new_link->getOutIndex()))/2.0f);
+        addObject(new_register);
+        Link * in_link = new Link(in, new_register, in->getNewParameter());
+        addLink(in_link);
+        Link * out_link = new Link(new_register, out, new_register->getNewParameter());
+        addLink(out_link);
+        delete new_link;
+        return;
+      }
+      for (auto it = obj_graph[link_to_check->getOutObj()].outputs.begin(); it != obj_graph[link_to_check->getOutObj()].outputs.end(); ++it) {
+        forward_links.insert(*it);
+      }
+      link_to_check = forward_links.empty() ? NULL : *forward_links.begin();
+    }
 	links.push_back(new_link);
-	Object * in, * out;
-	in = new_link->getInObj();
-	out = new_link->getOutObj();
+	
 	if (in != NULL) {
 		obj_graph[in].outputs.insert(new_link);
 	}
