@@ -15,12 +15,6 @@ ImageSequence::ImageSequence() {
 void ImageSequence::update() {
 	if (files.size() != 0) {
 		if (playing) {
-			/*sf::Time elapsed_time = clock.getElapsedTime() - last_time;
-			offset = offset + elapsed_time;
-			last_time = clock.getElapsedTime();
-			std::cout << offset.asSeconds() << std::endl;
-			int desired_frame = (int)(offset.asSeconds() * desired_FPS);
-			std::cout << "desired frame: " << desired_frame << std::endl;*/
 			current_file++;
 			if (current_file == files.size()) {
 				if (loop) {

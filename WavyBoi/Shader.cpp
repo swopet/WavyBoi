@@ -9,13 +9,13 @@ Shader::Shader() : SceneObject()
   texture_size = sf::Vector2u(1920, 1080);
 }
 
-Shader::Shader(std::string new_path) : SceneObject()
+Shader::Shader(std::string new_path, sf::Vector2u new_texture_size) : SceneObject()
 {
   std::cout << "load shader from " << new_path << std::endl;
   shader = NULL;
   ready = false;
   filename = new_path;
-  texture_size = sf::Vector2u(1920, 1080);
+  texture_size = new_texture_size;
   loadScene();
 }
 

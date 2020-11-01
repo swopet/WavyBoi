@@ -133,7 +133,7 @@ bool AnimationManager::processCommand(std::vector<std::string> args) {
         return false;
       }
       else {
-        Shader * new_shader = new Shader(args[1]);
+        Shader * new_shader = new Shader(args[1], preferences.display_resolution);
         if (new_shader->checkValid()) {
           addObject(new_shader);
           updateResourceCache(args[1], SHADER);
@@ -321,12 +321,15 @@ void AnimationManager::loadResourceCache()
 void AnimationManager::writeResourceCache()
 {
   std::ofstream t("./WBCache.txt",std::ofstream::trunc);
+  std::sort(resource_cache.videos.begin(), resource_cache.videos.end());
   for (auto it = resource_cache.videos.begin(); it != resource_cache.videos.end(); ++it) {
     t << "video:" << *it << std::endl;
   }
+  std::sort(resource_cache.plugins.begin(), resource_cache.plugins.end());
   for (auto it = resource_cache.plugins.begin(); it != resource_cache.plugins.end(); ++it) {
     t << "plugin:" << *it << std::endl;
   }
+  std::sort(resource_cache.shaders.begin(), resource_cache.shaders.end());
   for (auto it = resource_cache.shaders.begin(); it != resource_cache.shaders.end(); ++it) {
     t << "shader:" << *it << std::endl;
   }

@@ -74,15 +74,13 @@ void Multiplexer::setParameter(Parameter * parameter, int ind)
 			if (curr_selection < 1) curr_selection = 1;
 		}
 	}
-	if (ind == 1) {
-		out_type = parameter->getType();
-	}
 	if (ind == curr_selection) {
 		if (parameter->getType() == out_type) {
 			curr_value = parameter->getValue();
 		}
 		else {
-			
+          out_type = parameter->getType();
+          curr_value = parameter->getValue();
 		}
 	}
 }

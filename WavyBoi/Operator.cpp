@@ -109,7 +109,7 @@ void Operator::update()
 			else out_val.float_val = o_val;
 			break;
 		case ARITHMETIC::MODULO:
-			o_val = fmodf(l_val,r_val);
+			o_val = r_val == 0.0 ? l_val : fmodf(l_val,r_val);
 			if (left_type == PARAM_TYPE::INT) out_val.int_val = (int)o_val;
 			else out_val.float_val = o_val;
 			break;

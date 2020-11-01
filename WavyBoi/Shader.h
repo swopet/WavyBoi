@@ -12,7 +12,7 @@ private:
   sf::Vector2u texture_size;
 public:
   Shader();
-  Shader(std::string);
+  Shader(std::string, sf::Vector2u);
   void loadScene();
   void init();
   void update();
